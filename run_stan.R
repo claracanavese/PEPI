@@ -6,7 +6,7 @@ library(reshape2)
 library(patchwork)
 library(bayesplot)
 
-simulation_py <- read.csv("./GitHub/switching_process/Gillespy2/5t/1.2_1.5_0.01_0.001_5t_51p/simulations/switching_results_avg.csv") %>% tibble::as_tibble()
+simulation_py <- read.csv("./GitHub/Gillespy2/8t/1.2_1.5_0.001_0.01_8t_81p/simulations/switching_results_avg.csv") %>% tibble::as_tibble()
 # simulation_py <- readRDS("./GitHub/switching_process/Gillespy2/1.5_1.2_0.015_0.005_5t_51p/ODE.rds") #%>% tibble::as_tibble()
 # colnames(simulation_py) <- c('time','z_minus','z_plus','var_minus','var_plus','cov')
 # samples <- simulation_py[seq(101,501, by = 40),]
@@ -42,13 +42,13 @@ print(fit, pars = c("lambda_minus", "lambda_plus", "omega_minus", "omega_plus"),
 print(fit) 
 saveRDS(fit,"./GitHub/switching_process/Gillespy2/5t/1.2_1.5_0.01_0.001_5t_51p/gamma_1.5_280/fit_avg.rds")
 
-# simulation_py <- read.csv("./GitHub/switching_process/Gillespy2/1.5_1.2_0.005_0.015_8t_81p/simulations/switching_results_0.csv") %>% tibble::as_tibble()
-# simulation_py <- simulation_py[,-1]
-# t_samples = seq(1.0, 8.0, by = 0.7) %>% round(., 3)
-# samples = simulation_py %>% filter(simulation_py$time %in% t_samples)
-# # 
-# fit = readRDS("./GitHub/switching_process/Gillespy2/1.5_1.2_0.005_0.015_8t_81p/gamma_1.5_280/fit_0.rds")
-# print(fit, pars = c("lambda_minus", "lambda_plus", "omega_minus", "omega_plus"), digits_summary = 3)
+simulation_py <- read.csv("./Gillespy2/8t/1.2_1.5_0.001_0.01_8t_81p/simulations/switching_results_0.csv") %>% tibble::as_tibble()
+simulation_py <- simulation_py[,-1]
+t_samples = seq(1.0, 8.0, by = 0.7) %>% round(., 3)
+samples = simulation_py %>% filter(simulation_py$time %in% t_samples)
+
+fit = readRDS("./Gillespy2/8t/1.2_1.5_0.001_0.01_8t_81p/gamma_1.5_280/fit_0.rds")
+print(fit, pars = c("lambda_minus", "lambda_plus", "omega_minus", "omega_plus"), digits_summary = 3)
 
 bayesplot::mcmc_trace(fit, pars = c("lambda_minus", "lambda_plus", "omega_minus", "omega_plus"))
 ggsave("./GitHub/switching_process/Gillespy2/1.5_1.2_0.015_0.005_5t_51p/gamma_1.5_280/traceplot_0.png", width = 14, height = 12, dpi = 600)
@@ -110,15 +110,15 @@ posterior_omega_plus / prior_omega
 ggsave("./GitHub/switching_process/Gillespy2/5t/1.2_1.5_0.01_0.001_5t_51p/gamma_1.5_280/panel_avg.png", width = 12, height = 14, dpi = 600)
 
 # omega posteriors on same plot
-fit1 = readRDS("./GitHub/switching_process/Gillespy2/5t/1.2_1.5_0.01_0.001_5t_51p/gamma_1.5_280/fit_2.rds")
-print(fit1, pars = c("lambda_minus", "lambda_plus", "omega_minus", "omega_plus"), digits_summary = 3)
-
-fit2 = readRDS("./GitHub/switching_process/Gillespy2/5t/1.2_1.5_0.001_0.01_5t_51p/gamma_1.5_280/fit_1.rds")
-fit3 = readRDS("./GitHub/switching_process/Gillespy2/8t/1.2_1.5_0.001_0.01_8t_81p/gamma_1.5_280/fit_2.rds")
-fit4 = readRDS("./GitHub/switching_process/Gillespy2/8t/1.2_1.5_0.001_0.01_8t_81p/gamma_1.5_280/fit_3.rds")
-fit5 = readRDS("./GitHub/switching_process/Gillespy2/8t/1.2_1.5_0.001_0.01_8t_81p/gamma_1.5_280/fit_4.rds")
-fit6 = readRDS("./GitHub/switching_process/Gillespy2/8t/1.2_1.5_0.001_0.01_8t_81p/gamma_1.5_280/fit_avg.rds")
-posterior1 = as.data.frame(fit1); posterior2 = as.data.frame(fit2); posterior3 = as.data.frame(fit3); posterior4 = as.data.frame(fit4); posterior5 = as.data.frame(fit5); posterior6 = as.data.frame(fit6)
+fit1 = readRDS("./Gillespy2/8t/1.5_1.2_0.015_0.005_8t_81p/gamma_1.5_280/fit_0.rds")
+print(fit7, pars = c("lambda_minus", "lambda_plus", "omega_minus", "omega_plus"), digits_summary = 3)
+fit2 = readRDS("./Gillespy2/8t/1.5_1.2_0.015_0.005_8t_81p/gamma_1.5_280/fit_1.rds")
+fit3 = readRDS("./Gillespy2/8t/1.5_1.2_0.015_0.005_8t_81p/gamma_1.5_280/fit_2.rds")
+fit4 = readRDS("./Gillespy2/8t/1.5_1.2_0.015_0.005_8t_81p/gamma_1.5_280/fit_3.rds")
+fit5 = readRDS("./Gillespy2/8t/1.5_1.2_0.015_0.005_8t_81p/gamma_1.5_280/fit_4.rds")
+fit6 = readRDS("./Gillespy2/8t/1.5_1.2_0.015_0.005_8t_81p/gamma_1.5_280/fit_avg.rds")
+fit7 = readRDS("./Gillespy2/8t/1.5_1.2_0.015_0.005_8t_81p/gamma_1.5_280/fit_ode.rds")
+posterior1 = as.data.frame(fit1); posterior2 = as.data.frame(fit2); posterior3 = as.data.frame(fit3); posterior4 = as.data.frame(fit4); posterior5 = as.data.frame(fit5); posterior6 = as.data.frame(fit6); posterior7 = as.data.frame(fit7)
 posterior_omega_min = ggplot() + 
   geom_density(data = posterior1, aes(x = omega_minus, y = after_stat(density), colour = "0")) +
   geom_density(data = posterior2, aes(x = omega_minus, y = after_stat(density), colour = "1")) +
@@ -126,10 +126,11 @@ posterior_omega_min = ggplot() +
   geom_density(data = posterior4, aes(x = omega_minus, y = after_stat(density), colour = "3")) +
   geom_density(data = posterior5, aes(x = omega_minus, y = after_stat(density), colour = "4")) +
   geom_density(data = posterior6, aes(x = omega_minus, y = after_stat(density), colour = "avg")) +
+  geom_density(data = posterior7, aes(x = omega_minus, y = after_stat(density), colour = "ode")) +
   ggtitle("Posterior") + xlim(0,0.03) + xlab("omega_minus") + 
   theme(plot.title = element_text(hjust = 0.5)) + 
   scale_color_discrete(name = "") +
-  geom_vline(xintercept = 0.001, color = "black")
+  geom_vline(xintercept = 0.005, color = "black")
 posterior_omega_plus = ggplot() + 
   geom_density(data = posterior1, aes(x = omega_plus, y = after_stat(density), colour = "0")) +
   geom_density(data = posterior2, aes(x = omega_plus, y = after_stat(density), colour = "1")) +
@@ -137,13 +138,14 @@ posterior_omega_plus = ggplot() +
   geom_density(data = posterior4, aes(x = omega_plus, y = after_stat(density), colour = "3")) +
   geom_density(data = posterior5, aes(x = omega_plus, y = after_stat(density), colour = "4")) +
   geom_density(data = posterior6, aes(x = omega_plus, y = after_stat(density), colour = "avg")) +
+  geom_density(data = posterior7, aes(x = omega_plus, y = after_stat(density), colour = "ode")) +
   ggtitle("Posterior") + xlim(0,0.03) + xlab("omega_plus") + 
   theme(plot.title = element_text(hjust = 0.5)) + 
   scale_color_discrete(name = "") +
-  geom_vline(xintercept = 0.01, color = "black")
+  geom_vline(xintercept = 0.015, color = "black")
 
 (posterior_omega_min + posterior_omega_plus) / (prior_omega + prior_omega)
-ggsave("./GitHub/switching_process/Gillespy2/8t/1.2_1.5_0.01_0.001_8t_81p/gamma_1.5_280/omega_posterior.png", width = 14, height = 10, dpi = 600)
+ggsave("./Gillespy2/8t/1.5_1.2_0.015_0.005_8t_81p/omega_posterior_gamma_1.5_280.png", width = 14, height = 10, dpi = 600)
 
 
 # OLD MODEL
