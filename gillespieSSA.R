@@ -2,7 +2,7 @@ library("GillespieSSA2")
 
 # parameters
 params <- c(am=1.5, bm=0.0, ap=1.2, bp=0.0, om=0.01, op=0.001)
-final_time <- 3
+final_time <- 8
 sim_name <- "Switching Process"
 # initial state
 initial_state <- c(zm=1000, zp=100)
@@ -16,29 +16,19 @@ reactions <- list(
   reaction("om*zp", c(zm = +1), name = "switch_to_minus")
 )
 
-# exact method
-set.seed(1)
-out <- ssa(
-  initial_state = initial_state,
-  reactions = reactions,
-  params = params,
-  final_time = final_time,
-  method = ssa_exact(),
-  sim_name = sim_name, 
-  log_propensity = TRUE,
-  log_firings = TRUE
-)
-plot_ssa(out)
-print(out$stats)
-print(out$state)
-print(out$time)
-propensity <- out$propensity
-firings <- as.data.frame(cbind(out$time,out$firings))
-colnames(firings)[1] <- "time"
-sum(firings$switch_to_plus)
-sum(firings$switch_to_minus)
-first_plus = filter(firings,switch_to_plus == 1)[1,]$time
-first_minus = filter(firings,switch_to_minus == 1)[1,]$time
+# exact method, TOO SLOW
+# set.seed(1)
+# out <- ssa(
+#   initial_state = initial_state,
+#   reactions = reactions,
+#   params = params,
+#   final_time = final_time,
+#   method = ssa_exact(),
+#   sim_name = sim_name, 
+#   log_propensity = TRUE,
+#   log_firings = TRUE
+# )
+# plot_ssa(out)
 
 # explicit tau-leap
 set.seed(1)
@@ -47,10 +37,35 @@ out <- ssa(
   reactions = reactions,
   params = params,
   final_time = final_time,
-  method = ssa_etl(tau = 0.01),
-  sim_name = sim_name
+  method = ssa_etl(tau = 0.1),
+  sim_name = sim_name,
+  log_firings = TRUE
+)
+plot_ssa(out)
+firings <- as.data.frame(cbind(out$time,out$firings))
+colnames(firings)[1] <- "time"
+
+# binomial tau-leap
+set.seed(1)
+out <- ssa(
+  initial_state = initial_state,
+  reactions = reactions,
+  params = params,
+  final_time = final_time,
+  method = ssa_btl(mean_firings = 10),
+  sim_name = sim_name,
+  log_firings = TRUE
 )
 plot_ssa(out)
 
-saveRDS(out, file = "./simulations/gillespieSSA/out.Rdata")
-out$args
+firings <- as.data.frame(cbind(out$time,out$firings))
+colnames(firings)[1] <- "time"
+sum(firings$switch_to_plus)
+sum(firings$switch_to_minus)
+first_plus = filter(firings,switch_to_plus == 1)[1,]$time
+first_minus = filter(firings,switch_to_minus == 1)[1,]$time
+
+saveRDS(out, file = "./simulations/gillespieSSA2/out.Rdata")
+out1 <- readRDS("./simulations/gillespieSSA2/out.Rdata")
+
+rm(list = ls())
