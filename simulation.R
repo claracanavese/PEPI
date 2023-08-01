@@ -9,6 +9,8 @@ library(devtools)
 library(easypar)
 library(RColorBrewer)
 
+devtools::install_github("caravagnalab/easypar")
+
 # define parameters
 alpha_min = 15;beta_min = 0;alpha_plus = 10;beta_plus = 0;omega_p = 0.1;omega_m = 0.01
 
@@ -117,8 +119,6 @@ times_simulation2 <- function(alpha_min) {
 }
 
 el <- list(alpha_min)
-inputs <- list(el)[rep(1,10)]
-
 easypar::run(FUN = times_simulation2, PARAMS = inputs, parallel = TRUE)
 
 # standard procedure
@@ -143,8 +143,7 @@ plot <- output %>% ggplot(aes(time,Z, col=variable)) + ylab("Z") + geom_point() 
   scale_colour_manual(values=c(rgb(102,204,102,maxColorValue = 255),"#D5D139"))
 plot
 
-# ODE comparison
-
+# simulations and ODE comparison
 for (i in 0:14) {
   final_time <- paste("final_time", i, sep = "_")
   assign(final_time,read.csv(paste("./GitHub/switching_process/Gillespy2/1.2_1.5_0.015_0.005_8t_81p/switching_results_",i,".csv", sep="")) %>%
@@ -164,7 +163,6 @@ ode_sol <- readRDS("./simulations_time/ode_[10_15_00]_1.2.rds")
 ode_sol <- data.frame(t = ode_sol[,1], X = ode_sol[,2], Y = ode_sol[,3])
 options(scipen = 0)
 
-# plotting together
 plotmin <- ggplot() +
   geom_line(data = final_time_0[,-1], aes(time,z_minus, color = "0"), linewidth=0.8) +
   geom_line(data = final_time_1[,-1], aes(time,z_minus, color = "1"), linewidth=0.8) +
@@ -260,7 +258,22 @@ plotplus
 
 plotmin / plotplus
 
+# python VS R package
+final_time <- read.csv("./PEPI/Gillespy2/8t/1.5_1.2_0.001_0.01_8t_81p/simulations/switching_results_avg.csv") %>%
+  tibble::as_tibble()
+final_time2 <- readRDS("./R/1.5_1.2_0.01_0.001.rds")
 
+ggplot() +
+  geom_line(data = final_time, aes(time,z_minus, color = "0"), linewidth=0.8) +
+  geom_line(data = final_time2, aes(time,zm, color = "1"), linewidth=0.8) +
+  xlim(5,8)
+
+ggplot() +
+  geom_line(data = final_time, aes(time,z_plus, color = "0"), linewidth=0.8) +
+  geom_line(data = final_time2, aes(time,zp, color = "1"), linewidth=0.8) + 
+  xlim(5,8)
+
+###############################################################################
 plot1 <- final_time[,-1] %>% 
   reshape2::melt(id=c("t"), variable.name="type", value.name="Z") %>%
   ggplot() +
@@ -278,7 +291,6 @@ plot2 <- ode_sol %>%
   facet_grid(~type)  
 
 plot1 / plot2
-
 
 
 Zt_plots <- function(dat) {
