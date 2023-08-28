@@ -6,10 +6,10 @@ library(reshape2)
 library(patchwork)
 library(bayesplot)
 
-simulation_py <- read.csv("./GitHub/Gillespy2/8t/1.2_1.5_0.001_0.01_8t_81p/simulations/switching_results_avg.csv") %>% tibble::as_tibble()
-# simulation_py <- readRDS("./GitHub/switching_process/Gillespy2/1.5_1.2_0.015_0.005_5t_51p/ODE.rds") #%>% tibble::as_tibble()
+# simulation_py <- read.csv("./GitHub/Gillespy2/8t/1.2_1.5_0.001_0.01_8t_81p/simulations/switching_results_avg.csv") %>% tibble::as_tibble()
+simulation_py <- readRDS("./PEPI/simulations/simulation_359.rds") #%>% tibble::as_tibble()
 # colnames(simulation_py) <- c('time','z_minus','z_plus','var_minus','var_plus','cov')
-# samples <- simulation_py[seq(101,501, by = 40),]
+samples <- simulation_py[seq(12,82, by = 7),]
 
 simulation_py <- simulation_py[,-1]
 t_samples = seq(1.00, 8.00, by = 0.70) %>% round(., 3)
@@ -31,23 +31,23 @@ data_list <- list(
   n_times = nrow(samples),
   z0 = c(1000,100,0,0,0),
   t0 = simulation_py$time[1],
-  zminus = as.integer(samples$z_minus),
-  zplus = as.integer(samples$z_plus),
+  zminus = as.integer(samples$zm),
+  zplus = as.integer(samples$zp),
   t = samples$time
 )
-model <- rstan::stan_model("./GitHub/switching_process/regressionODE.stan")
+model <- rstan::stan_model("./PEPI/regressionODE.stan")
 fit <- rstan::sampling(model, data_list, chains=4, warmup=6000, iter=12000, cores=4)
 
 print(fit, pars = c("lambda_minus", "lambda_plus", "omega_minus", "omega_plus"), digits_summary = 3)
 print(fit) 
-saveRDS(fit,"./GitHub/switching_process/Gillespy2/5t/1.2_1.5_0.01_0.001_5t_51p/gamma_1.5_280/fit_avg.rds")
+saveRDS(fit,"./fit_11/fit_359.rds")
 
 simulation_py <- read.csv("./Gillespy2/8t/1.2_1.5_0.001_0.01_8t_81p/simulations/switching_results_0.csv") %>% tibble::as_tibble()
 simulation_py <- simulation_py[,-1]
 t_samples = seq(1.0, 8.0, by = 0.7) %>% round(., 3)
 samples = simulation_py %>% filter(simulation_py$time %in% t_samples)
 
-fit = readRDS("./Gillespy2/8t/1.2_1.5_0.001_0.01_8t_81p/gamma_1.5_280/fit_0.rds")
+fit = readRDS("./fit_10/fit_1.rds")
 print(fit, pars = c("lambda_minus", "lambda_plus", "omega_minus", "omega_plus"), digits_summary = 3)
 
 bayesplot::mcmc_trace(fit, pars = c("lambda_minus", "lambda_plus", "omega_minus", "omega_plus"))
