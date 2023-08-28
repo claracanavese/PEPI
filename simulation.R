@@ -9,22 +9,127 @@ library(devtools)
 library(easypar)
 library(RColorBrewer)
 
-devtools::install_github("caravagnalab/easypar")
+my_palette <- c(rgb(102,204,102,maxColorValue = 255),"#D5D139")
 
+# ODE solution
+odem <- function(t, lm, lp, om, op){
+  delta = (lm - lp)**2 + 4*om*op
+  alpha_hat = lm - lp + sqrt(delta)
+  c1 = (alpha_hat*1000 + 2*om*100)/(alpha_hat**2 + 4*om*op)
+  c2 = (2*op*1000 - alpha_hat*100)/(alpha_hat**2 + 4*om*op)
+  zm = exp((lm+lp)/2*t)*(c1*alpha_hat*exp(sqrt(delta)*t/2) + c2*2*om*exp(-sqrt(delta)*t/2))
+  return(zm)
+}
+odep <- function(t, lm, lp, om, op){
+  delta = (lm - lp)**2 + 4*om*op
+  alpha_hat = lm - lp + sqrt(delta)
+  c1 = (alpha_hat*1000 + 2*om*100)/(alpha_hat**2 + 4*om*op)
+  c2 = (2*op*1000 - alpha_hat*100)/(alpha_hat**2 + 4*om*op)
+  zp = exp((lm+lp)/2*t)*(c1*2*op*exp(sqrt(delta)*t/2) - c2*alpha_hat*exp(-sqrt(delta)*t/2))
+  return(zp)
+}
+
+ggplot() +
+  stat_function(fun = odem, args = list(lm = 1.5, lp = 1.0, om = 0.001, op = 0.01), color = my_palette[1]) +
+  stat_function(fun = odep, args = list(lm = 1.5, lp = 1.0, om = 0.001, op = 0.01), color = my_palette[2]) +
+  xlim(0,8)
+  
+
+# simulations and ODE comparison
+for (i in 0:19) {
+  sim <- paste("sim", i, sep = "_")
+  assign(sim,read.csv(paste("1.0_1.5_0.001_0.01_8t_81p_",i,".csv", sep="")) %>%
+    tibble::as_tibble())
+}
+
+plotmin <- ggplot() +
+  geom_line(data = sim_0[,-1], aes(time,z_minus,color="0"), linewidth=0.8) +
+  geom_line(data = sim_1[,-1], aes(time,z_minus,color="0"), linewidth=0.8) +
+  geom_line(data = sim_2[,-1], aes(time,z_minus,color="0"), linewidth=0.8) +
+  geom_line(data = sim_3[,-1], aes(time, z_minus,color="0"), linewidth=0.8) +
+  geom_line(data = sim_4[,-1], aes(time,z_minus,color="0"), linewidth=0.8) +
+  geom_line(data = sim_5[,-1], aes(time,z_minus,color="0"), linewidth=0.8) +
+  geom_line(data = sim_6[,-1], aes(time,z_minus,color="0"), linewidth=0.8) +
+  geom_line(data = sim_7[,-1], aes(time,z_minus,color="0"), linewidth=0.8) +
+  geom_line(data = sim_8[,-1], aes(time,z_minus,color="0"), linewidth=0.8) +
+  geom_line(data = sim_9[,-1], aes(time,z_minus,color="0"), linewidth=0.8) +
+  geom_line(data = sim_10[,-1], aes(time,z_minus,color="0"), linewidth=0.8) +
+  geom_line(data = sim_11[,-1], aes(time,z_minus,color="0"), linewidth=0.8) +
+  geom_line(data = sim_12[,-1], aes(time,z_minus,color="0"), linewidth=0.8) +
+  geom_line(data = sim_13[,-1], aes(time,z_minus,color="0"), linewidth=0.8) +
+  geom_line(data = sim_14[,-1], aes(time,z_minus,color="0"), linewidth=0.8) +
+  geom_line(data = sim_15[,-1], aes(time,z_minus,color="0"), linewidth=0.8) +
+  geom_line(data = sim_16[,-1], aes(time,z_minus,color="0"), linewidth=0.8) +
+  geom_line(data = sim_17[,-1], aes(time,z_minus,color="0"), linewidth=0.8) +
+  geom_line(data = sim_18[,-1], aes(time,z_minus,color="0"), linewidth=0.8) +
+  geom_line(data = sim_19[,-1], aes(time,z_minus,color="0"), linewidth=0.8) +
+  stat_function(fun = odem, args = list(lm = 1.0, lp = 1.5, om = 0.001, op = 0.01), aes(color="1"), linewidth = 0.8) +
+  scale_colour_manual(values = c(my_palette[1], "black"),labels = c('Simulations','ODE')) +
+  theme(axis.text = element_text(size = 10), axis.title = element_text(size = 14)) +
+  labs(x="t", y="z-", color = NULL) +
+  scale_y_continuous(limits = c(0,1.1e6), labels = function(x) format(x, scientific = TRUE)) +
+  theme(legend.text=element_text(size=12))
+plotmin
+
+
+plotplus <- ggplot() +
+  geom_line(data = sim_0[,-1], aes(time,z_plus, color = "0"), linewidth=0.8) +
+  geom_line(data = sim_1[,-1], aes(time,z_plus, color = "0"), linewidth=0.8) +
+  geom_line(data = sim_2[,-1], aes(time,z_plus, color = "0"), linewidth=0.8) +
+  geom_line(data = sim_3[,-1], aes(time,z_plus, color = "0"), linewidth=0.8) +
+  geom_line(data = sim_4[,-1], aes(time,z_plus, color = "0"), linewidth=0.8) +
+  geom_line(data = sim_5[,-1], aes(time,z_plus, color = "0"), linewidth=0.8) +
+  geom_line(data = sim_6[,-1], aes(time,z_plus, color = "0"), linewidth=0.8) +
+  geom_line(data = sim_7[,-1], aes(time,z_plus, color = "0"), linewidth=0.8) +
+  geom_line(data = sim_8[,-1], aes(time,z_plus, color = "0"), linewidth=0.8) +
+  geom_line(data = sim_9[,-1], aes(time,z_plus, color = "0"), linewidth=0.8) +
+  geom_line(data = sim_10[,-1], aes(time,z_plus, color = "0"), linewidth=0.8) +
+  geom_line(data = sim_11[,-1], aes(time,z_plus, color = "0"), linewidth=0.8) +
+  geom_line(data = sim_12[,-1], aes(time,z_plus, color = "0"), linewidth=0.8) +
+  geom_line(data = sim_13[,-1], aes(time,z_plus, color = "0"), linewidth=0.8) +
+  geom_line(data = sim_14[,-1], aes(time,z_plus, color = "0"), linewidth=0.8) +
+  geom_line(data = sim_15[,-1], aes(time,z_plus, color = "0"), linewidth=0.8) +
+  geom_line(data = sim_16[,-1], aes(time,z_plus, color = "0"), linewidth=0.8) +
+  geom_line(data = sim_17[,-1], aes(time,z_plus, color = "0"), linewidth=0.8) +
+  geom_line(data = sim_18[,-1], aes(time,z_plus, color = "0"), linewidth=0.8) +
+  geom_line(data = sim_19[,-1], aes(time,z_plus, color = "0"), linewidth=0.8) +
+  geom_function(fun = odep, args = list(lm = 1.0, lp = 1.5, om = 0.001, op = 0.01), aes(color = "1"), linewidth = 0.8) +
+  scale_colour_manual(values = c(my_palette[2], "black"),labels = c('Simulations','ODE')) +
+  theme(axis.text = element_text(size = 10), axis.title = element_text(size = 14)) +
+  scale_y_continuous(limits = c(0,1.1e6),labels = function(x) format(x, scientific = TRUE)) +
+  labs(x="t", y="z+", color = NULL) + theme(legend.text = element_text(size=12))
+plotplus
+
+plotmin + plotplus
+ggsave("./simVSode.png", width = 10, height = 3.5, dpi = 600)
+
+# python VS R package
+final_time <- read.csv("./PEPI/Gillespy2/8t/1.5_1.2_0.001_0.01_8t_81p/simulations/switching_results_avg.csv") %>%
+  tibble::as_tibble()
+final_time2 <- readRDS("./R/1.5_1.2_0.01_0.001.rds")
+
+ggplot() +
+  geom_line(data = final_time, aes(time,z_minus, color = "0"), linewidth=0.8) +
+  geom_line(data = final_time2, aes(time,zm, color = "1"), linewidth=0.8) +
+  xlim(5,8)
+
+ggplot() +
+  geom_line(data = final_time, aes(time,z_plus, color = "0"), linewidth=0.8) +
+  geom_line(data = final_time2, aes(time,zp, color = "1"), linewidth=0.8) + 
+  xlim(5,8)
+
+###############################################################################
+# OLD STUFF
 # define parameters
 alpha_min = 15;beta_min = 0;alpha_plus = 10;beta_plus = 0;omega_p = 0.1;omega_m = 0.01
-
 # population starting with 1 cell in state -
 Z_minus = 1; Z_plus = 0; time = 0
 Z <- c(Z_minus,Z_plus)
-
 # define stoichiometric vectors
 o1 <- c(1,0);o2 <- c(-1,0);o3 <- c(0,1);o4 <- c(0,1);o5 <- c(0,-1);o6 <- c(1,0)
 o <- rbind(o1,o2,o3,o4,o5,o6)
-
 # create tibble to store Z values for each t
 output <- tibble("t" = time,"Z-" = Z[1],"Z+" = Z[2])
-
 while (time < 1.0) { 
   a1 = alpha_min*Z[1]
   a2 = beta_min*Z[1]
@@ -42,7 +147,6 @@ while (time < 1.0) {
   Z <- Z+o[i,]
   output <- bind_rows(output,tibble("t" = time,"Z-" = Z[1],"Z+" = Z[2]))
 }
-
 times_simulation <- function(alpha_min, alpha_plus, beta_min, beta_plus, omega_m, omega_p, index) {
   # population starting with 1 cell in state -
   Z_minus = 1; Z_plus = 0; t = 0
@@ -79,48 +183,6 @@ times_simulation <- function(alpha_min, alpha_plus, beta_min, beta_plus, omega_m
   switching_times <- bind_rows(min_plus[1,],plus_min[1,])
   return(switching_times)
 }
-
-# failed attempt to use easypar :(
-times_simulation2 <- function(alpha_min) {
-  # population starting with 1 cell in state -
-  Z_minus = 1; Z_plus = 0; t = 0
-  Z <- c(Z_minus,Z_plus)
-  
-  # define stoichiometric vectors
-  o1 <- c(1,0);o2 <- c(-1,0);o3 <- c(-1,1);o4 <- c(0,1);o5 <- c(0,-1);o6 <- c(1,-1)
-  o <- rbind(o1,o2,o3,o4,o5,o6)
-  
-  # create tibbles to store switching times
-  min_plus <- tibble(t1 = numeric())
-  plus_min <- tibble(t2 = numeric())
-  
-  while (t < 0.5) { 
-    a1 = alpha_min*Z[1]
-    a2 = 0*Z[1]
-    a3 = 0.01*Z[1]
-    a4 = 10*Z[2]
-    a5 = 0*Z[2]
-    a6 = 0.1*Z[2]
-    a <- c(a1,a2,a3,a4,a5,a6)
-    a0 <- sum(a)
-    anorm <- a/a0
-    tau <- rexp(n = 1, rate = a0)
-    t <- t + tau
-    i <- rcat(1,anorm)
-    if (i == 3) {
-      min_plus <- bind_rows(min_plus,tibble("t1"=t))
-    } else if (i == 6) {
-      plus_min <- bind_rows(plus_min,tibble("t2"=t))
-    }
-    Z <- Z+o[i,]
-  }
-  switching_times <- bind_rows(min_plus[1,],plus_min[1,])
-  return(min_plus[1,])
-}
-
-el <- list(alpha_min)
-easypar::run(FUN = times_simulation2, PARAMS = inputs, parallel = TRUE)
-
 # standard procedure
 times = lapply(1:100, function(i){
   x <- times_simulation(alpha_min, alpha_plus, beta_min, beta_plus, omega_m, omega_p, i)
@@ -133,9 +195,7 @@ sapply(times, mean, na.rm = TRUE)
 sapply(times, sd, na.rm = TRUE)
 mean(times$t1, na.rm= TRUE)
 mean(times$t2, na.rm = TRUE)
-
 saveRDS(times, file = paste0("./simulations_time/times",alpha_min,"_",alpha_plus,"_",omega_p,"_",omega_m,".rds"))
-
 # save data in rds file
 saveRDS(output, file = paste0("./simulations_time/output_[15_10_01][0.96].rds"))
 output <- melt(output[,1:3], value.name = "Z", id = "t")
@@ -143,137 +203,6 @@ plot <- output %>% ggplot(aes(time,Z, col=variable)) + ylab("Z") + geom_point() 
   scale_colour_manual(values=c(rgb(102,204,102,maxColorValue = 255),"#D5D139"))
 plot
 
-# simulations and ODE comparison
-for (i in 0:14) {
-  final_time <- paste("final_time", i, sep = "_")
-  assign(final_time,read.csv(paste("./GitHub/switching_process/Gillespy2/1.2_1.5_0.015_0.005_8t_81p/switching_results_",i,".csv", sep="")) %>%
-    tibble::as_tibble())
-}
-
-for (i in 0:14) {
-  final_time <- paste("final_time1", i, sep = "_")
-  assign(final_time,read.csv(paste("./GitHub/switching_process/Gillespy2/1.2_1.5_0.005_0.015_8t_81p/switching_results_",i,".csv", sep="")) %>%
-           tibble::as_tibble())
-}
-
-final_time_15 <- read.csv("./GitHub/switching_process/Gillespy2/1.5_1.2_0.015_0.005_8t_81p/switching_results_avg.csv") %>%
-  tibble::as_tibble()
-
-ode_sol <- readRDS("./simulations_time/ode_[10_15_00]_1.2.rds")
-ode_sol <- data.frame(t = ode_sol[,1], X = ode_sol[,2], Y = ode_sol[,3])
-options(scipen = 0)
-
-plotmin <- ggplot() +
-  geom_line(data = final_time_0[,-1], aes(time,z_minus, color = "0"), linewidth=0.8) +
-  geom_line(data = final_time_1[,-1], aes(time,z_minus, color = "1"), linewidth=0.8) +
-  geom_line(data = final_time_2[,-1], aes(time,z_minus, color = "2"), linewidth=0.8) +
-  geom_line(data = final_time_3[,-1], aes(time, z_minus, color = "3"), linewidth=0.8) +
-  geom_line(data = final_time_4[,-1], aes(time,z_minus, color = "4"), linewidth=0.8) +
-  geom_line(data = final_time_5[,-1], aes(time,z_minus, color = "5"), linewidth=0.8) +
-  geom_line(data = final_time_6[,-1], aes(time,z_minus, color = "6"), linewidth=0.8) +
-  geom_line(data = final_time_7[,-1], aes(time,z_minus, color = "7"), linewidth=0.8) +
-  geom_line(data = final_time_8[,-1], aes(time,z_minus, color = "8"), linewidth=0.8) +
-  geom_line(data = final_time_9[,-1], aes(time,z_minus, color = "9"), linewidth=0.8) +
-  geom_line(data = final_time_10[,-1], aes(time,z_minus, color = "10"), linewidth=0.8) +
-  geom_line(data = final_time_11[,-1], aes(time,z_minus, color = "11"), linewidth=0.8) +
-  geom_line(data = final_time_12[,-1], aes(time,z_minus, color = "12"), linewidth=0.8) +
-  geom_line(data = final_time_13[,-1], aes(time,z_minus, color = "13"), linewidth=0.8) +
-  geom_line(data = final_time_14[,-1], aes(time,z_minus, color = "14"), linewidth=0.8) +
-  xlim(5,8)
-  #geom_line(data = final_time_15[,-1], aes(time,z_minus, color = "15"), linewidth=0.8) #+
-  # geom_line(data = ode_sol, aes(x = t, y = X), color = "black", linewidth=1.5) +
-  #scale_color_brewer(palette = "Paired")
-plotmin
-
-plotmin <- ggplot() +
-  geom_line(data = final_time_0[,-1], aes(time,z_minus, color = "0"), linewidth=0.8) +
-  geom_line(data = final_time_1[,-1], aes(time,z_minus, color = "0"), linewidth=0.8) +
-  geom_line(data = final_time_2[,-1], aes(time,z_minus, color = "0"), linewidth=0.8) +
-  geom_line(data = final_time_3[,-1], aes(time,z_minus, color = "0"), linewidth=0.8) +
-  geom_line(data = final_time_4[,-1], aes(time,z_minus, color = "0"), linewidth=0.8) +
-  geom_line(data = final_time_5[,-1], aes(time,z_minus, color = "0"), linewidth=0.8) +
-  geom_line(data = final_time_6[,-1], aes(time,z_minus, color = "0"), linewidth=0.8) +
-  geom_line(data = final_time_7[,-1], aes(time,z_minus, color = "0"), linewidth=0.8) +
-  geom_line(data = final_time_8[,-1], aes(time,z_minus, color = "0"), linewidth=0.8) +
-  geom_line(data = final_time_9[,-1], aes(time,z_minus, color = "0"), linewidth=0.8) +
-  geom_line(data = final_time_10[,-1], aes(time,z_minus, color = "0"), linewidth=0.8) +
-  geom_line(data = final_time1_0[,-1], aes(time,z_minus, color = "1"), linewidth=0.8) +
-  geom_line(data = final_time1_1[,-1], aes(time,z_minus, color = "1"), linewidth=0.8) +
-  geom_line(data = final_time1_2[,-1], aes(time,z_minus, color = "1"), linewidth=0.8) +
-  geom_line(data = final_time1_3[,-1], aes(time,z_minus, color = "1"), linewidth=0.8) +
-  geom_line(data = final_time1_4[,-1], aes(time,z_minus, color = "1"), linewidth=0.8) +
-  geom_line(data = final_time1_5[,-1], aes(time,z_minus, color = "1"), linewidth=0.8) +
-  geom_line(data = final_time1_6[,-1], aes(time,z_minus, color = "1"), linewidth=0.8) +
-  geom_line(data = final_time1_7[,-1], aes(time,z_minus, color = "1"), linewidth=0.8) +
-  geom_line(data = final_time1_8[,-1], aes(time,z_minus, color = "1"), linewidth=0.8) +
-  geom_line(data = final_time1_9[,-1], aes(time,z_minus, color = "1"), linewidth=0.8) +
-  geom_line(data = final_time1_10[,-1], aes(time,z_minus, color = "1"), linewidth=0.8)
-plotmin
-
-plotplus <- ggplot() +
-  geom_line(data = final_time_0[,-1], aes(time,z_plus, color = "0"), linewidth=0.8) +
-  geom_line(data = final_time_1[,-1], aes(time,z_plus, color = "0"), linewidth=0.8) +
-  geom_line(data = final_time_2[,-1], aes(time,z_plus, color = "0"), linewidth=0.8) +
-  geom_line(data = final_time_3[,-1], aes(time,z_plus, color = "0"), linewidth=0.8) +
-  geom_line(data = final_time_4[,-1], aes(time,z_plus, color = "0"), linewidth=0.8) +
-  geom_line(data = final_time_5[,-1], aes(time,z_plus, color = "0"), linewidth=0.8) +
-  geom_line(data = final_time_6[,-1], aes(time,z_plus, color = "0"), linewidth=0.8) +
-  geom_line(data = final_time_7[,-1], aes(time,z_plus, color = "0"), linewidth=0.8) +
-  geom_line(data = final_time_8[,-1], aes(time,z_plus, color = "0"), linewidth=0.8) +
-  geom_line(data = final_time_9[,-1], aes(time,z_plus, color = "0"), linewidth=0.8) +
-  geom_line(data = final_time_10[,-1], aes(time,z_plus, color = "0"), linewidth=0.8) +
-  geom_line(data = final_time1_0[,-1], aes(time,z_plus, color = "1"), linewidth=0.8) +
-  geom_line(data = final_time1_1[,-1], aes(time,z_plus, color = "1"), linewidth=0.8) +
-  geom_line(data = final_time1_2[,-1], aes(time,z_plus, color = "1"), linewidth=0.8) +
-  geom_line(data = final_time1_3[,-1], aes(time,z_plus, color = "1"), linewidth=0.8) +
-  geom_line(data = final_time1_4[,-1], aes(time,z_plus, color = "1"), linewidth=0.8) +
-  geom_line(data = final_time1_5[,-1], aes(time,z_plus, color = "1"), linewidth=0.8) +
-  geom_line(data = final_time1_6[,-1], aes(time,z_plus, color = "1"), linewidth=0.8) +
-  geom_line(data = final_time1_7[,-1], aes(time,z_plus, color = "1"), linewidth=0.8) +
-  geom_line(data = final_time1_8[,-1], aes(time,z_plus, color = "1"), linewidth=0.8) +
-  geom_line(data = final_time1_9[,-1], aes(time,z_plus, color = "1"), linewidth=0.8) +
-  geom_line(data = final_time1_10[,-1], aes(time,z_plus, color = "1"), linewidth=0.8)
-plotplus
-
-plotplus <- ggplot() +
-  geom_line(data = final_time_0[,-1], aes(time,z_plus, color = "0"), linewidth=0.8) +
-  geom_line(data = final_time_1[,-1], aes(time,z_plus, color = "1"), linewidth=0.8) +
-  geom_line(data = final_time_2[,-1], aes(time,z_plus, color = "2"), linewidth=0.8) +
-  geom_line(data = final_time_3[,-1], aes(time,z_plus, color = "3"), linewidth=0.8) +
-  geom_line(data = final_time_4[,-1], aes(time,z_plus, color = "4"), linewidth=0.8) +
-  geom_line(data = final_time_5[,-1], aes(time,z_plus, color = "5"), linewidth=0.8) +
-  geom_line(data = final_time_6[,-1], aes(time,z_plus, color = "6"), linewidth=0.8) +
-  geom_line(data = final_time_7[,-1], aes(time,z_plus, color = "7"), linewidth=0.8) +
-  geom_line(data = final_time_8[,-1], aes(time,z_plus, color = "8"), linewidth=0.8) +
-  geom_line(data = final_time_9[,-1], aes(time,z_plus, color = "9"), linewidth=0.8) +
-  geom_line(data = final_time_10[,-1], aes(time,z_plus, color = "10"), linewidth=0.8) +
-  geom_line(data = final_time_11[,-1], aes(time,z_plus, color = "11"), linewidth=0.8) +
-  geom_line(data = final_time_12[,-1], aes(time,z_plus, color = "12"), linewidth=0.8) +
-  geom_line(data = final_time_13[,-1], aes(time,z_plus, color = "13"), linewidth=0.8) +
-  geom_line(data = final_time_14[,-1], aes(time,z_plus, color = "14"), linewidth=0.8)
-  #geom_line(data = final_time_15[,-1], aes(time,z_plus, color = "15"), linewidth=0.8)
-  #geom_line(data = ode_sol, aes(x = time, y = Y), color = "black", linewidth=1) +
-  #scale_color_brewer(palette = "Paired")
-plotplus
-
-plotmin / plotplus
-
-# python VS R package
-final_time <- read.csv("./PEPI/Gillespy2/8t/1.5_1.2_0.001_0.01_8t_81p/simulations/switching_results_avg.csv") %>%
-  tibble::as_tibble()
-final_time2 <- readRDS("./R/1.5_1.2_0.01_0.001.rds")
-
-ggplot() +
-  geom_line(data = final_time, aes(time,z_minus, color = "0"), linewidth=0.8) +
-  geom_line(data = final_time2, aes(time,zm, color = "1"), linewidth=0.8) +
-  xlim(5,8)
-
-ggplot() +
-  geom_line(data = final_time, aes(time,z_plus, color = "0"), linewidth=0.8) +
-  geom_line(data = final_time2, aes(time,zp, color = "1"), linewidth=0.8) + 
-  xlim(5,8)
-
-###############################################################################
 plot1 <- final_time[,-1] %>% 
   reshape2::melt(id=c("t"), variable.name="type", value.name="Z") %>%
   ggplot() +
