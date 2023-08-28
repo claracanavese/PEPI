@@ -54,7 +54,7 @@ plot1ma <- final1a %>%
   ggplot(aes(x=z_minus)) + 
   geom_histogram(aes(y=after_stat(density)), fill = rgb(102,204,102,maxColorValue = 255), bins = 90, na.rm=TRUE) +
   stat_function(fun = dexp, args = list(rate = as.numeric(rate1a[1])), linewidth=0.6) +
-  theme(axis.text = element_text(size = 12), axis.title = element_text(size = 15)) +
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
   labs(x="z-",y="p(z-)") +
   scale_x_continuous(labels = function(x) format(x, scientific = TRUE), breaks = c(5e5,1e6))
 
@@ -62,15 +62,15 @@ plot1mb <- final1b %>%
   ggplot(aes(x=z_minus)) + 
   geom_histogram(aes(y=after_stat(density)), fill = rgb(102,204,102,maxColorValue = 255), bins = 90, na.rm=TRUE) +
   stat_function(fun = dexp, args = list(rate = as.numeric(rate1b[1])), linewidth=0.6) +
-  theme(axis.text = element_text(size = 12), axis.title = element_text(size = 15)) +
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
   labs(x="z-",y="p(z-)") +
-  scale_x_continuous(labels = function(x) format(x, scientific = TRUE),breaks = c(5e5,1e6))
+  scale_x_continuous(labels = function(x) format(x, scientific = TRUE),breaks = c(5e5,1e6)) 
 
 plot1mc <- final1c %>% 
   ggplot(aes(x=z_minus)) + 
   geom_histogram(aes(y=after_stat(density)), fill = rgb(102,204,102,maxColorValue = 255), bins = 90, na.rm=TRUE) +
   stat_function(fun = dexp, args = list(rate = as.numeric(rate1c[1])), linewidth=0.6) +
-  theme(axis.text = element_text(size = 12), axis.title = element_text(size = 15)) +
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
   labs(x="z-",y="p(z-)") +
   scale_x_continuous(labels = function(x) format(x, scientific = TRUE),breaks = c(5e5,1e6))
 
@@ -81,32 +81,66 @@ plot1pa <- final1a %>%
   ggplot(aes(x=z_plus)) + 
   geom_histogram(aes(y=after_stat(density)), fill = "#D5D139", bins = 80, na.rm = TRUE) +
   stat_function(fun = dexp, args = list(rate = as.numeric(rate1a[2])), linewidth=0.6) +
-  theme(axis.text = element_text(size = 12), axis.title = element_text(size = 14)) +
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
   labs(x="z+",y="p(z+)") + #ylim(0,0.0022) +
-  #ylim(0,0.015) + xlim(0,1000)
-  #scale_y_continuous(labels = function(x) format(x, scientific = TRUE),limits = c(0,1e-3)) +
-  scale_x_continuous(labels = function(x) format(x, scientific = TRUE), limits = c(0,5e3), breaks = c(2.5e3,5e3))
+  scale_x_continuous(labels = function(x) format(x, scientific = TRUE), limits = c(0,5e3), breaks = c(2e3,4e3)) +
+  scale_y_continuous(labels = function(x) format(x, scientific = TRUE), breaks = c(0,1.5e-3,3e-3))
 
 plot1pb <- final1b %>% 
   ggplot(aes(x=z_plus)) + 
   geom_histogram(aes(y=after_stat(density)), fill = "#D5D139", bins = 120, na.rm = TRUE) +
   stat_function(fun = dexp, args = list(rate = as.numeric(rate1b[2])), linewidth=0.6) +
-  theme(axis.text = element_text(size = 12), axis.title = element_text(size = 14)) +
-  scale_x_continuous(labels = function(x) format(x, scientific = TRUE), limits = c(0,2e4), breaks = c(1e4,2e4)) +
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
+  scale_x_continuous(labels = function(x) format(x, scientific = TRUE), limits = c(0,2.5e4), breaks = c(1e4,2e4)) +
+  scale_y_continuous(labels = function(x) format(x, scientific = TRUE), limits = c(0,1e-3), breaks = c(0,5e-4,1e-3)) +
   labs(x="z+",y="p(z+)")
 
 plot1pc <- final1c %>% 
   ggplot(aes(x=z_plus)) + 
   geom_histogram(aes(y=after_stat(density)), fill = "#D5D139", bins = 120, na.rm = TRUE) +
   stat_function(fun = dexp, args = list(rate = as.numeric(rate1c[2])), linewidth=0.6) +
-  theme(axis.text = element_text(size = 12), axis.title = element_text(size = 14)) +
-  scale_x_continuous(labels = function(x) format(x, scientific = TRUE), limits = c(0,2e4), breaks = c(1e4,2e4)) +
-  labs(x="z+",y="p(z+)") + ylim(0,6e-4)
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
+  scale_x_continuous(labels = function(x) format(x, scientific = TRUE), limits = c(0,2.5e4), breaks = c(1e4,2e4)) +
+  scale_y_continuous(labels = function(x) format(x, scientific = TRUE), limits = c(0,1e-3), breaks = c(0,5e-4,1e-3)) +
+  labs(x="z+",y="p(z+)") #+ ylim(0,6e-4)
 
 plot1pa + plot1pb + plot1pc
 (plot1ma + plot1mb + plot1mc) / (plot1pa + plot1pb + plot1pc)
 
 ggsave("./first_case.png",  width = 16, height = 8, dpi = 600)
+
+# size
+final1a <- final1a %>% mutate(z = z_plus + z_minus)
+final1b <- final1b %>% mutate(z = z_plus + z_minus)
+final1c <- final1c %>% mutate(z = z_plus + z_minus)
+
+ratetot1a = 1./(1./as.numeric(rate1a[1]) + 1./as.numeric(rate1a[2]))
+ratetot1b = 1./(1./as.numeric(rate1b[1]) + 1./as.numeric(rate1b[2]))
+ratetot1c = 1./(1./as.numeric(rate1c[1]) + 1./as.numeric(rate1c[2]))
+
+plot1a <- final1a %>% 
+  ggplot(aes(x=z)) + 
+  geom_histogram(aes(y=after_stat(density)), fill = rgb(102,204,102,maxColorValue = 255), bins = 90, na.rm=TRUE) +
+  stat_function(fun = dexp, args = list(rate = ratetot1a), linewidth=0.6) +
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
+  labs(x="z",y="p(z)") +
+  scale_x_continuous(labels = function(x) format(x, scientific = TRUE))
+
+plot1b <- final1b %>% 
+  ggplot(aes(x=z)) + 
+  geom_histogram(aes(y=after_stat(density)), fill = rgb(102,204,102,maxColorValue = 255), bins = 90, na.rm=TRUE) +
+  stat_function(fun = dexp, args = list(rate = ratetot1b), linewidth=0.6) +
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
+  labs(x="z",y="p(z)") +
+  scale_x_continuous(labels = function(x) format(x, scientific = TRUE))
+
+plot1c <- final1c %>% 
+  ggplot(aes(x=z)) + 
+  geom_histogram(aes(y=after_stat(density)), fill = rgb(102,204,102,maxColorValue = 255), bins = 90, na.rm=TRUE) +
+  stat_function(fun = dexp, args = list(rate = ratetot1c), linewidth=0.6) +
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
+  labs(x="z",y="p(z)") +
+  scale_x_continuous(labels = function(x) format(x, scientific = TRUE))
 
 # CASE 2
 
@@ -120,7 +154,7 @@ plot2ma <- final2a %>%
   ggplot(aes(x=z_minus)) + 
   geom_histogram(aes(y=after_stat(density)),fill = rgb(102,204,102,maxColorValue = 255), bins = 90, na.rm=TRUE) +
   stat_function(fun = dexp, args = list(rate = as.numeric(rate2a[1])), linewidth=0.6) +
-  theme(axis.text = element_text(size = 12), axis.title = element_text(size = 15)) +
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
   labs(x="z-",y="p(z-)") +
   scale_x_continuous(labels = function(x) format(x, scientific = TRUE), breaks = c(5e4,1e5))
 
@@ -129,7 +163,7 @@ plot2mb <- final2b %>%
   ggplot(aes(x=z_minus)) + 
   geom_histogram(aes(y=after_stat(density)),fill = rgb(102,204,102,maxColorValue = 255), bins = 90, na.rm=TRUE) +
   stat_function(fun = dexp, args = list(rate = as.numeric(rate2b[1])), linewidth=0.6) +
-  theme(axis.text = element_text(size = 12), axis.title = element_text(size = 15)) +
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
   labs(x="z-",y="p(z-)") +
   scale_x_continuous(labels = function(x) format(x, scientific = TRUE), breaks = c(5e4,1e5), limits = c(0,1.2e5))
 
@@ -138,7 +172,7 @@ plot2mc <- final2c %>%
   ggplot(aes(x=z_minus)) + 
   geom_histogram(aes(y=after_stat(density)),fill = rgb(102,204,102,maxColorValue = 255), bins = 90, na.rm=TRUE) +
   stat_function(fun = dexp, args = list(rate = as.numeric(rate2c[1])), linewidth=0.6) +
-  theme(axis.text = element_text(size = 12), axis.title = element_text(size = 15)) +
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
   labs(x="z-",y="p(z-)") +
   scale_x_continuous(labels = function(x) format(x, scientific = TRUE), breaks = c(5e4,1e5), limits = c(0,1.2e5))
 
@@ -150,9 +184,10 @@ plot2pa <- final2a %>%
   ggplot(aes(x=z_plus)) + 
   geom_histogram(aes(y=after_stat(density)),fill = "#D5D139", bins = 120, na.rm = TRUE) +
   stat_function(fun = dexp, args = list(rate = as.numeric(rate2a[2])), linewidth=0.6) +
-  theme(axis.text = element_text(size = 12), axis.title = element_text(size = 15)) +
-  scale_x_continuous(breaks = c(3e3,6e3,9e3), labels = function(x) format(x, scientific = TRUE),limits = c(0,9e3)) +
-  labs(x="z+",y="p(z+)")  + ylim(0,0.004)
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
+  scale_x_continuous(breaks = c(4e3,8e3), labels = function(x) format(x, scientific = TRUE),limits = c(0,9e3)) +
+  scale_y_continuous(labels = function(x) format(x, scientific = TRUE), limits = c(0,4e-3), breaks = c(0,2e-3,4e-3)) +
+  labs(x="z+",y="p(z+)")  #+ ylim(0,0.004)
 
 
 plot2pb <- final2b %>% 
@@ -160,23 +195,58 @@ plot2pb <- final2b %>%
   ggplot(aes(x=z_plus)) + 
   geom_histogram(aes(y=after_stat(density)),fill = "#D5D139", bins = 100, na.rm = TRUE) +
   stat_function(fun = dexp, args = list(rate = as.numeric(rate2b[2])), size=0.6) +
-  theme(axis.text = element_text(size = 12), axis.title = element_text(size = 15)) +
-  scale_x_continuous(breaks = c(3e3,6e3,9e3), labels = function(x) format(x, scientific = TRUE),limits = c(0,9e3)) +
-  labs(x="z+",y="p(z+)") + ylim(0,0.004)
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
+  scale_x_continuous(breaks = c(4e3,8e3), labels = function(x) format(x, scientific = TRUE),limits = c(0,9e3)) +
+  scale_y_continuous(labels = function(x) format(x, scientific = TRUE), limits = c(0,4e-3), breaks = c(0,2e-3,4e-3)) +
+  labs(x="z+",y="p(z+)") #+ ylim(0,0.004)
 
 plot2pc <- final2c %>% 
   #filter(`Z+` < 1000) %>% 
   ggplot(aes(x=z_plus)) + 
   geom_histogram(aes(y=after_stat(density)),fill = "#D5D139", bins = 100, na.rm = TRUE) +
   stat_function(fun = dexp, args = list(rate = as.numeric(rate2c[2])), size=0.6) +
-  theme(axis.text = element_text(size = 12), axis.title = element_text(size = 15)) +
-  scale_x_continuous(breaks = c(3e3,6e3,9e3), labels = function(x) format(x, scientific = TRUE),limits = c(0,9e3)) +
-  labs(x="z+",y="p(z+)") + ylim(0,0.004)
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
+  scale_x_continuous(breaks = c(4e3,8e3), labels = function(x) format(x, scientific = TRUE),limits = c(0,9e3)) +
+  scale_y_continuous(labels = function(x) format(x, scientific = TRUE), limits = c(0,4e-3), breaks = c(0,2e-3,4e-3)) +
+  labs(x="z+",y="p(z+)") #+ ylim(0,0.004)
 
 plot2pa + plot2pb + plot2pc
 (plot2ma + plot2mb + plot2mc) / (plot2pa + plot2pb + plot2pc)
 
 ggsave("./second_case.png",  width = 16, height = 8, dpi = 600)
+
+# size
+final2a <- final2a %>% mutate(z = z_plus + z_minus)
+final2b <- final2b %>% mutate(z = z_plus + z_minus)
+final2c <- final2c %>% mutate(z = z_plus + z_minus)
+
+ratetot2a = 1./(1./as.numeric(rate2a[1]) + 1./as.numeric(rate2a[2]))
+ratetot2b = 1./(1./as.numeric(rate2b[1]) + 1./as.numeric(rate2b[2]))
+ratetot2c = 1./(1./as.numeric(rate2c[1]) + 1./as.numeric(rate2c[2]))
+
+plot2a <- final2a %>% 
+  ggplot(aes(x=z)) + 
+  geom_histogram(aes(y=after_stat(density)), fill = rgb(102,204,102,maxColorValue = 255), bins = 90, na.rm=TRUE) +
+  stat_function(fun = dexp, args = list(rate = ratetot2a), linewidth=0.6) +
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
+  labs(x="z",y="p(z)") +
+  scale_x_continuous(labels = function(x) format(x, scientific = TRUE))
+
+plot2b <- final2b %>% 
+  ggplot(aes(x=z)) + 
+  geom_histogram(aes(y=after_stat(density)), fill = rgb(102,204,102,maxColorValue = 255), bins = 90, na.rm=TRUE) +
+  stat_function(fun = dexp, args = list(rate = ratetot2b), linewidth=0.6) +
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
+  labs(x="z",y="p(z)") +
+  scale_x_continuous(labels = function(x) format(x, scientific = TRUE))
+
+plot2c <- final2c %>% 
+  ggplot(aes(x=z)) + 
+  geom_histogram(aes(y=after_stat(density)), fill = rgb(102,204,102,maxColorValue = 255), bins = 90, na.rm=TRUE) +
+  stat_function(fun = dexp, args = list(rate = ratetot2c), linewidth=0.6) +
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
+  labs(x="z",y="p(z)") +
+  scale_x_continuous(labels = function(x) format(x, scientific = TRUE))
 
 # CASE 3
 
@@ -206,23 +276,28 @@ plot3ma <- final3a %>%
   ggplot(aes(x=z_minus)) +
   geom_histogram(aes(y=after_stat(density)), bins=80, fill=rgb(102,204,102,maxColorValue = 255), na.rm = TRUE) +
   geom_line(data=analytic1 %>% filter(type=="z_minus"), aes(x=z,y=P), linewidth=0.6) +
-  theme(axis.text = element_text(size = 12), axis.title = element_text(size = 15)) +
-  xlim(0,25000) + labs(x="z-",y="p(z-)")
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
+  scale_x_continuous(breaks = c(1e4,2e4), labels = function(x) format(x, scientific = TRUE),limits = c(0,2.5e4)) +
+  labs(x="z-",y="p(z-)")
 plot3ma
 
 plot3mb <- final3b %>% 
   ggplot(aes(x=z_minus)) +
   geom_histogram(aes(y=after_stat(density)), bins=80, fill=rgb(102,204,102,maxColorValue = 255), na.rm = TRUE) +
   geom_line(data=analytic2 %>% filter(type=="z_minus"), aes(x=z,y=P), linewidth=0.6) +
-  theme(axis.text = element_text(size = 12), axis.title = element_text(size = 15)) +
-  xlim(0,25000) + labs(x="z-",y="p(z-)")
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
+  scale_x_continuous(breaks = c(1e4,2e4), labels = function(x) format(x, scientific = TRUE),limits = c(0,2.5e4)) +
+  labs(x="z-",y="p(z-)")
 
 plot3mc <- final3c %>% 
   ggplot(aes(x=z_minus)) +
   geom_histogram(aes(y=after_stat(density)), bins=80, fill=rgb(102,204,102,maxColorValue = 255), na.rm = TRUE) +
   geom_line(data=analytic3 %>% filter(type=="z_minus"), aes(x=z,y=P), linewidth=0.6) +
-  theme(axis.text = element_text(size = 12), axis.title = element_text(size = 15)) +
-  xlim(0,25000) + labs(x="z-",y="p(z-)")
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
+  scale_x_continuous(breaks = c(1e4,2e4), labels = function(x) format(x, scientific = TRUE),limits = c(0,2.5e4)) +
+  labs(x="z-",y="p(z-)")
+
+(plot3ma + plot3mb + plot3mc)
 
 # plus
 
@@ -230,22 +305,33 @@ plot3pa <- final3a %>%
   ggplot(aes(x=z_plus)) +
   geom_histogram(aes(y=after_stat(density)), bins=150, fill="#D5D139", na.rm = TRUE) +
   geom_line(data=analytic1 %>% filter(type=="z_plus"), aes(x=z,y=P), linewidth=0.6) +
-  theme(axis.text = element_text(size = 12), axis.title = element_text(size = 15)) +
-  labs(x="z+",y="p(z+)") + xlim(0,50000) + ylim(0,2e-4)
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
+  scale_x_continuous(breaks = c(2e4,4e4), labels = function(x) format(x, scientific = TRUE),limits = c(0,5e4)) +
+  scale_y_continuous(labels = function(x) format(x, scientific = TRUE),limits = c(0,2e-4)) +
+  labs(x="z+",y="p(z+)")
 plot3p
 
 plot3pb <- final3b %>% 
   ggplot(aes(x=z_plus)) +
   geom_histogram(aes(y=after_stat(density)), bins=150, fill="#D5D139", na.rm = TRUE) +
   geom_line(data=analytic2 %>% filter(type=="z_plus"), aes(x=z,y=P), linewidth=0.6) +
-  theme(axis.text = element_text(size = 12), axis.title = element_text(size = 15)) +
-  labs(x="z+",y="p(z+)") + xlim(0,50000) + ylim(0,2e-4)
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
+  scale_x_continuous(breaks = c(2e4,4e4), labels = function(x) format(x, scientific = TRUE),limits = c(0,5e4)) +
+  scale_y_continuous(labels = function(x) format(x, scientific = TRUE),limits = c(0,2e-4)) +
+  labs(x="z+",y="p(z+)")
 
 plot3pc <- final3c %>% 
   ggplot(aes(x=z_plus)) +
   geom_histogram(aes(y=after_stat(density)), bins=150, fill="#D5D139", na.rm = TRUE) +
   geom_line(data=analytic3 %>% filter(type=="z_plus"), aes(x=z,y=P), linewidth=0.6) +
-  theme(axis.text = element_text(size = 12), axis.title = element_text(size = 15)) +
-  labs(x="z+",y="p(z+)") + xlim(0,50000) + ylim(0,2e-4)
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
+  scale_x_continuous(breaks = c(2e4,4e4), labels = function(x) format(x, scientific = TRUE),limits = c(0,5e4)) +
+  scale_y_continuous(labels = function(x) format(x, scientific = TRUE),limits = c(0,2e-4)) +
+  labs(x="z+",y="p(z+)")
 
+plot3pa + plot3pb + plot3pc
+(plot3ma + plot3mb + plot3mc) / (plot3pa + plot3pb + plot3pc)
+ggsave("./third_case.png",  width = 16, height = 8, dpi = 600)
 
+# size
+final3a <- final3a %>% mutate(z = z_plus + z_minus)
