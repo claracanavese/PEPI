@@ -3,6 +3,119 @@ library(RColorBrewer)
 library(tidyverse)
 library(patchwork)
 
+# CUMULATIVE DISTRIBUTION
+
+gk <- function(t,k,l) {
+  return(t^k*exp(l*t)/l + (-1)^k*factorial(k)/l^(k+1)*(exp(l*t)-1))
+}
+
+# Case 1
+c1odd <- function(t,k,om,op,lm,lp) {
+  return(op*(om*op/(lm-lp))^k*gk(t,k,lm)/factorial(k))
+}
+c1even <- function(t,k,om,op,lm,lp) {
+  return((om*op/(lm-lp))^k*gk(t,k-1,lm)/factorial(k-1))
+}
+
+cdf1 <- function(t,n,om,op,lm,lp) {
+  if(n %% 2 != 0) {
+    k = (n-1)/2
+    return(1.0/(c1odd(t,k,om,op,lm,lp)+1.0))
+  }
+  else if(n %% 2 == 0) {
+    k = n/2
+    return(1.0/(c1even(t,k,om,op,lm,lp)+1.0))
+  }
+}
+
+ggplot() +
+  geom_function(fun = cdf1, args = list(n=1,om=0.01,op=0.001,lm=1.5,lp=1.0), aes(color = "1")) +
+  geom_function(fun = cdf1, args = list(n=2,om=0.01,op=0.001,lm=1.5,lp=1.0), aes(color = "2")) +
+  geom_function(fun = cdf1, args = list(n=3,om=0.01,op=0.001,lm=1.5,lp=1.0), aes(color = "3")) +
+  xlim(0,15) + ylim(0,1)
+
+ggplot() +
+  geom_function(fun = cdf1, args = list(n=1,om=0.01,op=0.001,lm=1.5,lp=1.0), aes(color = "0.01")) +
+  geom_function(fun = cdf1, args = list(n=1,om=0.005,op=0.005,lm=1.5,lp=1.0), aes(color = "0.005")) +
+  geom_function(fun = cdf1, args = list(n=1,om=0.001,op=0.01,lm=1.5,lp=1.0), aes(color = "0.001")) +
+  xlim(0,15) + ylim(0,1)
+
+# Case 2
+c2odd <- function(t,k,om,op,l) {
+  return(op*(om*op)^k*gk(t,2*k,l)/factorial(2*k))
+}
+c2even <- function(t,k,om,op,l) {
+  return((om*op)^k*gk(t,2*k-1,l)/factorial(2*k-1))
+}
+
+cdf2 <- function(t,n,om,op,l) {
+  if(n %% 2 != 0) {
+    k = (n-1)/2
+    return(1.0/(c2odd(t,k,om,op,l)+1.0))
+  }
+  else if(n %% 2 == 0) {
+    k = n/2
+    return(1.0/(c2even(t,k,om,op,l)+1.0))
+  }
+}
+
+ggplot() +
+  geom_function(fun = cdf2, args = list(n=1,om=0.01,op=0.001,l=1.2), aes(color = "1")) +
+  geom_function(fun = cdf2, args = list(n=2,om=0.01,op=0.001,l=1.2), aes(color = "2")) +
+  geom_function(fun = cdf2, args = list(n=3,om=0.01,op=0.001,l=1.2), aes(color = "3")) +
+  xlim(0,15) + ylim(0,1)
+
+ggplot() +
+  geom_function(fun = cdf2, args = list(n=1,om=0.01,op=0.001,l=1.2), aes(color = "0.01")) +
+  geom_function(fun = cdf2, args = list(n=1,om=0.005,op=0.005,l=1.2), aes(color = "0.005")) +
+  geom_function(fun = cdf2, args = list(n=1,om=0.001,op=0.01,l=1.2), aes(color = "0.001")) +
+  xlim(0,15) + ylim(0,1)
+
+# Case 3
+ak_tilde <- function(t,k,om,op,lm,lp) {
+  return((om*op/(lp-lm))^k/(op*factorial(k-1))*gk(t,k-1,lp))
+}
+hat_lerch <- function(x,lm,lp){
+  return(lerch(x, s = 1, v = 1-lm/lp))
+}
+
+c3init <- function(t,om,op,lm,lp) {
+  return(op/lm*exp(lm*t))
+}
+c3odd <- function(t,k,om,op,lm,lp) {
+  return(op^2/lp*ak_tilde(t,k,om,op,lm,lp)*hat_lerch(-op*ak_tilde(t,k,om,op,lm,lp),lm,lp))
+}
+c3even <- function(t,k,om,op,lm,lp) {
+  return(op/lp*(lp-lm)*ak_tilde(t,k,om,op,lm,lp)*hat_lerch(-(lp-lm)*ak_tilde(t,k,om,op,lm,lp),lm,lp))
+}
+
+cdf3 <- function(t,n,om,op,lm,lp) {
+  if(n == 1) {
+    return(1.0/(c3init(t,om,op,lm,lp)+1.0))
+  }
+  else if(n %% 2 != 0) {
+    k = (n-1)/2
+    return(1.0/(c3odd(t,k,om,op,lm,lp)+1.0))
+  }
+  else if(n %% 2 == 0) {
+    k = n/2
+    return(1.0/(c3even(t,k,om,op,lm,lp)+1.0))
+  }
+}
+
+ggplot() +
+  geom_function(fun = cdf3, args = list(n=1,om=0.01,op=0.001,lm=1.0,lp=1.5), aes(color = "1")) +
+  geom_function(fun = cdf3, args = list(n=2,om=0.01,op=0.001,lm=1.0,lp=1.5), aes(color = "2")) +
+  geom_function(fun = cdf3, args = list(n=3,om=0.01,op=0.001,lm=1.0,lp=1.5), aes(color = "3")) +
+  xlim(0,15) + ylim(0,1)
+
+ggplot() +
+  geom_function(fun = cdf2, args = list(n=1,om=0.01,op=0.001,l=1.2), aes(color = "0.01")) +
+  geom_function(fun = cdf2, args = list(n=1,om=0.005,op=0.005,l=1.2), aes(color = "0.005")) +
+  geom_function(fun = cdf2, args = list(n=1,om=0.001,op=0.01,l=1.2), aes(color = "0.001")) +
+  xlim(0,15) + ylim(0,1)
+
+###########################################################################
 df1_theory <- data.frame(case = c(1,1,2,2,3,3),times = c(0.288,0.702,0.334,0.641,0.441,0.702))
 df1_sim <- data.frame(case = c(1,1,2,2,3,3), times = c(0.33,0.69,0.38,0.66,0.49,0.69), errors = c(0.11,0.08,0.12,0.09,0.11,0.08))
 
