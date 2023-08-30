@@ -50,6 +50,7 @@ rate1b <- Pz_exp(final1b,1.5,1.0,0.005,0.005)
 rate1c <- Pz_exp(final1c,1.5,1.0,0.001,0.01)
 
 # minus
+
 plot1ma <- final1a %>% 
   ggplot(aes(x=z_minus)) + 
   geom_histogram(aes(y=after_stat(density)), fill = my_palette[1], bins = 90, na.rm=TRUE) +
@@ -57,6 +58,12 @@ plot1ma <- final1a %>%
   theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
   labs(x="z-",y="p(z-)") +
   scale_x_continuous(labels = function(x) format(x, scientific = TRUE), breaks = c(5e5,1e6))
+
+# final1a %>% 
+#   ggplot() + 
+#   geom_density(aes(x=z_minus,y=after_stat(density), color = "simulation"), na.rm=TRUE) +
+#   stat_function(fun = dexp, args = list(rate = as.numeric(rate1a[1])), linewidth=0.6, aes(color = "theory")) +
+#   scale_colour_manual(values = c(my_palette[1], "black"),labels = c('Simulations','Theory')) 
 
 plot1mb <- final1b %>% 
   ggplot(aes(x=z_minus)) + 
@@ -77,6 +84,7 @@ plot1mc <- final1c %>%
 plot1ma + plot1mb + plot1mc
 
 # plus
+
 plot1pa <- final1a %>% 
   ggplot(aes(x=z_plus)) + 
   geom_histogram(aes(y=after_stat(density)), fill = my_palette[2], bins = 80, na.rm = TRUE) +
@@ -110,6 +118,7 @@ plot1pa + plot1pb + plot1pc
 ggsave("./first_case.png",  width = 16, height = 8, dpi = 600)
 
 # size
+
 final1a <- final1a %>% mutate(z = z_plus + z_minus)
 final1b <- final1b %>% mutate(z = z_plus + z_minus)
 final1c <- final1c %>% mutate(z = z_plus + z_minus)
@@ -144,6 +153,97 @@ plot1c <- final1c %>%
 
 plot1a + plot1b + plot1c
 ggsave("./first_case_size.png",  width = 16, height = 5, dpi = 600)
+
+# JOINT
+lm = 1.5; lp = 1.0; t = 8;
+
+final1a_j = final1a %>% filter(z_plus > 1)
+final1a_j = final1a_j[1:500,]
+# create analytic distribution
+x1a <- rexp(1000, rate = exp(-(lm + 0.001*0.01/(lm-lp))*t))
+y1a <- sapply(x1a, function(x) x*0.001/(lm - lp))
+joint1a <- data.frame(x1a,y1a)
+
+plot1aj <- ggplot() +
+  geom_point(final1a_j,mapping = aes(x=z_minus, y=z_plus), size=0.3) +
+  stat_density_2d_filled(joint1a, 
+                         mapping = aes(x=x1a,y=y1a), 
+                         contour_var = "ndensity", 
+                         alpha = 0.4, bins = 5) +
+  geom_density_2d(joint1a, mapping = aes(x=x1a,y=y1a), 
+                  contour_var = "ndensity", 
+                  colour = "black", bins = 5) +
+  scale_x_continuous(trans = "log10",
+                     limits = c(50,1.5e6),
+                     breaks = c(1e2,1e4,1e6)) +
+  scale_y_continuous(trans = "log10", 
+                     limits = c(1,5e4),
+                     labels = function(x) format(x, scientific = TRUE),
+                     breaks = c(1,1e2,1e4)) +
+  theme(axis.text = element_text(size = 16), axis.title = element_text(size = 20)) +
+  #guides(fill=guide_legend(title="denisity")) +
+  theme(legend.position="none") +
+  labs(x = "z-", y = "z+")
+
+final1b_j = final1b %>% filter(z_plus > 1)
+final1b_j = final1b_j[1:500,]
+# create analytic distribution
+x1b <- rexp(1000, rate = exp(-(lm + 0.005*0.005/(lm-lp))*t))
+y1b <- sapply(x1b, function(x) x*0.005/(lm - lp))
+joint1b <- data.frame(x1b,y1b)
+
+plot1bj <- ggplot() +
+  geom_point(final1b_j, mapping = aes(x=z_minus, y=z_plus), size=0.3) +
+  stat_density_2d_filled(joint1b, 
+                         mapping = aes(x=x1b,y=y1b), 
+                         contour_var = "ndensity", alpha = 0.4, bins = 5) +
+  geom_density_2d(joint1b, 
+                  mapping = aes(x=x1b,y=y1b),
+                  contour_var = "ndensity", 
+                  colour = "black", bins = 5) +
+  scale_x_continuous(trans = "log10", 
+                     limits = c(50,1.5e6),
+                     breaks = c(1e2,1e4,1e6)) +
+  scale_y_continuous(trans = "log10",
+                     limits = c(1,5e4), 
+                     labels = function(x) format(x, scientific = TRUE),
+                     breaks = c(1,1e2,1e4)) +
+  theme(axis.text = element_text(size = 16), axis.title = element_text(size = 20)) +
+  #guides(fill=guide_legend(title="density")) +
+  theme(legend.position="none") +
+  labs(x = "z-", y = "z+")
+
+final1c_j = final1c %>% filter(z_plus > 1)
+final1c_j = final1c_j[1:500,]
+# create analytic distribution
+x1c <- rexp(1000, rate = exp(-(lm + 0.001*0.01/(lm-lp))*t))
+y1c <- sapply(x1c, function(x) x*0.01/(lm - lp))
+joint1c <- data.frame(x1c,y1c)
+
+plot1cj <- ggplot() +
+  geom_point(final1c_j,mapping = aes(x=z_minus, y=z_plus), size=0.3) +
+  stat_density_2d_filled(joint1c, 
+                         mapping = aes(x=x1c,y=y1c), 
+                         contour_var = "ndensity", 
+                         alpha = 0.4, bins = 5) +
+  geom_density_2d(joint1c, 
+                  mapping = aes(x=x1c,y=y1c),
+                  contour_var = "ndensity", 
+                  colour = "black", bins = 5) +
+  scale_x_continuous(trans = "log10", 
+                     limits = c(50,1.5e6),
+                     breaks = c(1e2,1e4,1e6)) +
+  scale_y_continuous(trans = "log10", 
+                     limits = c(1,5e4),
+                     labels = function(x) format(x, scientific = TRUE),
+                     breaks = c(1,1e2,1e4)) +
+  theme(axis.text = element_text(size = 16), axis.title = element_text(size = 20)) +
+  theme(legend.position="none") +
+  labs(x = "z-", y = "z+")
+
+
+plot1aj + plot1bj + plot1cj
+ggsave("./first_case_joint.png",  width = 16, height = 6, dpi = 600)
 
 # CASE 2
 
@@ -218,7 +318,7 @@ plot2pa + plot2pb + plot2pc
 
 ggsave("./second_case.png",  width = 16, height = 8, dpi = 600)
 
-# size
+# SIZE
 final2a <- final2a %>% mutate(z = z_plus + z_minus)
 final2b <- final2b %>% mutate(z = z_plus + z_minus)
 final2c <- final2c %>% mutate(z = z_plus + z_minus)
@@ -253,6 +353,96 @@ plot2c <- final2c %>%
 
 plot2a + plot2b + plot2c
 ggsave("./second_case_size.png",  width = 16, height = 5, dpi = 600)
+
+# JOINT
+
+final2a_j = final2a %>% filter(z_plus > 1 & z_plus < 2000)
+final2a_j = final2a_j[1:500,]
+# create analytic distribution
+x2a <- rexp(1000, rate = exp(-1.2*t)/cosh(sqrt(0.01*0.001)*8))
+y2a <- sapply(x2a, function(x) x*sqrt(0.001/0.01)*tanh(sqrt(0.01*0.001)*8))
+joint2a <- data.frame(x2a,y2a)
+
+plot2aj <- ggplot() +
+  geom_point(final2a_j,mapping = aes(x=z_minus, y=z_plus), size=0.3) +
+  stat_density_2d_filled(joint2a, 
+                         mapping = aes(x=x2a,y=y2a), 
+                         contour_var = "ndensity", 
+                         alpha = 0.4, bins = 5) +
+  geom_density_2d(joint2a, mapping = aes(x=x2a,y=y2a), 
+                  contour_var = "ndensity", 
+                  colour = "black", bins = 5) +
+  scale_x_continuous(trans = "log10",
+                     limits = c(50,1.5e6),
+                     breaks = c(1e2,1e4,1e6)) +
+  scale_y_continuous(trans = "log10", 
+                     limits = c(1,5e4),
+                     labels = function(x) format(x, scientific = TRUE),
+                     breaks = c(1,1e2,1e4)) +
+  theme(axis.text = element_text(size = 16), axis.title = element_text(size = 20)) +
+  guides(fill=guide_legend(title="density")) +
+  #theme(legend.position="none") +
+  labs(x = "z-", y = "z+")
+
+final2b_j = final2b %>% filter(z_plus > 1)
+final2b_j = final2b_j[1:500,]
+# create analytic distribution
+x2b <- rexp(1000, rate = exp(-1.2*t)/cosh(sqrt(0.005*0.005)*8))
+y2b <- sapply(x2b, function(x) x*tanh(sqrt(0.005*0.005)*8))
+joint2b <- data.frame(x2b,y2b)
+
+plot2bj <- ggplot() +
+  geom_point(final2b_j, mapping = aes(x=z_minus, y=z_plus), size=0.3) +
+  stat_density_2d_filled(joint2b, 
+                         mapping = aes(x=x2b,y=y2b), 
+                         contour_var = "ndensity", alpha = 0.4, bins = 5) +
+  geom_density_2d(joint2b, 
+                  mapping = aes(x=x2b,y=y2b),
+                  contour_var = "ndensity", 
+                  colour = "black", bins = 5) +
+  scale_x_continuous(trans = "log10", 
+                     limits = c(50,1.5e6),
+                     breaks = c(1e2,1e4,1e6)) +
+  scale_y_continuous(trans = "log10",
+                     limits = c(1,5e4), 
+                     labels = function(x) format(x, scientific = TRUE),
+                     breaks = c(1,1e2,1e4)) +
+  theme(axis.text = element_text(size = 16), axis.title = element_text(size = 20)) +
+  #guides(fill=guide_legend(title="density")) +
+  theme(legend.position="none") +
+  labs(x = "z-", y = "z+")
+
+final3c_j = final3c %>% filter(z_plus > 1)
+final3c_j = final3c_j[1:500,]
+# create analytic distribution
+x3c <- rexp(1000, rate = exp(-1.2*t)/cosh(sqrt(0.01*0.001)*8))
+y3c <- sapply(x3c, function(x) x*sqrt(0.01/0.001)*tanh(sqrt(0.01*0.001)*8))
+joint3c <- data.frame(x3c,y3c)
+
+plot3cj <- ggplot() +
+  geom_point(final3c_j,mapping = aes(x=z_minus, y=z_plus), size=0.3) +
+  stat_density_2d_filled(joint3c, 
+                         mapping = aes(x=x3c,y=y3c), 
+                         contour_var = "ndensity", 
+                         alpha = 0.4, bins = 5) +
+  geom_density_2d(joint3c, 
+                  mapping = aes(x=x3c,y=y3c),
+                  contour_var = "ndensity", 
+                  colour = "black", bins = 5) +
+  scale_x_continuous(trans = "log10", 
+                     limits = c(50,1.5e6),
+                     breaks = c(1e2,1e4,1e6)) +
+  scale_y_continuous(trans = "log10", 
+                     limits = c(1,5e4),
+                     labels = function(x) format(x, scientific = TRUE),
+                     breaks = c(1,1e2,1e4)) +
+  theme(axis.text = element_text(size = 16), axis.title = element_text(size = 20)) +
+  theme(legend.position="none") +
+  labs(x = "z-", y = "z+")
+
+
+plot1aj + plot1bj + plot1cj
+ggsave("./first_case_joint.png",  width = 16, height = 6, dpi = 600)
 
 # CASE 3
 

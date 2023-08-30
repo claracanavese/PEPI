@@ -6,15 +6,15 @@ library(bayesplot)
 library(StanHeaders)
 library(easypar)
 
-model <- rstan::stan_model("./PEPI/regressionODE.stan")
-simulation <- readRDS(paste0("./PEPI/simulations/simulation_",1,".rds")) %>% tibble::as_tibble()
+# model <- rstan::stan_model("./PEPI/regressionODE.stan")
+# simulation <- readRDS(paste0("./PEPI/simulations/simulation_",1,".rds")) %>% tibble::as_tibble()
 
 stan_fit = function(i){
   
   model <- rstan::stan_model("./regressionODE.stan")
   simulation <- readRDS(paste0("./simulations/simulation_",i,".rds")) %>% tibble::as_tibble()
   # print(paste0("simulation_",i))
-  samples <- simulation[seq(20,80, by = 30),]
+  samples <- simulation[seq(10,80, by = 5),]
   data_list <- list(
     n_times = nrow(samples),
     z0 = c(1000,100,0,0,0),
@@ -30,7 +30,7 @@ stan_fit = function(i){
 
 # stan_fit(1)
 # 
-# fit1 = readRDS("./fit/fit_1.rds")
+# fit1 = readRDS("./fit_3/fit_1.rds")
 # print(fit1, pars = c("lambda_minus", "lambda_plus", "omega_minus", "omega_plus"), digits_summary = 3)
 
 easypar::run( FUN = stan_fit,
