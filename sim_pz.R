@@ -18,7 +18,7 @@ Pz_exp <- function(dat,lm,lp,om,op) {
   rates <- list(exprate_minus,exprate_plus)
   return(rates)
 }
-my_palette <- c(rgb(102,204,102,maxColorValue = 255),"#D5D139","#826BB0")
+my_palette <- c("#72B8B5","#FFCB0A","#265450")
 
 # upload simulated distributions
 
@@ -130,23 +130,23 @@ ratetot1c = 1./(1./as.numeric(rate1c[1]) + 1./as.numeric(rate1c[2]))
 plot1a <- final1a %>% 
   ggplot(aes(x=z)) + 
   geom_histogram(aes(y=after_stat(density)), fill = my_palette[3], bins = 90, na.rm=TRUE) +
-  stat_function(fun = dexp, args = list(rate = ratetot1a), linewidth=0.6) +
+  stat_function(fun = dexp, args = list(rate = ratetot1a), linewidth=0.7) +
   theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
   labs(x="z",y="p(z)") +
   scale_x_continuous(labels = function(x) format(x, scientific = TRUE), breaks = c(5e5,1e6))
 
 plot1b <- final1b %>% 
   ggplot(aes(x=z)) + 
-  geom_histogram(aes(y=after_stat(density)), fill = "#9581BC", bins = 90, na.rm=TRUE) +
-  stat_function(fun = dexp, args = list(rate = ratetot1b), linewidth=0.6) +
+  geom_histogram(aes(y=after_stat(density)), fill = my_palette[3], alpha=0.8, bins = 90, na.rm=TRUE) +
+  stat_function(fun = dexp, args = list(rate = ratetot1b), linewidth=0.7) +
   theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
   labs(x="z",y="p(z)") +
   scale_x_continuous(labels = function(x) format(x, scientific = TRUE), breaks = c(5e5,1e6))
 
 plot1c <- final1c %>% 
   ggplot(aes(x=z)) + 
-  geom_histogram(aes(y=after_stat(density)), fill = "#AA9BCB", bins = 90, na.rm=TRUE) +
-  stat_function(fun = dexp, args = list(rate = ratetot1c), linewidth=0.6) +
+  geom_histogram(aes(y=after_stat(density)), fill = my_palette[3], alpha=0.6,bins = 90, na.rm=TRUE) +
+  stat_function(fun = dexp, args = list(rate = ratetot1c), linewidth=0.7) +
   theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
   labs(x="z",y="p(z)") +
   scale_x_continuous(labels = function(x) format(x, scientific = TRUE), breaks = c(5e5,1e6))

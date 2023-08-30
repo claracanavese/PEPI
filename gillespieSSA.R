@@ -2,7 +2,7 @@ library("GillespieSSA2")
 
 # parameters
 params <- c(am=1.2, bm=0.0, ap=1.2, bp=0.0, om=0.01, op=0.001)
-final_time <- 12
+final_time <- 15
 sim_name <- "Switching Process"
 # initial state
 initial_state <- c(zm=1, zp=0)
@@ -87,7 +87,7 @@ saveRDS(parameters, file = "./R/parameters.rds")
 
 # easypar
 
-final_time <- rep(8,nrow(parameters))
+final_time <- rep(15,nrow(parameters))
 parameters$final_time = final_time
 all_params = parameters
 simulation_number <-rep(1:100,each=nrow(all_params))

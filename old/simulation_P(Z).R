@@ -39,7 +39,7 @@ Zt_log_plots <- function(dat) {
   # plot the evolution of both populations on same graph (log scale)
   dat1 <- melt(dat[,1:3], value.name = "Z", id = "t")
   plot1 <- dat1 %>% ggplot(aes(t,Z, col=variable)) + ylab("Z") + geom_point(size=0.5) +
-    scale_colour_manual(values=c(rgb(102,204,102,maxColorValue = 255),"#D5D139")) + 
+    scale_colour_manual(values="#72B8B5","#D5D139")) + 
     theme(axis.text = element_text(size = 10), axis.title = element_text(size = 14)) +
     scale_y_continuous(trans = 'log10') +
     theme(legend.position = "none")

@@ -9,7 +9,7 @@ library(devtools)
 library(easypar)
 library(RColorBrewer)
 
-my_palette <- c(rgb(102,204,102,maxColorValue = 255),"#D5D139")
+my_palette <- c("#72B8B5","#FFCB0A")
 
 # ODE solution
 odem <- function(t, lm, lp, om, op){
