@@ -12,8 +12,8 @@ Pz_exp <- function(dat,lm,lp,om,op) {
     exprate_minus <- exp(-(lm+om*op/(lm-lp))*time)
     exprate_plus <- (lm - lp)/op*exp(-(lm+om*op/(lm-lp))*time)
   } else if (lm == lp) {
-    exprate_minus <- 1.0/(cosh(sqrt(om*op)*time))*exp(-lm*time)
-    exprate_plus <- 1.0/(sinh(sqrt(om*op)*time))*sqrt(om/op)*exp(-lm*time)
+    exprate_minus <- exp(-lm*time)/(cosh(sqrt(om*op)*time))
+    exprate_plus <- exp(-lm*time)*sqrt(om/op)/(sinh(sqrt(om*op)*time))
   }
   rates <- list(exprate_minus,exprate_plus)
   return(rates)
@@ -29,7 +29,7 @@ final1b <- final1b[,2:4]
 final1c <- read.csv("./pz_sims/1.5_1.0_0.001_0.01_8t_81p.csv")
 final1c <- final1c[,2:4]
 
-final2a <- read.csv("./pz_sims/1.2_0.01_0.001_8t_81p_2000.csv")
+final2a <- read.csv("./pz_sims/1.2_0.01_0.001_15t_81p.csv")
 final2a <- final2a[,2:4]
 final2b <- read.csv("./pz_sims/1.2_0.005_8t_81p.csv")
 final2b <- final2b[,2:4]
@@ -117,7 +117,7 @@ plot1pa + plot1pb + plot1pc
 
 ggsave("./first_case.png",  width = 16, height = 8, dpi = 600)
 
-# size
+# SIZE
 
 final1a <- final1a %>% mutate(z = z_plus + z_minus)
 final1b <- final1b %>% mutate(z = z_plus + z_minus)
@@ -160,7 +160,7 @@ lm = 1.5; lp = 1.0; t = 8;
 final1a_j = final1a %>% filter(z_plus > 1)
 final1a_j = final1a_j[1:500,]
 # create analytic distribution
-x1a <- rexp(1000, rate = exp(-(lm + 0.001*0.01/(lm-lp))*t))
+x1a <- rexp(1000, rate = as.numeric(rate1a[1]))
 y1a <- sapply(x1a, function(x) x*0.001/(lm - lp))
 joint1a <- data.frame(x1a,y1a)
 
@@ -188,7 +188,7 @@ plot1aj <- ggplot() +
 final1b_j = final1b %>% filter(z_plus > 1)
 final1b_j = final1b_j[1:500,]
 # create analytic distribution
-x1b <- rexp(1000, rate = exp(-(lm + 0.005*0.005/(lm-lp))*t))
+x1b <- rexp(1000, rate = as.numeric(rate1b[1]))
 y1b <- sapply(x1b, function(x) x*0.005/(lm - lp))
 joint1b <- data.frame(x1b,y1b)
 
@@ -216,7 +216,7 @@ plot1bj <- ggplot() +
 final1c_j = final1c %>% filter(z_plus > 1)
 final1c_j = final1c_j[1:500,]
 # create analytic distribution
-x1c <- rexp(1000, rate = exp(-(lm + 0.001*0.01/(lm-lp))*t))
+x1c <- rexp(1000, rate = as.numeric(rate1c[1]))
 y1c <- sapply(x1c, function(x) x*0.01/(lm - lp))
 joint1c <- data.frame(x1c,y1c)
 
@@ -355,12 +355,11 @@ plot2a + plot2b + plot2c
 ggsave("./second_case_size.png",  width = 16, height = 5, dpi = 600)
 
 # JOINT
-
-final2a_j = final2a %>% filter(z_plus > 1 & z_plus < 2000)
-final2a_j = final2a_j[1:500,]
+final2a_j = final2a %>% filter(z_plus > 1)
+final2a_j = final2a_j[1:800,]
 # create analytic distribution
-x2a <- rexp(1000, rate = exp(-1.2*t)/cosh(sqrt(0.01*0.001)*8))
-y2a <- sapply(x2a, function(x) x*sqrt(0.001/0.01)*tanh(sqrt(0.01*0.001)*8))
+x2a <- rexp(1000, rate = as.numeric(rate2a[1]))
+y2a <- sapply(x2a, function(x) x*as.numeric(rate2a[1])/as.numeric(rate2a[2]))
 joint2a <- data.frame(x2a,y2a)
 
 plot2aj <- ggplot() +
@@ -372,13 +371,9 @@ plot2aj <- ggplot() +
   geom_density_2d(joint2a, mapping = aes(x=x2a,y=y2a), 
                   contour_var = "ndensity", 
                   colour = "black", bins = 5) +
-  scale_x_continuous(trans = "log10",
-                     limits = c(50,1.5e6),
-                     breaks = c(1e2,1e4,1e6)) +
-  scale_y_continuous(trans = "log10", 
-                     limits = c(1,5e4),
-                     labels = function(x) format(x, scientific = TRUE),
-                     breaks = c(1,1e2,1e4)) +
+  scale_x_continuous(trans = "log10") +
+  scale_y_continuous(trans = "log10",
+                     labels = function(x) format(x, scientific = TRUE)) +
   theme(axis.text = element_text(size = 16), axis.title = element_text(size = 20)) +
   guides(fill=guide_legend(title="density")) +
   #theme(legend.position="none") +

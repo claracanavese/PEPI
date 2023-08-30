@@ -35,9 +35,9 @@ ggplot() +
   xlim(0,15) + ylim(0,1)
 
 ggplot() +
-  geom_function(fun = cdf1, args = list(n=1,om=0.01,op=0.001,lm=1.5,lp=1.0), aes(color = "0.01")) +
-  geom_function(fun = cdf1, args = list(n=1,om=0.005,op=0.005,lm=1.5,lp=1.0), aes(color = "0.005")) +
-  geom_function(fun = cdf1, args = list(n=1,om=0.001,op=0.01,lm=1.5,lp=1.0), aes(color = "0.001")) +
+  geom_function(fun = cdf1, args = list(n=1,om=0.01,op=0.001,lm=1.0,lp=1.5), aes(color = "0.01")) +
+  geom_function(fun = cdf1, args = list(n=1,om=0.005,op=0.005,lm=1.0,lp=1.5), aes(color = "0.005")) +
+  geom_function(fun = cdf1, args = list(n=1,om=0.001,op=0.01,lm=1.0,lp=1.5), aes(color = "0.001")) +
   xlim(0,15) + ylim(0,1)
 
 # Case 2

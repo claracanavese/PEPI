@@ -1,8 +1,8 @@
 library("GillespieSSA2")
 
 # parameters
-params <- c(am=1.5, bm=0.0, ap=1.0, bp=0.0, om=0.01, op=0.001)
-final_time <- 5
+params <- c(am=1.2, bm=0.0, ap=1.2, bp=0.0, om=0.01, op=0.001)
+final_time <- 12
 sim_name <- "Switching Process"
 # initial state
 initial_state <- c(zm=1, zp=0)
@@ -40,8 +40,8 @@ firings <- as.data.frame(cbind(out$time,out$firings))
 colnames(firings)[1] <- "time"
 sum(firings$switch_to_plus)
 sum(firings$switch_to_minus)
-first_plus = filter(firings, switch_to_plus != 0)[1,]$time
-first_minus = filter(firings, switch_to_minus != 0)[1,]$time
+first_plus = filter(firings, firings$switch_to_plus != 0)[1,]$time
+first_minus = filter(firings, firings$switch_to_minus != 0)[1,]$time
 
 state <- as.data.frame(cbind(out$time,out$state,out$firings))
 colnames(state)[1] <- "time"

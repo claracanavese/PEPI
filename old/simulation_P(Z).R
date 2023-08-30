@@ -609,12 +609,11 @@ y <- 1:300
 contour(x,y,jp)
 
 # plot Z- VS Z+
-final2 %>% 
-  filter(`Z-` < 10000) %>% 
-  mutate(sum = `Z+`+`Z-`, "Z- rate" = `Z-`/sum, "Z+ rate" = `Z+`/sum) %>% 
-  ggplot(aes(x=`Z-`,y=`Z+`)) + 
+final1a %>% 
+  mutate(z = z_minus + z_plus, "Z- rate" = z_minus/z, "Z+ rate" = z_plus/z) %>% 
+  ggplot(aes(x=z_minus,y=z_plus)) + 
   geom_point(color = 'cyan4') +
-  geom_line(aes(x=`Z-`, y=`Z-`*omega_p/(alpha_min-alpha_plus)), color='black')
+  geom_line(aes(x=z_minus, y=z_minus*omega_p/(alpha_min-alpha_plus)), color='black')
   #ylim(0,max(max(final$`Z-`),max(final$`Z+`)))
   
 final2 %>% 
@@ -785,26 +784,25 @@ ggsave("./imgs/theorem1/case2.png",dpi=600)
 
 # JOINT PLOT
 
-lambda_min=10; lambda_plus=20; omega_m=0.01; omega_p=0.1; alpha_min=10; alpha_plus=20; beta_min=0; beta_min=0
-final <- readRDS("./simulations/10_20_01_001 [0.8]/final.rds")
-final <- final %>% filter(final$`Z+`>1)
-final <- final %>% filter(final$`Z-`>1)
-final <- final %>% filter(final$`Z+`<5e6)
-#final <- final %>% filter(final$`Z-` != 265)
+lambda_min=1.5; lambda_plus=1.0; omega_m=0.01; omega_p=0.001; alpha_min=1.5; alpha_plus=1; beta_min=0; beta_min=0
+time = 8;
+final1a <- read.csv("./pz_sims/1.5_1.0_0.01_0.001_8t_81p.csv")
+final1a <- final1a[,2:4]
+final1a_j = final1a %>% filter(z_plus < 2000 & z_plus > 1 & z_minus < 9e5)
 
 ggplot() +
-  geom_point(final,mapping = aes(x=`Z+`, y=`Z-`),geom = "point",bins = 70) #+
-  #stat_density_2d(joint_th, mapping = aes(x=x,y=y, fill = ..level..), geom = "polygon", alpha = 0.5)
-  #scale_fill_continuous(type = "viridis") 
+  geom_point(final1a_j,mapping = aes(x=z_minus, y=z_plus)) +
+  stat_density_2d(joint_th, mapping = aes(x=x,y=y, fill = ..level..), geom = "polygon", alpha = 0.1, bins = 50) +
+  scale_fill_continuous(type = "viridis") 
   #scale_fill_brewer()
   #theme_bw()
 
 ggplot() +
-  geom_point(final,mapping = aes(x=`Z+`, y=`Z-`)) +
-  #stat_density_2d_filled(joint_th, mapping = aes(x=x,y=y), alpha = 0.4) +
-  geom_density_2d(joint_th, mapping = aes(x=x,y=y),colour = "black") +
-  #scale_x_continuous(trans = "log10", limits = c(1,1.2e6), breaks = c(1e2,1e4,1e6)) +
-  #scale_y_continuous(trans = "log10", limits = c(10,1.2e6), breaks = c(1e2,1e4,1e6)) +
+  geom_point(final1a_j,mapping = aes(x=z_minus, y=z_plus), size=0.5) +
+  stat_density_2d_filled(joint_th, mapping = aes(x=x,y=y), alpha = 0.4, bins = 7) +
+  geom_density_2d(joint_th, mapping = aes(x=x,y=y),colour = "black", bins = 7) +
+  scale_x_continuous(trans = "log10") +
+  scale_y_continuous(trans = "log10") +
   theme(axis.text = element_text(size = 16), axis.title = element_text(size = 20))
   #xlim(0,10e3)
 ggsave("./imgs/pt/joint_15_10_005.png",dpi=600)
@@ -813,13 +811,14 @@ ggplot() +
   stat_density_2d_filled(joint_th, mapping = aes(x=x,y=y),alpha = 0.5) +
   scale_fill_brewer()
 
-x <- rpareto(1000,lambda_min/lambda_plus, scale = 10000)
-y <- sapply(x, function(x) x*omega_m/(lambda_plus - lambda_min))
+x <- rexp(1000, rate = exp(-(lambda_min + omega_m*omega_p/(lambda_min-lambda_plus))*time))
+# x <- rpareto(1000,lambda_min/lambda_plus, scale = 10000)
+y <- sapply(x, function(x) x*omega_p/(lambda_min - lambda_plus))
 
 joint_th <- data.frame(x,y)
 
 ggplot() +
-  stat_density_2d(aes(x=rexp(1000,rate = (lambda_min-lambda_plus)/omega_p*exp(-(lambda_min+omega_m*omega_p/(lambda_min-lambda_plus))*0.8)),y=rexp(1000,rate = exp(-(lambda_min+omega_m*omega_p/(lambda_min-lambda_plus))*0.8)),fill= ..level..))
+  stat_density_2d(aes(x=rexp(1000,rate = (lambda_min-lambda_plus)/omega_p*exp(-(lambda_min+omega_m*omega_p/(lambda_min-lambda_plus))*8)),y=rexp(1000,rate = exp(-(lambda_min+omega_m*omega_p/(lambda_min-lambda_plus))*8)),fill= after_stat(level)))
   #stat_density_2d(aes(fill = ..level..), geom = "polygon", colour="white")
 
 ggplot(joint_th,aes(x,y)) +
