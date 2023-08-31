@@ -64,29 +64,41 @@ covariances <- function(t, state, parameters) {
   with(as.list(c(state,parameters)), {
     dM1 <- lambda_min*M1 + omega_min*M2
     dM2 <- lambda_plus*M2 + omega_plus*M1
-    dV1 <- 2*lambda_min*V1 + (alpha_min+beta_min)*M1 + 2*omega_min*C + omega_min*M2
-    dV2 <- 2*lambda_plus*V2 + (alpha_plus+beta_plus)*M2 + 2*omega_plus*C + omega_plus*M1
-    dC <- (lambda_min + lambda_plus)*C + omega_plus*V1 + omega_min*V2
+    dS1 <- 2*lambda_min*S1 + (alpha_min+beta_min)*M1 + 2*omega_min*C + omega_min*M2
+    dS2 <- 2*lambda_plus*S2 + (alpha_plus+beta_plus)*M2 + 2*omega_plus*C + omega_plus*M1
+    dC <- (lambda_min + lambda_plus)*C + omega_plus*S1 + omega_min*S2
+    list(c(dM1, dM2, dS1, dS2, dC))
+  })
+}
+
+covariances2 <- function(t, state, parameters) {
+  with(as.list(c(state,parameters)), {
+    dM1 <- lambda_min*M1 + omega_min*M2
+    dM2 <- lambda_plus*M2 + omega_plus*M1
+    dV1 <- (alpha_min+beta_min)*M1 + 2*(omega_min-omega_plus)*C + omega_min*M2
+    dV2 <-(alpha_plus+beta_plus)*M2 + 2*(omega_plus-omega_min)*C + omega_plus*M1
+    dC <- (lambda_min + lambda_plus)*C + omega_plus*(V1+M1^2) + omega_min*(V2+M2^2)
     list(c(dM1, dM2, dV1, dV2, dC))
   })
 }
 
-state <- c(M1 = 1000, M2 = 100, V1 = 0, V2 = 0, C = 0)
+state <- c(M1 = 1, M2 = 0, S1 = 0, S2 = 0, C = 0)
+state <- c(M1 = 1, M2 = 0, V1 = 0, V2 = 0, C = 0)
 
 
 options(scipen = 0)
-parameters_cov1 <- c(lambda_min = 1.5, lambda_plus = 1.2, omega_min = 0.005, omega_plus = 0.015, alpha_min = 1.5, beta_min = 0, alpha_plus = 1.2, beta_plus = 0)
-out1 <- ode(y = state, times = seq(0, 5, by = 0.01), func = covariances, parms = parameters_cov1)
-out1_df <- data.frame(t = out1[,1], M1 = out1[,2], M2 = out1[,3], V1 = out1[,4], V2 = out1[,5], C = out1[,6])
+parameters_cov1 <- c(lambda_min = 1.5, lambda_plus = 1.0, omega_min = 0.005, omega_plus = 0.005, alpha_min = 1.5, beta_min = 0, alpha_plus = 1.0, beta_plus = 0)
+out1 <- ode(y = state, times = seq(0, 20, by = 0.01), func = covariances2, parms = parameters_cov1)
+out1_df2 <- data.frame(t = out1[,1], M1 = out1[,2], M2 = out1[,3], V1 = out1[,4], V2 = out1[,5], C = out1[,6])
 # saveRDS(out1_df, file = paste0("./GitHub/switching_process/Gillespy2/1.5_1.2_0.015_0.005_5t_51p/ODE.rds"))
 
-parameters_cov2 <- c(lambda_min = 1.5, lambda_plus = 1.181, omega_min = 0.005, omega_plus = 0.016, alpha_min = 1.5, beta_min = 0, alpha_plus = 1.181, beta_plus = 0)
-out2 <- ode(y = state, times = seq(0, 5, by = 0.01), func = covariances, parms = parameters_cov2)
-out2_df <- data.frame(t = out2[,1], M1 = out2[,2], M2 = out2[,3], V1 = out2[,4], V2 = out2[,5], C = out2[,6])
+parameters_cov2 <- c(lambda_min = 1.2, lambda_plus = 1.2, omega_min = 0.005, omega_plus = 0.002, alpha_min = 1.2, beta_min = 0, alpha_plus = 1.2, beta_plus = 0)
+out2 <- ode(y = state, times = seq(0, 20, by = 0.01), func = covariances, parms = parameters_cov2)
+out2_df <- data.frame(t = out2[,1], M1 = out2[,2], M2 = out2[,3], S1 = out2[,4], S2 = out2[,5], C = out2[,6])
 
-parameters_cov3 <- c(lambda_min = 1.5, lambda_plus = 1.172, omega_min = 0.007, omega_plus = 0.002, alpha_min = 1.5, beta_min = 0, alpha_plus = 1.172, beta_plus = 0)
-out3 <- ode(y = state, times = seq(0, 8, by = 0.01), func = covariances, parms = parameters_cov3)
-out3_df <- data.frame(t = out3[,1], M1 = out3[,2], M2 = out3[,3], V1 = out3[,4], V2 = out3[,5], C = out3[,6])
+parameters_cov3 <- c(lambda_min = 1.0, lambda_plus = 1.5, omega_min = 0.005, omega_plus = 0.005, alpha_min = 1.0, beta_min = 0, alpha_plus = 1.5, beta_plus = 0)
+out3 <- ode(y = state, times = seq(0, 20, by = 0.01), func = covariances, parms = parameters_cov3)
+out3_df <- data.frame(t = out3[,1], M1 = out3[,2], M2 = out3[,3], S1 = out3[,4], S2 = out3[,5], C = out3[,6])
 
 simulation <- read.csv("./GitHub/switching_process/Gillespy2/1.5_1.2_0.015_0.005_5t_51p/simulations/switching_results_avg.csv") %>% tibble::as_tibble()
 
@@ -121,20 +133,11 @@ ggsave("./GitHub/switching_process/Gillespy2/1.5_1.2_0.015_0.005_5t_51p/gamma_1.
 
 
 # plot standard deviation
-plotr1 <- out_df %>% mutate(R1 = D1/M1) %>%
+plotsm1 <- out1_df2 %>% mutate(R1 = V1/M1,R2 = V2/M2) %>%
   ggplot() +
-  geom_line(aes(x = t,y = R1), color = "red")
-plotd1 <- out_df %>% ggplot(aes(x = t, y = D1)) + geom_line(color = "red")
-plotm1 <- out_df %>% ggplot(aes(x = t, y = M1)) + geom_line(color = "red")
-plotd1
-
-plotr2 <- out_df %>% mutate(R2 = D2/M2) %>%
-  ggplot() +
+  geom_line(aes(x = t,y = R1), color = "red") +
   geom_line(aes(x = t,y = R2), color = "blue") 
-plotd2 <- out_df %>% ggplot(aes(x = t, y = D2)) + geom_line(color = "blue") +
-  scale_y_continuous(labels = function(x) format(x, scientific = TRUE))
-plotm2 <- out_df %>% ggplot(aes(x = t, y = M2)) + geom_line(color = "blue")
-plotd2
+
 
 plotr1 / plotr2
 (plotm1 + plotd1) / (plotm2 + plotd2)
