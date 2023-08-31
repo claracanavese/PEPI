@@ -87,7 +87,7 @@ saveRDS(parameters, file = "./R/parameters.rds")
 
 # easypar
 
-final_time <- rep(15,nrow(parameters))
+final_time <- rep(18,nrow(parameters))
 parameters$final_time = final_time
 all_params = parameters
 simulation_number <-rep(1:100,each=nrow(all_params))
@@ -125,7 +125,39 @@ simulation = function(i){
   saveRDS(state, file = paste0("./R/simulations/simulation_",i,".rds"))
 }
 
-easypar::run( FUN = simulation,
+simulation_pz = function(i){
+  library("GillespieSSA2")
+  params <- c(am=all_params$am[i], bm=all_params$bm[i], ap=all_params$ap[i], bp=all_params$bp[i], om=all_params$om[i], op=all_params$op[i])
+  final_time <- all_params$final_time[i]
+  sim_name <- paste0("Switching Process",i)
+  # initial state
+  initial_state <- c(zm=1, zp=0)
+  # reactions
+  reactions <- list(
+    reaction("am*zm", c(zm = +1), name = "birth_minus"),
+    reaction("bm*zm", c(zm = -1), name = "death_minus"),
+    reaction("ap*zp", c(zp = +1), name = "birth_plus"),
+    reaction("bp*zp", c(zp = -1), name = "death_plus"),
+    reaction("op*zm", c(zp = +1), name = "switch_to_plus"),
+    reaction("om*zp", c(zm = +1), name = "switch_to_minus")
+  )
+  # simulation
+  out <- ssa(
+    initial_state = initial_state,
+    reactions = reactions,
+    params = params,
+    final_time = final_time,
+    method = ssa_etl(tau = 0.1),
+    sim_name = sim_name,
+    log_firings = TRUE
+  )
+  # create dataframe to save
+  state <- as.data.frame(cbind(out$time,out$state,out$firings))
+  colnames(state)[1] <- "time"
+  saveRDS(state, file = paste0("./simulations_for_pz/simulation_",i,".rds"))
+}
+
+easypar::run( FUN = simulation_pz,
               PARAMS = lapply(1:nrow(all_params), list),
               parallel = TRUE,
               filter_errors = FALSE,
