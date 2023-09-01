@@ -148,7 +148,7 @@ simulation_pz = function(i){
     reactions = reactions,
     params = params,
     final_time = final_time,
-    method = ssa_etl(tau = 0.1),
+    method = ssa_etl(tau = 0.2),
     sim_name = sim_name,
     log_firings = TRUE
   )
@@ -159,16 +159,16 @@ simulation_pz = function(i){
 }
 
 easypar::run( FUN = simulation_pz,
-              PARAMS = lapply(1:nrow(all_params), list),
+              PARAMS = lapply(2904:nrow(all_params), list),
               parallel = TRUE,
               filter_errors = FALSE,
               export = ls(globalenv())
 )
 
-# sim <- readRDS(paste0("./simulations_for_pz/simulation_",1.5,"_",1,"_",0.01,"_",0.001,"_",1,".rds")) %>% tibble::as_tibble()
+sim <- readRDS(paste0("./simulations_for_pz_10t/simulation_",1.5,"_",1,"_",0.01,"_",0.001,"_",1,".rds")) %>% tibble::as_tibble()
 pz <- data.frame()
-for (i in seq(1,100)) {
-  sim <- readRDS(paste0("./simulations_for_pz/simulation_",1.2,"_",1.2,"_",0.005,"_",0.005,"_",i,".rds")) %>% tibble::as_tibble()
-  pz <- bind_rows(pz,sim[151,])
+for (i in seq(1,500)) {
+  sim <- readRDS(paste0("./simulations_for_pz_10t/simulation_",1.0,"_",1.5,"_",0.005,"_",0.005,"_",i,".rds")) %>% tibble::as_tibble()
+  pz <- bind_rows(pz,sim[51,])
 }
-saveRDS(pz,"./1.2_0.005_15t.rds")
+saveRDS(pz,"./R/1.0_1.5_0.005_10t.rds")
