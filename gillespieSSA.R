@@ -86,11 +86,11 @@ parameters = rbind(parameters, c(am=1.2, bm=0.0, ap=1.2, bp=0.0, om=0.005, op=0.
 saveRDS(parameters, file = "./R/parameters.rds")
 
 # easypar
-
-final_time <- rep(18,nrow(parameters))
+rm(all_params)
+final_time <- rep(10,nrow(parameters))
 parameters$final_time = final_time
 all_params = parameters
-simulation_number <-rep(1:100,each=nrow(all_params))
+simulation_number <-rep(1:500,each=nrow(all_params))
 all_params = cbind(all_params, simulation_number)
 
 simulation = function(i){
@@ -125,6 +125,7 @@ simulation = function(i){
   saveRDS(state, file = paste0("./R/simulations/simulation_",i,".rds"))
 }
 
+
 simulation_pz = function(i){
   library("GillespieSSA2")
   params <- c(am=all_params$am[i], bm=all_params$bm[i], ap=all_params$ap[i], bp=all_params$bp[i], om=all_params$om[i], op=all_params$op[i])
@@ -154,7 +155,7 @@ simulation_pz = function(i){
   # create dataframe to save
   state <- as.data.frame(cbind(out$time,out$state,out$firings))
   colnames(state)[1] <- "time"
-  saveRDS(state, file = paste0("./simulations_for_pz/simulation_",i,".rds"))
+  saveRDS(state, file = paste0("./simulations_for_pz/simulation_",all_params$am[i],"_",all_params$ap[i],"_",all_params$om[i],"_",all_params$op[i],"_",all_params$simulation_number[i],".rds"))
 }
 
 easypar::run( FUN = simulation_pz,
@@ -164,3 +165,10 @@ easypar::run( FUN = simulation_pz,
               export = ls(globalenv())
 )
 
+# sim <- readRDS(paste0("./simulations_for_pz/simulation_",1.5,"_",1,"_",0.01,"_",0.001,"_",1,".rds")) %>% tibble::as_tibble()
+pz <- data.frame()
+for (i in seq(1,100)) {
+  sim <- readRDS(paste0("./simulations_for_pz/simulation_",1.2,"_",1.2,"_",0.005,"_",0.005,"_",i,".rds")) %>% tibble::as_tibble()
+  pz <- bind_rows(pz,sim[151,])
+}
+saveRDS(pz,"./1.2_0.005_15t.rds")

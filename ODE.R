@@ -2,68 +2,13 @@ library(deSolve)
 library(RColorBrewer)
 library(reshape2)
 
-# MY ODE
-# rho, sigma
-switching_process1 <- function(t, state, parameters) {
-  with(as.list(c(state, parameters)), {
-    drho <- rho*rho*(lambda_plus + omega_min - lambda_min - omega_plus) + rho*(lambda_min - lambda_plus - 2*omega_min) + omega_min
-    dsigma <- sigma*((lambda_min + omega_plus - lambda_plus - omega_min)*rho + lambda_plus + omega_min)
-    list(c(drho, dsigma))
-  })
-}
-
-parameters <- c(lambda_min = 15, lambda_plus = 10, omega_min = 0.01, omega_plus = 0.1)
-
-state <- c(rho = 1, sigma = 1)
-times <- seq(0, 2, by = 0.001)
-out <- ode(y = state, times = times, func = switching_process1, parms = parameters)
-plot(out)
-
-switching_process1 <- function(t, state, parameters) {
-  with(as.list(c(state, parameters)), {
-    drho <- (lambda_min - omega_plus)*rho + omega_min*(1 - rho) - rho*(lambda_min*rho + lambda_plus*(1 - rho))
-    dsigma <- sigma*(lambda_min*rho + lambda_plus*(1 - rho))
-    list(c(drho, dsigma))
-  })
-}
-
-# x,y
-switching_process2 <- function(t, state, parameters) {
-  with(as.list(c(state, parameters)), {
-    dX <- lambda_min*X + omega_min*Y
-    dY <- lambda_plus*Y + omega_plus*X
-    list(c(dX, dY))
-  })
-}
-state <- c(X = 1000, Y = 100)
-times <- seq(0, 4., by = 0.01)
-parameters1 <- c(lambda_min = 1.5, lambda_plus = 1.0, omega_min = 0.01, omega_plus = 0.01)
-parameters2 <- c(lambda_min = 1.5, lambda_plus = 0.768, omega_min = 0.02, omega_plus = 0.072)
-out2 <- ode(y = state, times = times, func = switching_process2, parms = parameters1)
-out2b <- ode(y = state, times = times, func = switching_process2, parms = parameters2)
-plot(out2)
-
-out2_df <- data.frame(t = out2[,1], ZM = out2[,2], ZP = out2[,3])
-out2b_df <- data.frame(t = out2b[,1], ZM = out2b[,2], ZP = out2b[,3])
-ggplot() + 
-  #geom_line(data = out2_df, aes(x=t,y=ZM),color="red") + 
-  geom_line(data = out2_df, aes(x=t,y=ZP),color="red") +
-  #geom_line(data = out2b_df, aes(x=t,y=ZM),color="blue") + 
-  geom_line(data = out2b_df, aes(x=t,y=ZP),color="blue") +
-  ylab("Z")
-
-n_obs <- rpois(n = length(times),
-               lambda = out[,2])
-plot(n_obs ~ times, xlab = "Time", ylab = "Z-")
-points(times, out[,2], type = "l", lwd=2)
-
-saveRDS(out2_df, file = paste0("./simulations_time/ode_[1.5_1.0_001]_4.0_1000.100.rds"))
+my_palette <- c("#72B8B5","#FFCB0A","#265450")
 
 # (co)variances
 covariances <- function(t, state, parameters) {
   with(as.list(c(state,parameters)), {
-    dM1 <- lambda_min*M1 + omega_min*M2
-    dM2 <- lambda_plus*M2 + omega_plus*M1
+    dM1 <- lambda_min*M1 + omega_plus*M2
+    dM2 <- lambda_plus*M2 + omega_min*M1
     dS1 <- 2*lambda_min*S1 + (alpha_min+beta_min)*M1 + 2*omega_min*C + omega_min*M2
     dS2 <- 2*lambda_plus*S2 + (alpha_plus+beta_plus)*M2 + 2*omega_plus*C + omega_plus*M1
     dC <- (lambda_min + lambda_plus)*C + omega_plus*S1 + omega_min*S2
@@ -73,31 +18,37 @@ covariances <- function(t, state, parameters) {
 
 covariances2 <- function(t, state, parameters) {
   with(as.list(c(state,parameters)), {
-    dM1 <- lambda_min*M1 + omega_min*M2
-    dM2 <- lambda_plus*M2 + omega_plus*M1
+    dM1 <- lambda_min*M1 + omega_plus*M2
+    dM2 <- lambda_plus*M2 + omega_min*M1
+    dS1 <- 2*lambda_min*S1 + (alpha_min+beta_min)*M1 + 2*omega_min*C + omega_min*M2
+    dS2 <- 2*lambda_plus*S2 + (alpha_plus+beta_plus)*M2 + 2*omega_plus*C + omega_plus*M1
     dV1 <- (alpha_min+beta_min)*M1 + 2*(omega_min-omega_plus)*C + omega_min*M2
-    dV2 <-(alpha_plus+beta_plus)*M2 + 2*(omega_plus-omega_min)*C + omega_plus*M1
-    dC <- (lambda_min + lambda_plus)*C + omega_plus*(V1+M1^2) + omega_min*(V2+M2^2)
-    list(c(dM1, dM2, dV1, dV2, dC))
+    dV2 <- (alpha_plus+beta_plus)*M2 + 2*(omega_plus-omega_min)*C + omega_plus*M1
+    dC <- (lambda_min + lambda_plus)*C + omega_plus*S1 + omega_min*S2
+    list(c(dM1, dM2,dS1, dS2, dV1, dV2, dC))
   })
 }
 
-state <- c(M1 = 1, M2 = 0, S1 = 0, S2 = 0, C = 0)
-state <- c(M1 = 1, M2 = 0, V1 = 0, V2 = 0, C = 0)
-
+state <- c(M1 = 1, M2 = 0, S1 = 1, S2 = 0, C = 0)
+state <- c(M1 = 1, M2 = 0, S1 = 1, S2 = 0, V1 = 0, V2 = 0, C = 0)
 
 options(scipen = 0)
-parameters_cov1 <- c(lambda_min = 1.5, lambda_plus = 1.0, omega_min = 0.005, omega_plus = 0.005, alpha_min = 1.5, beta_min = 0, alpha_plus = 1.0, beta_plus = 0)
-out1 <- ode(y = state, times = seq(0, 20, by = 0.01), func = covariances2, parms = parameters_cov1)
-out1_df2 <- data.frame(t = out1[,1], M1 = out1[,2], M2 = out1[,3], V1 = out1[,4], V2 = out1[,5], C = out1[,6])
-# saveRDS(out1_df, file = paste0("./GitHub/switching_process/Gillespy2/1.5_1.2_0.015_0.005_5t_51p/ODE.rds"))
+parameters_cov1a <- c(lambda_min = 1.5, lambda_plus = 1.0, omega_min = 0.005, omega_plus = 0.005, alpha_min = 1.5, beta_min = 0, alpha_plus = 1.0, beta_plus = 0)
+parameters_cov1b <- c(lambda_min = 1.5, lambda_plus = 1.0, omega_min = 0.005, omega_plus = 0.005, alpha_min = 1.5, beta_min = 0, alpha_plus = 1.0, beta_plus = 0)
+parameters_cov1c <- c(lambda_min = 1.5, lambda_plus = 1.0, omega_min = 0.005, omega_plus = 0.005, alpha_min = 1.5, beta_min = 0, alpha_plus = 1.0, beta_plus = 0)
+out1a <- ode(y = state, times = seq(0, 20, by = 0.01), func = covariances, parms = parameters_cov1a)
+out1b <- ode(y = state, times = seq(0, 20, by = 0.01), func = covariances2, parms = parameters_cov1a)
+out1c <- ode(y = state, times = seq(0, 20, by = 0.01), func = covariances, parms = parameters_cov1c)
+out1a_df <- data.frame(t = out1a[,1], M1 = out1a[,2], M2 = out1a[,3], S1 = out1a[,4], S2 = out1a[,5], C = out1a[,6])
+out1b_df <- data.frame(t = out1b[,1], M1 = out1b[,2], M2 = out1b[,3], S1 = out1b[,4], S2 = out1b[,5],  V1 = out1b[,6], V2 = out1b[,7], C = out1b[,8])
+out1a_df <- data.frame(t = out1[,1], M1 = out1[,2], M2 = out1[,3], S1 = out1[,4], S2 = out1[,5], C = out1[,6])
 
-parameters_cov2 <- c(lambda_min = 1.2, lambda_plus = 1.2, omega_min = 0.005, omega_plus = 0.002, alpha_min = 1.2, beta_min = 0, alpha_plus = 1.2, beta_plus = 0)
-out2 <- ode(y = state, times = seq(0, 20, by = 0.01), func = covariances, parms = parameters_cov2)
+parameters_cov2 <- c(lambda_min = 1.2, lambda_plus = 1.2, omega_min = 0.001, omega_plus = 0.01, alpha_min = 1.2, beta_min = 0, alpha_plus = 1.2, beta_plus = 0)
+out2 <- ode(y = state, times = seq(0, 50, by = 0.01), func = covariances, parms = parameters_cov2)
 out2_df <- data.frame(t = out2[,1], M1 = out2[,2], M2 = out2[,3], S1 = out2[,4], S2 = out2[,5], C = out2[,6])
 
 parameters_cov3 <- c(lambda_min = 1.0, lambda_plus = 1.5, omega_min = 0.005, omega_plus = 0.005, alpha_min = 1.0, beta_min = 0, alpha_plus = 1.5, beta_plus = 0)
-out3 <- ode(y = state, times = seq(0, 20, by = 0.01), func = covariances, parms = parameters_cov3)
+out3 <- ode(y = state, times = seq(0, 50, by = 0.01), func = covariances, parms = parameters_cov3)
 out3_df <- data.frame(t = out3[,1], M1 = out3[,2], M2 = out3[,3], S1 = out3[,4], S2 = out3[,5], C = out3[,6])
 
 simulation <- read.csv("./GitHub/switching_process/Gillespy2/1.5_1.2_0.015_0.005_5t_51p/simulations/switching_results_avg.csv") %>% tibble::as_tibble()
@@ -133,14 +84,42 @@ ggsave("./GitHub/switching_process/Gillespy2/1.5_1.2_0.015_0.005_5t_51p/gamma_1.
 
 
 # plot standard deviation
-plotsm1 <- out1_df2 %>% mutate(R1 = V1/M1,R2 = V2/M2) %>%
+plotsm1 <- out1a_df %>% 
+  mutate(V1b = S1-M1**2,V2b = S2 - M2**2) %>% mutate(dif1 = V1/V1b, dif2 = V2/V2b)
+  mutate(D1 = sqrt(V1), D2 = sqrt(V2)) %>% 
+  mutate(R1 = D1/M1, R2 = D2/M2) %>% 
   ggplot() +
-  geom_line(aes(x = t,y = R1), color = "red") +
-  geom_line(aes(x = t,y = R2), color = "blue") 
+  geom_line(aes(x = t,y = R1, color = "z-"), linewidth = 1) +
+  geom_line(aes(x = t,y = R2, color = "z+"), linewidth = 1) +
+  labs(x = "t", y = expression(sigma/mu), color = NULL) + ylim(0,3) +
+  scale_color_manual(values=c(my_palette[1],my_palette[2])) +
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
+  theme(legend.text = element_text(size = 16))
 
+plotsm2 <- out2_df %>% 
+  mutate(V1 = S1-M1**2,V2 = S2 - M2**2) %>%
+  mutate(D1 = sqrt(V1), D2 = sqrt(V2)) %>% 
+  mutate(R1 = D1/M1, R2 = D2/M2) %>% 
+  ggplot() +
+  geom_line(aes(x = t,y = R1, color = "z-")) +
+  geom_line(aes(x = t,y = R2, color = "z+")) +
+  labs(x = "t", y = expression(sigma/mu), color = NULL) + ylim(0,3) +
+  scale_color_manual(values=c(my_palette[1],my_palette[2])) +
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
+  theme(legend.text = element_text(size = 16))
 
-plotr1 / plotr2
-(plotm1 + plotd1) / (plotm2 + plotd2)
+plotsm3 <- out3_df %>% 
+  mutate(V1 = S1-M1**2,V2 = S2 - M2**2) %>%
+  mutate(D1 = sqrt(V1), D2 = sqrt(V2)) %>% 
+  mutate(R1 = D1/M1, R2 = D2/M2) %>% 
+  ggplot() +
+  geom_line(aes(x = t,y = R1, color = "z-")) +
+  geom_line(aes(x = t,y = R2, color = "z+")) +
+  labs(x = "t", y = expression(sigma/mu), color = NULL) + ylim(0,3) +
+  scale_color_manual(values=c(my_palette[1],my_palette[2])) +
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
+  theme(legend.text = element_text(size = 16))
+
 
 ggplot(out_df) +
   geom_line(aes(x = t, y = M1, color = "mean1"), linewidth = 1) +
@@ -218,4 +197,60 @@ ggplot() +
   #stat_function(fun = zmin_ode, args = list(z0, lambda_minus = 0.995, lambda_plus = 1.474, omega_minus = 0.016, omega_plus = 0.015), color = 'red') +
   stat_function(fun = zplus_ode, args = list(z0, lambda_minus = 0.995, lambda_plus = 1.474, omega_minus = 0.016, omega_plus = 0.015), color = 'red') +
   xlim(1,4)
+
+# rho, sigma
+switching_process1 <- function(t, state, parameters) {
+  with(as.list(c(state, parameters)), {
+    drho <- rho*rho*(lambda_plus + omega_min - lambda_min - omega_plus) + rho*(lambda_min - lambda_plus - 2*omega_min) + omega_min
+    dsigma <- sigma*((lambda_min + omega_plus - lambda_plus - omega_min)*rho + lambda_plus + omega_min)
+    list(c(drho, dsigma))
+  })
+}
+
+parameters <- c(lambda_min = 15, lambda_plus = 10, omega_min = 0.01, omega_plus = 0.1)
+
+state <- c(rho = 1, sigma = 1)
+times <- seq(0, 2, by = 0.001)
+out <- ode(y = state, times = times, func = switching_process1, parms = parameters)
+plot(out)
+
+switching_process1 <- function(t, state, parameters) {
+  with(as.list(c(state, parameters)), {
+    drho <- (lambda_min - omega_plus)*rho + omega_min*(1 - rho) - rho*(lambda_min*rho + lambda_plus*(1 - rho))
+    dsigma <- sigma*(lambda_min*rho + lambda_plus*(1 - rho))
+    list(c(drho, dsigma))
+  })
+}
+
+# x,y
+switching_process2 <- function(t, state, parameters) {
+  with(as.list(c(state, parameters)), {
+    dX <- lambda_min*X + omega_min*Y
+    dY <- lambda_plus*Y + omega_plus*X
+    list(c(dX, dY))
+  })
+}
+state <- c(X = 1000, Y = 100)
+times <- seq(0, 4., by = 0.01)
+parameters1 <- c(lambda_min = 1.5, lambda_plus = 1.0, omega_min = 0.01, omega_plus = 0.01)
+parameters2 <- c(lambda_min = 1.5, lambda_plus = 0.768, omega_min = 0.02, omega_plus = 0.072)
+out2 <- ode(y = state, times = times, func = switching_process2, parms = parameters1)
+out2b <- ode(y = state, times = times, func = switching_process2, parms = parameters2)
+plot(out2)
+
+out2_df <- data.frame(t = out2[,1], ZM = out2[,2], ZP = out2[,3])
+out2b_df <- data.frame(t = out2b[,1], ZM = out2b[,2], ZP = out2b[,3])
+ggplot() + 
+  #geom_line(data = out2_df, aes(x=t,y=ZM),color="red") + 
+  geom_line(data = out2_df, aes(x=t,y=ZP),color="red") +
+  #geom_line(data = out2b_df, aes(x=t,y=ZM),color="blue") + 
+  geom_line(data = out2b_df, aes(x=t,y=ZP),color="blue") +
+  ylab("Z")
+
+n_obs <- rpois(n = length(times),
+               lambda = out[,2])
+plot(n_obs ~ times, xlab = "Time", ylab = "Z-")
+points(times, out[,2], type = "l", lwd=2)
+
+saveRDS(out2_df, file = paste0("./simulations_time/ode_[1.5_1.0_001]_4.0_1000.100.rds"))
 
