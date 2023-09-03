@@ -1,8 +1,8 @@
 library("GillespieSSA2")
 
 # parameters
-params <- c(am=1.2, bm=0.0, ap=1.2, bp=0.0, om=0.01, op=0.001)
-final_time <- 15
+params <- c(am=1.5, bm=0.0, ap=1.0, bp=0.0, om=0.01, op=0.001)
+final_time <- 10
 sim_name <- "Switching Process"
 # initial state
 initial_state <- c(zm=1, zp=0)
@@ -16,6 +16,51 @@ reactions <- list(
   reaction("om*zp", c(zm = +1), name = "switch_to_minus")
 )
 
+simulation1 = function(i){
+  library("GillespieSSA2")
+  params <- c(am=1.5, bm=0.0, ap=1.0, bp=0.0, om=0.01, op=0.001)
+  sim_name <- paste0("Switching Process",i)
+  # initial state
+  initial_state <- c(zm=1, zp=0)
+  # reactions
+  reactions <- list(
+    reaction("am*zm", c(zm = +1), name = "birth_minus"),
+    reaction("bm*zm", c(zm = -1), name = "death_minus"),
+    reaction("ap*zp", c(zp = +1), name = "birth_plus"),
+    reaction("bp*zp", c(zp = -1), name = "death_plus"),
+    reaction("op*zm", c(zp = +1), name = "switch_to_plus"),
+    reaction("om*zp", c(zm = +1), name = "switch_to_minus")
+  )
+  # simulation
+  out <- ssa(
+    initial_state = initial_state,
+    reactions = reactions,
+    params = params,
+    final_time = final_time,
+    method = ssa_exact(),
+    sim_name = sim_name,
+    log_firings = TRUE
+  )
+  # create dataframe to save
+  state <- as.data.frame(cbind(out$time,out$state,out$firings))
+  colnames(state)[1] <- "time"
+  saveRDS(state, file = paste0("./simulations_1/simulation_",i,".rds"))
+}
+easypar::run( FUN = simulation1,
+              PARAMS = lapply(1:500, list),
+              parallel = TRUE,
+              filter_errors = FALSE,
+              export = ls(globalenv())
+)
+pz <- data.frame()
+for (i in seq(1,500)) {
+  sim <- readRDS(paste0("./simulations_1/simulation_",i,".rds")) %>% tibble::as_tibble()
+  pz <- bind_rows(pz,sim[nrow(sim),])
+}
+saveRDS(pz,"./R/1.0_1.5_0.005_10t.rds")
+sim <- readRDS(paste0("./simulations_1/simulation_",1,".rds")) %>% tibble::as_tibble()
+rm(sim)
+      
 # explicit tau-leap
 set.seed(1)
 
@@ -25,7 +70,7 @@ out <- ssa(
   reactions = reactions,
   params = params,
   final_time = final_time,
-  method = ssa_etl(tau = 0.1),
+  method = ssa_exact(),
   sim_name = sim_name,
   log_firings = TRUE
 )
