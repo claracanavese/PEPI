@@ -3,155 +3,74 @@ library(RColorBrewer)
 library(tidyverse)
 library(patchwork)
 
-# CUMULATIVE DISTRIBUTION
+fs <- readRDS("./R/1.5_1.0_0.001_0.01_10t_fs.RData")
+ss <- readRDS("./R/1.5_1.0_0.001_0.01_10t_ss.RData")
+median(unlist(fs), na.rm = TRUE)
+sd(unlist(fs), na.rm = TRUE)
+median(unlist(ss), na.rm = TRUE)
+sd(unlist(ss), na.rm = TRUE)
 
-gk <- function(t,k,l) {
-  return(t^k*exp(l*t)/l + (-1)^k*factorial(k)/l^(k+1)*(exp(l*t)-1))
-}
-
-# Case 1
-c1odd <- function(t,k,om,op,lm,lp) {
-  return(op*(om*op/(lm-lp))^k*gk(t,k,lm)/factorial(k))
-}
-c1even <- function(t,k,om,op,lm,lp) {
-  return((om*op/(lm-lp))^k*gk(t,k-1,lm)/factorial(k-1))
-}
-
-cdf1 <- function(t,n,om,op,lm,lp) {
-  if(n %% 2 != 0) {
-    k = (n-1)/2
-    return(1.0/(c1odd(t,k,om,op,lm,lp)+1.0))
-  }
-  else if(n %% 2 == 0) {
-    k = n/2
-    return(1.0/(c1even(t,k,om,op,lm,lp)+1.0))
-  }
-}
-
-ggplot() +
-  geom_function(fun = cdf1, args = list(n=1,om=0.01,op=0.001,lm=1.5,lp=1.0), aes(color = "1")) +
-  geom_function(fun = cdf1, args = list(n=2,om=0.01,op=0.001,lm=1.5,lp=1.0), aes(color = "2")) +
-  geom_function(fun = cdf1, args = list(n=3,om=0.01,op=0.001,lm=1.5,lp=1.0), aes(color = "3")) +
-  xlim(0,15) + ylim(0,1)
-
-ggplot() +
-  geom_function(fun = cdf1, args = list(n=1,om=0.01,op=0.001,lm=1.0,lp=1.5), aes(color = "0.01")) +
-  geom_function(fun = cdf1, args = list(n=1,om=0.005,op=0.005,lm=1.0,lp=1.5), aes(color = "0.005")) +
-  geom_function(fun = cdf1, args = list(n=1,om=0.001,op=0.01,lm=1.0,lp=1.5), aes(color = "0.001")) +
-  xlim(0,15) + ylim(0,1)
-
-# Case 2
-c2odd <- function(t,k,om,op,l) {
-  return(op*(om*op)^k*gk(t,2*k,l)/factorial(2*k))
-}
-c2even <- function(t,k,om,op,l) {
-  return((om*op)^k*gk(t,2*k-1,l)/factorial(2*k-1))
-}
-
-cdf2 <- function(t,n,om,op,l) {
-  if(n %% 2 != 0) {
-    k = (n-1)/2
-    return(1.0/(c2odd(t,k,om,op,l)+1.0))
-  }
-  else if(n %% 2 == 0) {
-    k = n/2
-    return(1.0/(c2even(t,k,om,op,l)+1.0))
-  }
-}
-
-ggplot() +
-  geom_function(fun = cdf2, args = list(n=1,om=0.01,op=0.001,l=1.2), aes(color = "1")) +
-  geom_function(fun = cdf2, args = list(n=2,om=0.01,op=0.001,l=1.2), aes(color = "2")) +
-  geom_function(fun = cdf2, args = list(n=3,om=0.01,op=0.001,l=1.2), aes(color = "3")) +
-  xlim(0,15) + ylim(0,1)
-
-ggplot() +
-  geom_function(fun = cdf2, args = list(n=1,om=0.01,op=0.001,l=1.2), aes(color = "0.01")) +
-  geom_function(fun = cdf2, args = list(n=1,om=0.005,op=0.005,l=1.2), aes(color = "0.005")) +
-  geom_function(fun = cdf2, args = list(n=1,om=0.001,op=0.01,l=1.2), aes(color = "0.001")) +
-  xlim(0,15) + ylim(0,1)
-
-# Case 3
-ak_tilde <- function(t,k,om,op,lm,lp) {
-  return((om*op/(lp-lm))^k/(op*factorial(k-1))*gk(t,k-1,lp))
-}
-hat_lerch <- function(x,lm,lp){
-  return(lerch(x, s = 1, v = 1-lm/lp))
-}
-
-c3init <- function(t,om,op,lm,lp) {
-  return(op/lm*exp(lm*t))
-}
-c3odd <- function(t,k,om,op,lm,lp) {
-  return(op^2/lp*ak_tilde(t,k,om,op,lm,lp)*hat_lerch(-op*ak_tilde(t,k,om,op,lm,lp),lm,lp))
-}
-c3even <- function(t,k,om,op,lm,lp) {
-  return(op/lp*(lp-lm)*ak_tilde(t,k,om,op,lm,lp)*hat_lerch(-(lp-lm)*ak_tilde(t,k,om,op,lm,lp),lm,lp))
-}
-
-cdf3 <- function(t,n,om,op,lm,lp) {
-  if(n == 1) {
-    return(1.0/(c3init(t,om,op,lm,lp)+1.0))
-  }
-  else if(n %% 2 != 0) {
-    k = (n-1)/2
-    return(1.0/(c3odd(t,k,om,op,lm,lp)+1.0))
-  }
-  else if(n %% 2 == 0) {
-    k = n/2
-    return(1.0/(c3even(t,k,om,op,lm,lp)+1.0))
-  }
-}
-
-ggplot() +
-  geom_function(fun = cdf3, args = list(n=1,om=0.01,op=0.001,lm=1.0,lp=1.5), aes(color = "1")) +
-  geom_function(fun = cdf3, args = list(n=2,om=0.01,op=0.001,lm=1.0,lp=1.5), aes(color = "2")) +
-  geom_function(fun = cdf3, args = list(n=3,om=0.01,op=0.001,lm=1.0,lp=1.5), aes(color = "3")) +
-  xlim(0,15) + ylim(0,1)
-
-ggplot() +
-  geom_function(fun = cdf2, args = list(n=1,om=0.01,op=0.001,l=1.2), aes(color = "0.01")) +
-  geom_function(fun = cdf2, args = list(n=1,om=0.005,op=0.005,l=1.2), aes(color = "0.005")) +
-  geom_function(fun = cdf2, args = list(n=1,om=0.001,op=0.01,l=1.2), aes(color = "0.001")) +
-  xlim(0,15) + ylim(0,1)
-
-###########################################################################
-df1_theory <- data.frame(case = c(1,1,2,2,3,3),times = c(0.288,0.702,0.334,0.641,0.441,0.702))
-df1_sim <- data.frame(case = c(1,1,2,2,3,3), times = c(0.33,0.69,0.38,0.66,0.49,0.69), errors = c(0.11,0.08,0.12,0.09,0.11,0.08))
+df1_theory <- data.frame(case = c(1,1,2,2,3,3),times = c(4.875,7.484,3.803,6.873,3.340,7.484))
+df1_sim <- data.frame(case = c(1,1,2,2,3,3), times = c(4.92,7.58,3.81,6.95,3.31,7.42), errors = c(1.15,1.03,1.20,1.11,1.15,1.19))
 
 plot1 <- ggplot() +
-  geom_jitter(data=df1_theory, aes(x=case,y=times,color="thoery"),size=4, shape = 17, height = 0, width = 0.03) + 
+  geom_jitter(data=df1_theory, aes(x=case,y=times,color="theory"),size=4, shape = 17, height = 0, width = 0.05) + 
   geom_point(data=df1_sim, aes(x=case,y=times,color="simulation"),size=3) +
   geom_errorbar(data=df1_sim, aes(x=case, ymin=times-errors, ymax=times+errors),width=.08,color="black") +
   scale_x_continuous(breaks = c(1,2,3)) +
-  scale_color_manual(values=c("black","chartreuse3")) +
+  scale_color_manual(values=c("black","#BE202F")) +
   labs(col=NULL) +
   guides(colour = guide_legend(override.aes = list(shape = c(16,17)))) +
+  labs(y="t") + ylim(2,10) +
+  theme(legend.text = element_text(size = 16), axis.text = element_text(size = 16), axis.title = element_text(size = 18)) +
   theme(legend.position = "none")
 plot1
 
-df2_theory <- data.frame(case = c(1,1,2,2,3,3),times = c(0.265,0.500,0.300,0.459,0.380,0.500))
-df2_sim <- data.frame(case = c(1,1,2,2,3,3), times = c(0.27,0.51,0.30,0.50,0.38,0.53), errors = c(0.09,0.06,0.09,0.07,0.08,0.06))
+fs <- readRDS("./R/1.2_0.001_0.01_10t_fs.RData")
+ss <- readRDS("./R/1.2_0.001_0.01_10t_ss.RData")
+median(unlist(fs), na.rm = TRUE)
+sd(unlist(fs), na.rm = TRUE)
+median(unlist(ss), na.rm = TRUE)
+sd(unlist(ss), na.rm = TRUE)
+
+df2_theory <- data.frame(case = c(1,1,2,2,3,3),times = c(5.908,8.012,5.567,7.323,3.990,8.012))
+df2_sim <- data.frame(case = c(1,1,2,2,3,3), times = c(5.99,8.48,4.54,7.76,3.97,8.14), errors = c(1.52,1.18,1.40,1.27,1.44,1.14))
 
 plot2 <- ggplot() +
-  geom_jitter(data=df2_theory, aes(x=case,y=times),size=4, shape = 17,color="chartreuse3",height = 0, width = 0.1) + 
-  geom_point(data=df2_sim, aes(x=case,y=times),size=3) +
-  geom_errorbar(data=df2_sim, aes(x=case, ymin=times-errors, ymax=times+errors),width=.08,color="black") +
-  scale_x_continuous(breaks = c(1,2,3)) 
+  geom_jitter(data=df2_theory, aes(x=case,y=times, color = "Theory"),size=4, shape = 17,height = 0, width = 0.03) + 
+  geom_point(data=df2_sim, aes(x=case,y=times,color="Simulation"),size=3) +
+  geom_errorbar(data=df2_sim, aes(x=case, ymin=times-errors, ymax=times+errors),width=.08) +
+  scale_x_continuous(breaks = c(1,2,3)) +
+  scale_color_manual(values=c("black","#BE202F")) +
+  labs(y="t", col = NULL) + ylim(2,10) +
+  theme(legend.text = element_text(size = 16), axis.text = element_text(size = 16), axis.title = element_text(size = 18)) +
+  theme(legend.position = "none")
 plot2
 
-df3_theory <- data.frame(case = c(1,1,2,2,3,3),times = c(0.462,0.762,0.530,0.750,0.691,0.876))
-df3_sim <- data.frame(case = c(1,1,2,2,3,3), times = c(0.46,0.74,0.53,0.72,0.68,0.83), errors = c(0.14,0.11,0.15,0.12,0.16,0.13))
+fs <- readRDS("./R/1.0_1.5_0.001_0.01_10t_fs.RData")
+ss <- readRDS("./R/1.0_1.5_0.001_0.01_10t_ss.RData")
+median(unlist(fs), na.rm = TRUE)
+sd(unlist(fs), na.rm = TRUE)
+median(unlist(ss), na.rm = TRUE)
+sd(unlist(ss), na.rm = TRUE)
+
+df3_theory <- data.frame(case = c(1,1,2,2,3,3),times = c(6.909,9.366,5.303,8.223,4.615,8.607))
+df3_sim <- data.frame(case = c(1,1,2,2,3,3), times = c(6.74,8.65,5.37,8.10,4.48,8.24), errors = c(1.56,1.15,1.75,1.33,1.61,1.27))
 
 plot3 <- ggplot() +
-  geom_jitter(data=df3_theory, aes(x=case,y=times),size=4, shape = 17,color="chartreuse3",height = 0, width = 0.1) + 
-  geom_point(data=df3_sim, aes(x=case,y=times),size=3) +
-  geom_errorbar(data=df3_sim, aes(x=case, ymin=times-errors, ymax=times+errors),width=.08,color="black") +
-  scale_x_continuous(breaks = c(1,2,3)) 
+  geom_jitter(data=df3_theory, aes(x=case,y=times,color="Theory"),size=4, shape = 17,height = 0, width = 0.05) + 
+  geom_point(data=df3_sim, aes(x=case,y=times,color="Simulation"),size=3) +
+  geom_errorbar(data=df3_sim, aes(x=case, ymin=times-errors, ymax=times+errors),width=.08) +
+  scale_x_continuous(breaks = c(1,2,3)) +
+  scale_color_manual(values=c("black","#BE202F")) +
+  labs(y="t", col = NULL) + ylim(2,10) +
+  theme(axis.text = element_text(size = 16), axis.title = element_text(size = 18)) +
+  theme(legend.position = "none")
 plot3
-plot1 + plot2 + plot3
+ggsave("./switching_times_legend.png",dpi=600)
 
-ggsave("./imgs/switching_times/jitter.png",dpi=600)
+plot1 + plot2 + plot3
+ggsave("./switching_times.png",width = 12, height = 4,dpi=600)
 
 # cumulative distribution plot
 omega_m = 0.01

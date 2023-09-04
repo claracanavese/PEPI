@@ -1,7 +1,7 @@
 library("GillespieSSA2")
 
 # parameters
-params <- c(am=1.5, bm=0.0, ap=1.0, bp=0.0, om=0.01, op=0.001)
+params <- c(am=1.2, bm=0.0, ap=1.2, bp=0.0, om=0.01, op=0.001)
 final_time <- 10
 sim_name <- "Switching Process"
 # initial state
@@ -18,7 +18,7 @@ reactions <- list(
 
 simulation1 = function(i){
   library("GillespieSSA2")
-  params <- c(am=1.5, bm=0.0, ap=1.0, bp=0.0, om=0.01, op=0.001)
+  params <- c(am=1.0, bm=0.0, ap=1.5, bp=0.0, om=0.001, op=0.01)
   sim_name <- paste0("Switching Process",i)
   # initial state
   initial_state <- c(zm=1, zp=0)
@@ -44,7 +44,7 @@ simulation1 = function(i){
   # create dataframe to save
   state <- as.data.frame(cbind(out$time,out$state,out$firings))
   colnames(state)[1] <- "time"
-  saveRDS(state, file = paste0("./simulations_1/simulation_",i,".rds"))
+  saveRDS(state, file = paste0("./R/simulations_1.0_1.5_0.001_0.01_10t/simulation_",i,".rds"))
 }
 easypar::run( FUN = simulation1,
               PARAMS = lapply(1:500, list),
@@ -53,13 +53,26 @@ easypar::run( FUN = simulation1,
               export = ls(globalenv())
 )
 pz <- data.frame()
+first_switch = list()
+second_switch = list()
 for (i in seq(1,500)) {
-  sim <- readRDS(paste0("./simulations_1/simulation_",i,".rds")) %>% tibble::as_tibble()
+  sim <- readRDS(paste0("./R/simulations_1.0_1.5_0.001_0.01_10t/simulation_",i,".rds")) %>% tibble::as_tibble()
   pz <- bind_rows(pz,sim[nrow(sim),])
+  fs = filter(sim, switch_to_plus > 0)
+  ss = filter(sim, switch_to_minus > 0)
+  first_switch[i] = fs[1,]$time
+  second_switch[i] = ss[1,]$time
 }
-saveRDS(pz,"./R/1.0_1.5_0.005_10t.rds")
-sim <- readRDS(paste0("./simulations_1/simulation_",1,".rds")) %>% tibble::as_tibble()
-rm(sim)
+
+median(unlist(first_switch), na.rm = TRUE)
+sd(unlist(first_switch), na.rm = TRUE)
+median(unlist(second_switch), na.rm = TRUE)
+sd(unlist(second_switch), na.rm = TRUE)
+
+saveRDS(first_switch, file="./R/1.0_1.5_0.001_0.01_10t_fs.RData")
+saveRDS(second_switch, file="./R/1.0_1.5_0.001_0.01_10t_ss.RData")
+saveRDS(pz,"./R/1.0_1.5_0.001_0.01_10t.rds")
+
       
 # explicit tau-leap
 set.seed(1)
