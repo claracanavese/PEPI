@@ -6,8 +6,8 @@ library(reshape2)
 library(patchwork)
 library(bayesplot)
 
-# simulation_py <- read.csv("./GitHub/Gillespy2/8t/1.2_1.5_0.001_0.01_8t_81p/simulations/switching_results_avg.csv") %>% tibble::as_tibble()
-simulation_py <- readRDS("./PEPI/simulations/simulation_359.rds") #%>% tibble::as_tibble()
+simulation_py <- read.csv("./simulations_1.5_1.2_0.015_0.005_8t/switching_results_avg.csv") %>% tibble::as_tibble()
+# simulation_py <- readRDS("./PEPI/simulations/simulation_359.rds") %>% tibble::as_tibble()
 # colnames(simulation_py) <- c('time','z_minus','z_plus','var_minus','var_plus','cov')
 samples <- simulation_py[seq(12,82, by = 7),]
 
@@ -29,10 +29,10 @@ prior_omega =
 # NEW MODEL
 data_list <- list(
   n_times = nrow(samples),
-  z0 = c(1000,100,0,0,0),
+  z0 = c(1000,100,0,0),
   t0 = simulation_py$time[1],
-  zminus = as.integer(samples$zm),
-  zplus = as.integer(samples$zp),
+  zminus = as.integer(samples$z_minus),
+  zplus = as.integer(samples$z_plus),
   t = samples$time
 )
 model <- rstan::stan_model("./PEPI/regressionODE.stan")
