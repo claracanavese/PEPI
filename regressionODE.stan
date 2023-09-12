@@ -57,8 +57,8 @@ model {
   
   lambda_minus ~ gamma(2.,1.);
   lambda_plus ~ gamma(2.,1.);
-  omega_minus ~ gamma(1.5, 280);
-  omega_plus ~ gamma(1.5, 280);
+  omega_minus ~ gamma(1.5, 200);
+  omega_plus ~ gamma(1.5, 200);
   // omega_minus ~  cauchy(0.01,0.01);
   // omega_plus ~ cauchy(0.01,0.01);
   // omega_minus ~  gamma(2,0.01);
@@ -76,13 +76,16 @@ model {
 generated quantities {
   real pred_minus[n_times];
   real pred_plus[n_times];
+  real var_minus[n_times];
+  real var_plus[n_times];
   real pred[n_times, 4] = integrate_ode_rk45(switching_process, z0, t0, t, theta, x_r, x_i);
   // real y_prior[n_times];
   
   for (i in 1:n_times){
     pred_minus[i] = pred[i,1];
     pred_plus[i] = pred[i,2];
-    // y_prior[i] = gamma_rng(1.5,280);
+    var_minus[i] = pred[i,3];
+    var_plus[i] = pred[i,4];
   }
   
   // for (i in 1:n_times){
