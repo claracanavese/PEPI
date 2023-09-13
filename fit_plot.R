@@ -104,7 +104,7 @@ plot9 = err[c(9,18,27,36),] %>% ggplot() +
 (plot1 + plot2 + plot3) / (plot4 + plot5 + plot6) / (plot7 + plot8 + plot9)
 ggsave("./inference_error.png", width = 10, height = 8, dpi = 600)
 
-fit = readRDS("./fit_11/fit_38.rds")
+fit = readRDS("./fit_11/fit_37.rds")
 print(fit, pars = c("lambda_minus", "lambda_plus", "omega_minus", "omega_plus"), digits_summary = 4)
 posterior = as.data.frame(fit)
 posterior_lambda_min = posterior %>% ggplot() + geom_density(aes(x = lambda_minus, y = after_stat(density))) + ggtitle("Posterior") + xlim(0,5) + xlab("lambda_minus") + theme(plot.title = element_text(hjust = 0.5)) + geom_vline(xintercept = 1.5, color = "forestgreen")
@@ -112,3 +112,8 @@ posterior_lambda_plus = posterior %>% ggplot() + geom_density(aes(x = lambda_plu
 posterior_omega_min = posterior %>% ggplot() + geom_density(aes(x = omega_minus, y = after_stat(density))) + ggtitle("Posterior") + xlim(0,0.03) + xlab("omega_minus") + theme(plot.title = element_text(hjust = 0.5)) + geom_vline(xintercept = 0.001, color = "forestgreen")
 posterior_omega_plus = posterior %>% ggplot() + geom_density(aes(x = omega_plus, y = after_stat(density))) + ggtitle("Posterior") + xlim(0,0.03) + xlab("omega_plus") + theme(plot.title = element_text(hjust = 0.5)) + geom_vline(xintercept = 0.01, color = "forestgreen")
 
+prior_omega = 
+  ggplot() + stat_function(fun = dgamma, args = list(shape = 1.5, rate = 200)) +
+  ggtitle("Prior") + xlab("omega") + theme(plot.title = element_text(hjust = 0.5)) + ylab("density") + xlim(0.,0.03)
+
+posterior_omega_min / prior_omega
