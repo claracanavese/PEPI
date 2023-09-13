@@ -3,8 +3,24 @@ library(RColorBrewer)
 library(tidyverse)
 library(patchwork)
 
-fs <- readRDS("./R/1.5_1.0_0.001_0.01_10t_fs.RData")
-ss <- readRDS("./R/1.5_1.0_0.001_0.01_10t_ss.RData")
+fs <- readRDS("./R_times/1.0_1.5_0.01_0.001_10t_fs.RData")
+ss <- readRDS("./R_times/1.0_1.5_0.01_0.001_10t_ss.RData")
+fs_df = data.frame(unlist(fs))
+colnames(fs_df) = c("fs")
+ss_df = data.frame(unlist(ss))
+colnames(ss_df) = c("ss")
+
+fs_theory <- read.csv("./R_times/1.0_1.5_0.01_0.001_fs.csv") %>%
+  tibble::as_tibble()
+ss_theory <- read.csv("./R_times/1.0_1.5_0.01_0.001_ss.csv") %>%
+  tibble::as_tibble()
+
+ggplot() +
+  geom_histogram(data = fs_df, aes(x = fs, y = after_stat(density)), bins = 70) +
+  geom_line(data = fs_theory, aes(x = fs, y = p), linewidth = 1) +
+  geom_histogram(data = ss_df, aes(x = ss, y = after_stat(density)), bins = 90) +
+  geom_line(data = ss_theory, aes(x = ss, y = p), linewidth = 1) 
+
 median(unlist(fs), na.rm = TRUE)
 sd(unlist(fs), na.rm = TRUE)
 median(unlist(ss), na.rm = TRUE)
