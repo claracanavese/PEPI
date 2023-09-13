@@ -243,8 +243,8 @@ z0 <- as.array(c(1000,100))
 t <- seq(0,9, length=50)
 input <- lapply(t, function(time) {
   dplyr::tibble(
-    zmin = zmin_ode(time, z0 = z0, lambda_minus = 1.5, lambda_plus = 1, omega_minus = .005, omega_plus = .005),
-    zplus = zplus_ode(time, z0, 1.5, 1, .005, .005)
+    zmin = zmin_ode(time, z0 = z0, lambda_minus = 1.5, lambda_plus = 1, omega_minus = 0.005, omega_plus = .005),
+    zplus = zplus_ode(time, z0, 1.5, 1, 0.005, .005)
     )
 }) %>% do.call('bind_rows', .)
 
