@@ -1,4 +1,8 @@
 library("GillespieSSA2")
+library("easypar")
+library("StanHeaders")
+library(dplyr)
+library(magrittr)
 
 # parameters
 params <- c(am=1.2, bm=0.0, ap=1.2, bp=0.0, om=0.01, op=0.001)
@@ -18,8 +22,8 @@ reactions <- list(
 
 simulation1 = function(i){
   library("GillespieSSA2")
-  params <- c(am=1.0, bm=0.0, ap=1.5, bp=0.0, om=0.001, op=0.01)
-  sim_name <- paste0("Switching Process",i)
+  params <- c(am=1.0, bm=0.0, ap=1.5, bp=0.0, om=0.01, op=0.001)
+  sim_name <- paste0("Switching Process ",i)
   # initial state
   initial_state <- c(zm=1, zp=0)
   # reactions
@@ -36,42 +40,52 @@ simulation1 = function(i){
     initial_state = initial_state,
     reactions = reactions,
     params = params,
-    final_time = final_time,
+    final_time = 14,
     method = ssa_exact(),
     sim_name = sim_name,
     log_firings = TRUE
   )
+  print(paste0("Switching Process ",i))
   # create dataframe to save
   state <- as.data.frame(cbind(out$time,out$state,out$firings))
   colnames(state)[1] <- "time"
-  saveRDS(state, file = paste0("./R/simulations_1.0_1.5_0.001_0.01_10t/simulation_",i,".rds"))
+  
+  pz <<- bind_rows(pz,state[nrow(state),])
+  fs = filter(state, switch_to_plus > 0)
+  ss = filter(state, switch_to_minus > 0)
+  first_switch[i] <<- fs[1,]$time
+  second_switch[i] <<- ss[1,]$time
 }
+
 easypar::run( FUN = simulation1,
-              PARAMS = lapply(1:500, list),
+              PARAMS = lapply(1:2, list),
               parallel = TRUE,
               filter_errors = FALSE,
               export = ls(globalenv())
 )
+prova <- lapply(1:500, simulation1)
+
 pz <- data.frame()
 first_switch = list()
 second_switch = list()
-for (i in seq(1,500)) {
-  sim <- readRDS(paste0("./R/simulations_1.0_1.5_0.001_0.01_10t/simulation_",i,".rds")) %>% tibble::as_tibble()
-  pz <- bind_rows(pz,sim[nrow(sim),])
-  fs = filter(sim, switch_to_plus > 0)
-  ss = filter(sim, switch_to_minus > 0)
-  first_switch[i] = fs[1,]$time
-  second_switch[i] = ss[1,]$time
-}
+
+# for (i in seq(1,500)) {
+#   sim <- readRDS(paste0("./R/simulations_1.0_1.5_0.001_0.01_10t/simulation_",i,".rds")) %>% tibble::as_tibble()
+#   pz <- bind_rows(pz,sim[nrow(sim),])
+#   fs = filter(sim, switch_to_plus > 0)
+#   ss = filter(sim, switch_to_minus > 0)
+#   first_switch[i] = fs[1,]$time
+#   second_switch[i] = ss[1,]$time
+# }
 
 median(unlist(first_switch), na.rm = TRUE)
 sd(unlist(first_switch), na.rm = TRUE)
 median(unlist(second_switch), na.rm = TRUE)
 sd(unlist(second_switch), na.rm = TRUE)
 
-saveRDS(first_switch, file="./R/1.0_1.5_0.001_0.01_10t_fs.RData")
-saveRDS(second_switch, file="./R/1.0_1.5_0.001_0.01_10t_ss.RData")
-saveRDS(pz,"./R/1.0_1.5_0.001_0.01_10t.rds")
+saveRDS(first_switch, file="./R/1.0_1.5_0.01_0.001_14t_fs.RData")
+saveRDS(second_switch, file="./R/1.0_1.5_0.01_0.001_14t_ss.RData")
+saveRDS(pz,"./R/1.0_1.5_0.01_0.001_14t.rds")
 
       
 # explicit tau-leap
