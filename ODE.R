@@ -257,12 +257,14 @@ input <- lapply(t, function(time) {
     zplus = zplus_ode(time, z0, lambda_minus = 1.5, lambda_plus = 1.0, omega_minus = .01, omega_plus = .001)
     )
 }) %>% do.call('bind_rows', .)
-output <- lapply(t, function(time) {
-  dplyr::tibble(
-    zmin = zmin_ode(time, z0 = z0, lambda_minus = 1.2, lambda_plus = 1.14, omega_minus = 0.006, omega_plus = 0.013),
-    zplus = zplus_ode(time, z0, lambda_minus = 1.2, lambda_plus = 1.14, omega_minus = 0.006, omega_plus = 0.013)
-  )
-}) %>% do.call('bind_rows', .)
+# output <- lapply(t, function(time) {
+#   dplyr::tibble(
+#     zmin = zmin_ode(time, z0 = z0, lambda_minus = 1.2, lambda_plus = 1.14, omega_minus = 0.006, omega_plus = 0.013),
+#     zplus = zplus_ode(time, z0, lambda_minus = 1.2, lambda_plus = 1.14, omega_minus = 0.006, omega_plus = 0.013)
+#   )
+# }) %>% do.call('bind_rows', .)
+
+sim1 <- read.csv("./PEPI/sim_1.5_1.0_0.01_0.001/simulation_1.csv")
 
 input$t <- t
 output$t <- t
@@ -273,7 +275,7 @@ input %>%
 
 ggplot() +
   geom_line(data = input, aes(x = t, y = zmin, color = "ode_min")) +
-  geom_point(data = sim1, aes(x = time, y = zm, color = "sim_1"), size = 0.5) +
+  geom_point(data = sim1, aes(x = time, y = z_minus, color = "sim_1"), size = 0.5) +
   geom_point(data = sim2, aes(x = time, y = zm, color = "sim_2"), size = 0.5) +
   geom_point(data = sim3, aes(x = time, y = zm, color = "sim_3"), size = 0.5) +
   geom_point(data = sim4, aes(x = time, y = zm, color = "sim_4"), size = 0.5) +
