@@ -1,7 +1,9 @@
 library(deSolve)
 library(RColorBrewer)
 library(reshape2)
-
+library(magrittr)
+library(dplyr)
+library(ggplot2)
 my_palette <- c("#72B8B5","#FFCB0A","#265450")
 
 # (co)variances
@@ -248,17 +250,17 @@ zplus_ode <- function(t, z0, lambda_minus, lambda_plus, omega_minus, omega_plus)
 }
 
 z0 <- as.array(c(1000,100))
-t <- seq(0,9, length=50)
+t <- seq(0,10, length=100)
 input <- lapply(t, function(time) {
   dplyr::tibble(
-    zmin = zmin_ode(time, z0 = z0, lambda_minus = 1., lambda_plus = 1.5, omega_minus = .005, omega_plus = .005),
-    zplus = zplus_ode(time, z0, lambda_minus = 1., lambda_plus = 1.5, omega_minus = .005, omega_plus = .005)
+    zmin = zmin_ode(time, z0 = z0, lambda_minus = 1.5, lambda_plus = 1.0, omega_minus = .01, omega_plus = .001),
+    zplus = zplus_ode(time, z0, lambda_minus = 1.5, lambda_plus = 1.0, omega_minus = .01, omega_plus = .001)
     )
 }) %>% do.call('bind_rows', .)
 output <- lapply(t, function(time) {
   dplyr::tibble(
-    zmin = zmin_ode(time, z0 = z0, lambda_minus = 1., lambda_plus = 1.49, omega_minus = 0.01, omega_plus = 0.004),
-    zplus = zplus_ode(time, z0, lambda_minus = 1., lambda_plus = 1.49, omega_minus = 0.01, omega_plus = 0.004)
+    zmin = zmin_ode(time, z0 = z0, lambda_minus = 1.2, lambda_plus = 1.14, omega_minus = 0.006, omega_plus = 0.013),
+    zplus = zplus_ode(time, z0, lambda_minus = 1.2, lambda_plus = 1.14, omega_minus = 0.006, omega_plus = 0.013)
   )
 }) %>% do.call('bind_rows', .)
 
@@ -271,10 +273,28 @@ input %>%
 
 ggplot() +
   geom_line(data = input, aes(x = t, y = zmin, color = "ode_min")) +
+  geom_point(data = sim1, aes(x = time, y = zm, color = "sim_1"), size = 0.5) +
+  geom_point(data = sim2, aes(x = time, y = zm, color = "sim_2"), size = 0.5) +
+  geom_point(data = sim3, aes(x = time, y = zm, color = "sim_3"), size = 0.5) +
+  geom_point(data = sim4, aes(x = time, y = zm, color = "sim_4"), size = 0.5) +
+  geom_point(data = sim5, aes(x = time, y = zm, color = "sim_5"), size = 0.5) +
+  geom_point(data = sim6, aes(x = time, y = zm, color = "sim_6"), size = 0.5) +
+  geom_point(data = sim7, aes(x = time, y = zm, color = "sim_7"), size = 0.5) +
+  geom_point(data = sim8, aes(x = time, y = zm, color = "sim_8"), size = 0.5) +
+  geom_point(data = sim9, aes(x = time, y = zm, color = "sim_9"), size = 0.5)
+  
+ggplot() +
   geom_line(data = input, aes(x = t, y = zplus, color = "ode_plus")) +
-  geom_point(data = output, aes(x = t, y = zmin, color = "inference_min")) +
-  geom_point(data = output, aes(x = t, y = zplus, color = "inference_plus")) +
-  theme(legend.title = element_blank())
+  geom_point(data = sim1, aes(x = time, y = zp, color = "sim_1"), size = 0.5) +
+  geom_point(data = sim2, aes(x = time, y = zp, color = "sim_2"), size = 0.5) +
+  geom_point(data = sim3, aes(x = time, y = zp, color = "sim_3"), size = 0.5) +
+  geom_point(data = sim4, aes(x = time, y = zp, color = "sim_4"), size = 0.5) +
+  geom_point(data = sim5, aes(x = time, y = zp, color = "sim_5"), size = 0.5) +
+  geom_point(data = sim6, aes(x = time, y = zp, color = "sim_6"), size = 0.5) +
+  geom_point(data = sim7, aes(x = time, y = zp, color = "sim_7"), size = 0.5) +
+  geom_point(data = sim8, aes(x = time, y = zp, color = "sim_8"), size = 0.5) +
+  geom_point(data = sim9, aes(x = time, y = zp, color = "sim_9"), size = 0.5)
+
   
 zmin_ode(0, z0, 1.5, 1.0, .01, .01)
 
