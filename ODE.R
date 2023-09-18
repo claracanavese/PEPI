@@ -1,7 +1,9 @@
 library(deSolve)
 library(RColorBrewer)
 library(reshape2)
-
+library(magrittr)
+library(dplyr)
+library(ggplot2)
 my_palette <- c("#72B8B5","#FFCB0A","#265450")
 
 # (co)variances
@@ -20,19 +22,26 @@ covariances2 <- function(t, state, parameters) {
   with(as.list(c(state,parameters)), {
     dM1 <- lambda_min*M1 + omega_min*M2
     dM2 <- lambda_plus*M2 + omega_plus*M1
-    dS1 <- 2*lambda_min*S1 + (alpha_min+beta_min)*M1 + 2*omega_min*C + omega_min*M2
-    dS2 <- 2*lambda_plus*S2 + (alpha_plus+beta_plus)*M2 + 2*omega_plus*C + omega_plus*M1
-    dV1 <- (alpha_min+beta_min)*M1 + omega_min*M2
-    dV2 <- (alpha_plus+beta_plus)*M2 + omega_plus*M1
-    dC <- (lambda_min + lambda_plus)*C + omega_plus*S1 + omega_min*S2
-    list(c(dM1, dM2,dS1, dS2, dV1, dV2, dC))
+    dV1 <- 2*lambda_min*V1 + 2*omega_min*C + (alpha_min+beta_min)*M1 + omega_min*M2
+    dV2 <- 2*lambda_plus*V2 + 2*omega_plus*C + (alpha_plus+beta_plus)*M2 + omega_plus*M1
+    dC <- (lambda_min + lambda_plus)*C + omega_plus*V1 + omega_min*V2
+    list(c(dM1, dM2, dV1, dV2, dC))
   })
 }
 
 state <- c(M1 = 1, M2 = 0, S1 = 1, S2 = 0, C = 0)
-state2 <- c(M1 = 1, M2 = 0, S1 = 1, S2 = 0, V1 = 0, V2 = 0, C = 0)
+state2 <- c(M1 = 1, M2 = 0, V1 = 0, V2 = 0, C = 0)
 
 options(scipen = 0)
+
+parameters <- c(lambda_min = 1.5, lambda_plus = 1.0, omega_min = 0.001, omega_plus = 0.01, alpha_min = 1.5, beta_min = 0, alpha_plus = 1.0, beta_plus = 0)
+out1 <- ode(y = state, times = seq(0, 20, by = 0.01), func = covariances, parms = parameters)
+out2 <- ode(y = state2, times = seq(0, 20, by = 0.01), func = covariances2, parms = parameters)
+out1_df <- data.frame(t = out1[,1], M1 = out1[,2], M2 = out1[,3], S1 = out1[,4], S2 = out1[,5], C = out1[,6])
+out2_df <- data.frame(t = out2[,1], M1 = out2[,2], M2 = out2[,3], V1 = out2[,4], V2 = out2[,5], C = out2[,6])
+
+out1_df = out1_df %>% mutate(V1 = S1 - M1**2,V2 = S2 - M2**2)
+
 
 # case 1
 parameters_cov1a <- c(lambda_min = 1.5, lambda_plus = 1.0, omega_min = 0.001, omega_plus = 0.01, alpha_min = 1.5, beta_min = 0, alpha_plus = 1.0, beta_plus = 0)
@@ -98,7 +107,6 @@ pplus
 pmin / pplus
 ggsave("./GitHub/switching_process/Gillespy2/1.5_1.2_0.015_0.005_5t_51p/gamma_1.5_280/odeVSregression_ode_zoom.png", width = 8, height = 7, dpi = 600)
 
-
 # plot standard deviation over mean
 plotsm1a <- out1a_df %>% 
   mutate(V1 = S1 - M1**2,V2 = S2 - M2**2) %>% 
@@ -111,6 +119,7 @@ plotsm1a <- out1a_df %>%
   scale_color_manual(values=c(my_palette[1],my_palette[2])) +
   theme(axis.text = element_text(size = 16), axis.title = element_text(size = 18)) +
   theme(legend.position="none")
+
 plotsm1b <- out1b_df %>% 
   mutate(V1 = S1 - M1**2,V2 = S2 - M2**2) %>%
   mutate(D1 = sqrt(V1), D2 = sqrt(V2)) %>% 
@@ -122,6 +131,7 @@ plotsm1b <- out1b_df %>%
   scale_color_manual(values=c(my_palette[1],my_palette[2])) +
   theme(axis.text = element_text(size = 16), axis.title = element_text(size = 18)) +
   theme(legend.position="none")
+
 plotsm1c <- out1c_df %>% 
   mutate(V1 = S1 - M1**2,V2 = S2 - M2**2) %>% 
   mutate(D1 = sqrt(V1), D2 = sqrt(V2)) %>% 
@@ -240,20 +250,54 @@ zplus_ode <- function(t, z0, lambda_minus, lambda_plus, omega_minus, omega_plus)
 }
 
 z0 <- as.array(c(1000,100))
-t <- seq(0,9, length=50)
+t <- seq(0,10, length=100)
 input <- lapply(t, function(time) {
   dplyr::tibble(
-    zmin = zmin_ode(time, z0 = z0, lambda_minus = 1.5, lambda_plus = 1, omega_minus = .005, omega_plus = .005),
-    zplus = zplus_ode(time, z0, 1.5, 1, .005, .005)
+    zmin = zmin_ode(time, z0 = z0, lambda_minus = 1.5, lambda_plus = 1.0, omega_minus = .01, omega_plus = .001),
+    zplus = zplus_ode(time, z0, lambda_minus = 1.5, lambda_plus = 1.0, omega_minus = .01, omega_plus = .001)
     )
 }) %>% do.call('bind_rows', .)
+# output <- lapply(t, function(time) {
+#   dplyr::tibble(
+#     zmin = zmin_ode(time, z0 = z0, lambda_minus = 1.2, lambda_plus = 1.14, omega_minus = 0.006, omega_plus = 0.013),
+#     zplus = zplus_ode(time, z0, lambda_minus = 1.2, lambda_plus = 1.14, omega_minus = 0.006, omega_plus = 0.013)
+#   )
+# }) %>% do.call('bind_rows', .)
+
+sim1 <- read.csv("./PEPI/sim_1.5_1.0_0.01_0.001/simulation_1.csv")
 
 input$t <- t
+output$t <- t
 input %>% 
   tidyr::pivot_longer(!t) %>% 
   ggplot(mapping = aes(x=t, y=value, col=name)) +
   geom_point()
 
+ggplot() +
+  geom_line(data = input, aes(x = t, y = zmin, color = "ode_min")) +
+  geom_point(data = sim1, aes(x = time, y = z_minus, color = "sim_1"), size = 0.5) +
+  geom_point(data = sim2, aes(x = time, y = zm, color = "sim_2"), size = 0.5) +
+  geom_point(data = sim3, aes(x = time, y = zm, color = "sim_3"), size = 0.5) +
+  geom_point(data = sim4, aes(x = time, y = zm, color = "sim_4"), size = 0.5) +
+  geom_point(data = sim5, aes(x = time, y = zm, color = "sim_5"), size = 0.5) +
+  geom_point(data = sim6, aes(x = time, y = zm, color = "sim_6"), size = 0.5) +
+  geom_point(data = sim7, aes(x = time, y = zm, color = "sim_7"), size = 0.5) +
+  geom_point(data = sim8, aes(x = time, y = zm, color = "sim_8"), size = 0.5) +
+  geom_point(data = sim9, aes(x = time, y = zm, color = "sim_9"), size = 0.5)
+  
+ggplot() +
+  geom_line(data = input, aes(x = t, y = zplus, color = "ode_plus")) +
+  geom_point(data = sim1, aes(x = time, y = zp, color = "sim_1"), size = 0.5) +
+  geom_point(data = sim2, aes(x = time, y = zp, color = "sim_2"), size = 0.5) +
+  geom_point(data = sim3, aes(x = time, y = zp, color = "sim_3"), size = 0.5) +
+  geom_point(data = sim4, aes(x = time, y = zp, color = "sim_4"), size = 0.5) +
+  geom_point(data = sim5, aes(x = time, y = zp, color = "sim_5"), size = 0.5) +
+  geom_point(data = sim6, aes(x = time, y = zp, color = "sim_6"), size = 0.5) +
+  geom_point(data = sim7, aes(x = time, y = zp, color = "sim_7"), size = 0.5) +
+  geom_point(data = sim8, aes(x = time, y = zp, color = "sim_8"), size = 0.5) +
+  geom_point(data = sim9, aes(x = time, y = zp, color = "sim_9"), size = 0.5)
+
+  
 zmin_ode(0, z0, 1.5, 1.0, .01, .01)
 
 y = lapply(t, zplus_ode, z0=z0, lambda_minus=1.5, lambda_plus=1.0, omega_minus=0.01, omega_plus=0.01) %>% unlist()
@@ -335,20 +379,20 @@ switching_process2 <- function(t, state, parameters) {
   })
 }
 state <- c(X = 1000, Y = 100)
-times <- seq(0, 10., by = 0.01)
-parameters1 <- c(lambda_min = 1.5, lambda_plus = 1.0, omega_min = 0.01, omega_plus = 0.001)
+times <- seq(0, 9., by = 0.01)
+parameters1 <- c(lambda_min = 1.2, lambda_plus = 1.2, omega_min = 0.001, omega_plus = 0.01)
 parameters2 <- c(lambda_min = 1.5, lambda_plus = 0.768, omega_min = 0.02, omega_plus = 0.072)
-out2 <- ode(y = state, times = times, func = switching_process2, parms = parameters1)
+out2 <- ode(y = state, times = t, func = switching_process2, parms = parameters1)
 out2b <- ode(y = state, times = times, func = switching_process2, parms = parameters2)
 plot(out2)
 
 out2_df <- data.frame(time = out2[,1], z_minus = out2[,2], z_plus = out2[,3])
 out2b_df <- data.frame(t = out2b[,1], ZM = out2b[,2], ZP = out2b[,3])
 ggplot() + 
-  #geom_line(data = out2_df, aes(x=t,y=ZM),color="red") + 
-  geom_line(data = out2_df, aes(x=time,y=z_plus),color="red") +
-  #geom_line(data = out2b_df, aes(x=t,y=ZM),color="blue") + 
-  geom_line(data = out2b_df, aes(x=t,y=ZP),color="blue") +
+  geom_line(data = out2_df, aes(x=t,y=z_minus),color="blue") + 
+  geom_line(data = out2_df, aes(x=t,y=z_plus),color="red") +
+  geom_point(data = input, aes(x=t,y=zmin),color="blue") + 
+  geom_point(data = input, aes(x=t,y=zplus),color="red") +
   ylab("Z")
 
 n_obs <- rpois(n = length(times),

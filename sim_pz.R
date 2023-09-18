@@ -24,7 +24,6 @@ my_palette <- c("#72B8B5","#FFCB0A","#265450")
 
 final1a <- read.csv("./python/1.5_1.0_0.01_0.001_10t_51p.csv")
 final1a <- final1a[,2:4]
-final1a_R <- readRDS("./R/1.5_1.0_0.01_0.001_10t.rds")
 final1b <- read.csv("./python/1.5_1.0_0.005_10t_51p.csv")
 final1b <- final1b[,2:4]
 final1c <- read.csv("./python/1.5_1.0_0.001_0.01_10t_51p.csv")
@@ -37,44 +36,31 @@ final2b <- final2b[,2:4]
 final2c <- read.csv("./python/1.2_0.001_0.01_15t_51p.csv")
 final2c <- final2c[,2:4]
 
-final3a <- read.csv("./python/1.0_1.5_0.01_0.001_10t_51p.csv")
+final3a <- read.csv("./python/1.0_1.5_0.01_0.001_15t_51p.csv")
 final3a <- final3a[,2:4]
-final3b <- read.csv("./python/1.0_1.5_0.005_10t_51p.csv")
+final3b <- read.csv("./python/1.0_1.5_0.005_15t_51p.csv")
 final3b <- final3b[,2:4]
-final3c <- read.csv("./python/1.0_1.5_0.001_0.01_10t_51p.csv")
+final3c <- read.csv("./python/1.0_1.5_0.001_0.01_15t_51p.csv")
 final3c <- final3c[,2:4]
 
 # CASE 1
 
 rate1a <- Pz_exp(final1a,1.5,1.0,0.01,0.001)
-rate1aR <- Pz_exp(final1a_R,1.5,1.0,0.01,0.001)
-
 rate1b <- Pz_exp(final1b,1.5,1.0,0.005,0.005)
 rate1c <- Pz_exp(final1c,1.5,1.0,0.001,0.01)
 
 # minus
-
 plot1ma <- final1a %>% 
   ggplot(aes(x=z_minus)) + 
-  geom_histogram(aes(y=after_stat(density)), fill = my_palette[1], bins =80, na.rm=TRUE) +
-  stat_function(fun = dexp, args = list(rate = as.numeric(rate1a[1])), linewidth=0.6) +
+  geom_histogram(aes(y=after_stat(density)), fill = my_palette[1], bins = 70, na.rm=TRUE) +
+  stat_function(fun = dexp, args = list(rate = as.numeric(rate1a[1])), linewidth=1) +
   theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
   labs(x="z-",y="p(z-)") +
   scale_x_continuous(labels = function(x) format(x, scientific = TRUE), 
                      limits = c(0,3e7)) + 
   scale_y_continuous(labels = function(x) format(x, scientific = TRUE),
                      breaks = c(0,2e-7,4e-7), limits = c(0,4e-7))
-plot1maR <- final1a_R %>% 
-  ggplot(aes(x=zm)) + 
-  geom_histogram(aes(y=after_stat(density)), fill = my_palette[1], bins =80, na.rm=TRUE) +
-  stat_function(fun = dexp, args = list(rate = as.numeric(rate1aR[1])), linewidth=0.6) +
-  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
-  labs(x="z-",y="p(z-)") +
-  scale_x_continuous(labels = function(x) format(x, scientific = TRUE), 
-                     limits = c(0,3e7)) + 
-  scale_y_continuous(labels = function(x) format(x, scientific = TRUE),
-                     breaks = c(0,2e-7,4e-7), limits = c(0,4e-7))
-plot1ma + plot1maR
+
 # final1a %>% 
 #   ggplot() + 
 #   geom_density(aes(x=z_minus,y=after_stat(density), color = "simulation"), na.rm=TRUE) +
@@ -84,7 +70,7 @@ plot1ma + plot1maR
 plot1mb <- final1b %>% 
   ggplot(aes(x=z_minus)) + 
   geom_histogram(aes(y=after_stat(density)), fill = my_palette[1], bins = 90, na.rm=TRUE) +
-  stat_function(fun = dexp, args = list(rate = as.numeric(rate1b[1])), linewidth=0.6) +
+  stat_function(fun = dexp, args = list(rate = as.numeric(rate1b[1])), linewidth=1) +
   theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
   labs(x="z-",y="p(z-)") +
   scale_x_continuous(labels = function(x) format(x, scientific = TRUE),
@@ -95,7 +81,7 @@ plot1mb <- final1b %>%
 plot1mc <- final1c %>% 
   ggplot(aes(x=z_minus)) + 
   geom_histogram(aes(y=after_stat(density)), fill = my_palette[1], bins = 90, na.rm=TRUE) +
-  stat_function(fun = dexp, args = list(rate = as.numeric(rate1c[1])), linewidth=0.6) +
+  stat_function(fun = dexp, args = list(rate = as.numeric(rate1c[1])), linewidth=1) +
   theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
   labs(x="z-",y="p(z-)") +
   scale_x_continuous(labels = function(x) format(x, scientific = TRUE),
@@ -107,11 +93,10 @@ plot1ma / plot1mb / plot1mc
 ggsave("./pz/pmz_1_10t.png",  width = 5, height = 10, dpi = 600)
 
 # plus
-
 plot1pa <- final1a %>% 
   ggplot(aes(x=z_plus)) + 
   geom_histogram(aes(y=after_stat(density)), fill = my_palette[2], bins = 90, na.rm = TRUE) +
-  stat_function(fun = dexp, args = list(rate = as.numeric(rate1a[2])), linewidth=0.6) +
+  stat_function(fun = dexp, args = list(rate = as.numeric(rate1a[2])), linewidth=1) +
   theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
   labs(x="z+",y="p(z+)") +
   scale_x_continuous(labels = function(x) format(x, scientific = TRUE), 
@@ -123,7 +108,7 @@ plot1pa <- final1a %>%
 plot1pb <- final1b %>% 
   ggplot(aes(x=z_plus)) + 
   geom_histogram(aes(y=after_stat(density)), fill = my_palette[2], bins = 80, na.rm = TRUE) +
-  stat_function(fun = dexp, args = list(rate = as.numeric(rate1b[2])), linewidth=0.6) +
+  stat_function(fun = dexp, args = list(rate = as.numeric(rate1b[2])), linewidth=1) +
   theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
   labs(x="z+",y="p(z+)") +
   scale_x_continuous(labels = function(x) format(x, scientific = TRUE), 
@@ -135,7 +120,7 @@ plot1pb <- final1b %>%
 plot1pc <- final1c %>% 
   ggplot(aes(x=z_plus)) + 
   geom_histogram(aes(y=after_stat(density)), fill = my_palette[2], bins = 70, na.rm = TRUE) +
-  stat_function(fun = dexp, args = list(rate = as.numeric(rate1c[2])), linewidth=0.6) +
+  stat_function(fun = dexp, args = list(rate = as.numeric(rate1c[2])), linewidth=1) +
   theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
   labs(x="z+",y="p(z+)") +
   scale_x_continuous(labels = function(x) format(x, scientific = TRUE), 
@@ -151,7 +136,6 @@ ggsave("./pz/ppz_1_10t.png",  width = 5, height = 10, dpi = 600)
 ggsave("./first_case.png",  width = 16, height = 8, dpi = 600)
 
 # SIZE
-
 final1a <- final1a %>% mutate(z = z_minus + z_plus)
 final1b <- final1b %>% mutate(z = z_plus + z_minus)
 final1c <- final1c %>% mutate(z = z_plus + z_minus)
@@ -163,7 +147,7 @@ ratetot1c = 1./(1./as.numeric(rate1c[1]) + 1./as.numeric(rate1c[2]))
 plot1a <- final1a %>% 
   ggplot(aes(x=z)) + 
   geom_histogram(aes(y=after_stat(density)), fill = my_palette[3], bins = 80, na.rm=TRUE) +
-  stat_function(fun = dexp, args = list(rate = ratetot1a), linewidth=0.7) +
+  stat_function(fun = dexp, args = list(rate = ratetot1a), linewidth=1) +
   theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
   labs(x="z",y="p(z)") + 
   scale_x_continuous(labels = function(x) format(x, scientific = TRUE), breaks = c(1e7,2e7),limits = c(0,2.75e7))
@@ -171,7 +155,7 @@ plot1a <- final1a %>%
 plot1b <- final1b %>% 
   ggplot(aes(x=z)) + 
   geom_histogram(aes(y=after_stat(density)), fill = my_palette[3], alpha=0.8, bins = 80, na.rm=TRUE) +
-  stat_function(fun = dexp, args = list(rate = ratetot1b), linewidth=0.7) +
+  stat_function(fun = dexp, args = list(rate = ratetot1b), linewidth=1) +
   theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
   labs(x="z",y="p(z)") +
   scale_x_continuous(labels = function(x) format(x, scientific = TRUE), breaks = c(1e7,2e7))
@@ -179,7 +163,7 @@ plot1b <- final1b %>%
 plot1c <- final1c %>% 
   ggplot(aes(x=z)) + 
   geom_histogram(aes(y=after_stat(density)), fill = my_palette[3], alpha=0.6,bins = 80, na.rm=TRUE) +
-  stat_function(fun = dexp, args = list(rate = ratetot1c), linewidth=0.7) +
+  stat_function(fun = dexp, args = list(rate = ratetot1c), linewidth=1) +
   theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
   labs(x="z",y="p(z)") +
   scale_x_continuous(labels = function(x) format(x, scientific = TRUE), breaks = c(1e7,2e7), limits = c(0,2.75e7))
@@ -204,8 +188,8 @@ plot1aj <- ggplot() +
   geom_density_2d(joint1a, mapping = aes(x=x1a,y=y1a), 
                   contour_var = "ndensity", 
                   colour = "black", bins = 5) +
-  scale_x_continuous(trans = "log10") +
-                     #limits = c(50,1.5e6),
+  scale_x_continuous(trans = "log10",
+                     limits = c(1e3,1e8)) +
                      #breaks = c(1e2,1e4,1e6)) +
   scale_y_continuous(trans = "log10",
                      limits = c(1e1,5e5),
@@ -232,8 +216,8 @@ plot1bj <- ggplot() +
                   mapping = aes(x=x1b,y=y1b),
                   contour_var = "ndensity", 
                   colour = "black", bins = 5) +
-  scale_x_continuous(trans = "log10") +
-                     #limits = c(50,1.5e6),
+  scale_x_continuous(trans = "log10",
+                     limits = c(1e3,1e8)) +
                      #breaks = c(1e2,1e4,1e6)) +
   scale_y_continuous(trans = "log10",
                      limits = c(1e1,5e5), 
@@ -261,8 +245,8 @@ plot1cj <- ggplot() +
                   mapping = aes(x=x1c,y=y1c),
                   contour_var = "ndensity", 
                   colour = "black", bins = 5) +
-  scale_x_continuous(trans = "log10") +
-                     #limits = c(50,1.5e6),
+  scale_x_continuous(trans = "log10",
+                     limits = c(1e3,1e8)) +
                      #breaks = c(1e2,1e4,1e6)) +
   scale_y_continuous(trans = "log10", 
                      limits = c(1e1,5e5),
@@ -278,7 +262,6 @@ ggsave("./pz/pjz_1_10t.png",  width = 5, height = 10, dpi = 600)
 ggsave("./first_case_joint.png",  width = 16, height = 6, dpi = 600)
 
 # CASE 2
-
 rate2a <- Pz_exp(final2a,1.2,1.2,0.01,0.001)
 rate2b <- Pz_exp(final2b,1.2,1.2,0.005,0.005)
 rate2c <- Pz_exp(final2c,1.2,1.2,0.001,0.01)
@@ -378,30 +361,30 @@ ratetot2c = 1./(1./as.numeric(rate2c[1]) + 1./as.numeric(rate2c[2]))
 
 plot2a <- final2a %>% 
   ggplot(aes(x=z)) + 
-  geom_histogram(aes(y=after_stat(density)), fill = my_palette[3], alpha = 0.9, bins = 90, na.rm=TRUE) +
+  geom_histogram(aes(y=after_stat(density)), fill = my_palette[3], alpha = 0.9, bins = 80, na.rm=TRUE) +
   stat_function(fun = dexp, args = list(rate = ratetot2a), linewidth=1) +
   theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
   labs(x="z",y="p(z)") +
   scale_x_continuous(labels = function(x) format(x, scientific = TRUE), limits = c(0,4.5e8), breaks = c(0,2e8,4e8)) +
-  scale_y_continuous(labels = function(x) format(x, scientific = TRUE), breaks = c(0,3e-6,6e-6))
+  scale_y_continuous(labels = function(x) format(x, scientific = TRUE), limits = c(0,1.6e-8), breaks = c(0,6e-9,1.2e-8))
 
 plot2b <- final2b %>% 
   ggplot(aes(x=z)) + 
-  geom_histogram(aes(y=after_stat(density)), fill = my_palette[3], alpha = 0.7, bins = 90, na.rm=TRUE) +
+  geom_histogram(aes(y=after_stat(density)), fill = my_palette[3], alpha = 0.7, bins = 80, na.rm=TRUE) +
   stat_function(fun = dexp, args = list(rate = ratetot2b), linewidth=1) +
   theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
   labs(x="z",y="p(z)") +
   scale_x_continuous(labels = function(x) format(x, scientific = TRUE), limits = c(0,4.5e8), breaks = c(0,2e8,4e8)) +
-  scale_y_continuous(labels = function(x) format(x, scientific = TRUE), breaks = c(0,3e-6,6e-6))
+  scale_y_continuous(labels = function(x) format(x, scientific = TRUE), limits = c(0,1.6e-8), breaks = c(0,6e-9,1.2e-8))
 
 plot2c <- final2c %>% 
   ggplot(aes(x=z)) + 
-  geom_histogram(aes(y=after_stat(density)), fill = my_palette[3], alpha = 0.5, bins = 90, na.rm=TRUE) +
+  geom_histogram(aes(y=after_stat(density)), fill = my_palette[3], alpha = 0.5, bins = 80, na.rm=TRUE) +
   stat_function(fun = dexp, args = list(rate = ratetot2c), linewidth=1) +
   theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
   labs(x="z",y="p(z)") +
   scale_x_continuous(labels = function(x) format(x, scientific = TRUE), limits = c(0,4.5e8), breaks = c(0,2e8,4e8)) +
-  scale_y_continuous(labels = function(x) format(x, scientific = TRUE), limits = c(0,6e-6), breaks = c(0,3e-6,6e-6))
+  scale_y_continuous(labels = function(x) format(x, scientific = TRUE), limits = c(0,1.6e-8), breaks = c(0,6e-9,1.2e-8))
 
 plot2a / plot2b / plot2c
 ggsave("./pz/ptz_2_15t.png",  width = 5, height = 10, dpi = 600)
@@ -425,7 +408,8 @@ plot2aj <- ggplot() +
                   contour_var = "ndensity", 
                   colour = "black", bins = 5) +
   scale_x_continuous(trans = "log10",
-                     limits = c(5e4,6e8)) +
+                     limits = c(5e4,6e8),
+                     breaks = c(1e6,1e8)) +
   scale_y_continuous(trans = "log10",
                      labels = function(x) format(x, scientific = TRUE),
                      limits = c(1e3,1e8)) +
@@ -451,7 +435,8 @@ plot2bj <- ggplot() +
                   contour_var = "ndensity", 
                   colour = "black", bins = 5) +
   scale_x_continuous(trans = "log10",
-                     limits = c(5e4,6e8)) +
+                     limits = c(5e4,6e8),
+                     breaks = c(1e6,1e8)) +
   scale_y_continuous(trans = "log10", 
                      labels = function(x) format(x, scientific = TRUE),
                      limits = c(1e3,1e8)) +
@@ -473,12 +458,13 @@ plot2cj <- ggplot() +
                          mapping = aes(x=x2c,y=y2c), 
                          contour_var = "ndensity", 
                          alpha = 0.4, bins = 5) +
-  geom_density_2d(joint3c, 
+  geom_density_2d(joint2c, 
                   mapping = aes(x=x2c,y=y2c),
                   contour_var = "ndensity", 
                   colour = "black", bins = 5) +
   scale_x_continuous(trans = "log10",
-                     limits = c(5e4,6e8)) +
+                     limits = c(5e4,6e8),
+                     breaks = c(1e6,1e8)) +
   scale_y_continuous(trans = "log10", 
                      labels = function(x) format(x, scientific = TRUE),
                      limits = c(1e3,1e8)) +
@@ -488,7 +474,7 @@ plot2cj <- ggplot() +
 
 
 plot2aj / plot2bj / plot2cj
-ggsave("./second_case_joint_15t.png",  width = 16, height = 6, dpi = 600)
+ggsave("./pz/pjz_2_15t.png",  width = 5, height = 10, dpi = 600)
 
 # CASE 3
 
