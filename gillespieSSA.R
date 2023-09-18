@@ -64,7 +64,7 @@ easypar::run( FUN = simulation1,
               filter_errors = FALSE,
               export = ls(globalenv())
 )
-prova <- lapply(1:200, simulation1)
+prova <- lapply(1:100, simulation1)
 
 pz <- data.frame()
 first_switch = list()
