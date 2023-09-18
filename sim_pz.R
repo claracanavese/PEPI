@@ -478,87 +478,105 @@ ggsave("./pz/pjz_2_15t.png",  width = 5, height = 10, dpi = 600)
 
 # CASE 3
 
-analytic1 <- read.csv("1_1.5_0.01_0.001_8t_minus.csv") %>%
+analytic1 <- read.csv("./PEPI/analytics/1_1.5_0.01_0.001_15t_minus.csv") %>%
   tibble::as_tibble() %>% 
   mutate(type="z_minus") %>% 
-  add_row(read.csv("1_1.5_0.01_0.001_8t_plus.csv") %>% 
+  add_row(read.csv("./PEPI/analytics/1_1.5_0.01_0.001_15t_plus.csv") %>% 
+            tibble::as_tibble() %>% 
+            mutate(type="z_plus")) 
+
+analytic2 <- read.csv("./PEPI/analytics/1_1.5_0.005_15t_minus.csv") %>%
+  tibble::as_tibble() %>% 
+  mutate(type="z_minus") %>% 
+  add_row(read.csv("./PEPI/analytics/1_1.5_0.005_15t_plus.csv") %>% 
             tibble::as_tibble() %>% 
             mutate(type="z_plus"))
 
-analytic2 <- read.csv("1_1.5_0.005_8t_minus.csv") %>%
+analytic3 <- read.csv("./PEPI/analytics/1_1.5_0.001_0.01_15t_minus.csv") %>%
   tibble::as_tibble() %>% 
   mutate(type="z_minus") %>% 
-  add_row(read.csv("1_1.5_0.005_8t_plus.csv") %>% 
-            tibble::as_tibble() %>% 
-            mutate(type="z_plus"))
-
-analytic3 <- read.csv("1_1.5_0.001_0.01_8t_minus.csv") %>%
-  tibble::as_tibble() %>% 
-  mutate(type="z_minus") %>% 
-  add_row(read.csv("1_1.5_0.001_0.01_8t_plus.csv") %>% 
+  add_row(read.csv("./PEPI/analytics/1_1.5_0.001_0.01_15t_plus.csv") %>% 
             tibble::as_tibble() %>% 
             mutate(type="z_plus"))
 
 # minus
 plot3ma <- final3a %>% 
   ggplot(aes(x=z_minus)) +
-  geom_histogram(aes(y=after_stat(density)), bins=80, fill=my_palette[1], na.rm = TRUE) +
-  geom_line(data=analytic1 %>% filter(type=="z_minus"), aes(x=z,y=P), linewidth=0.6) +
+  geom_histogram(aes(y=after_stat(density)), bins=90, fill=my_palette[1], na.rm = TRUE) +
+  geom_line(data=analytic1 %>% filter(type=="z_minus"), aes(x=z,y=P), linewidth=1) +
   theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
-  scale_x_continuous(breaks = c(1e4,2e4), labels = function(x) format(x, scientific = TRUE),limits = c(0,2.5e4)) +
+  scale_x_continuous(labels = function(x) format(x, scientific = TRUE),
+                     limits = c(0,3e7)) +
+  scale_y_continuous(labels = function(x) format(x, scientific = TRUE),
+                     breaks = c(0,1.5e-7,3e-7)) +
   labs(x="z-",y="p(z-)")
 plot3ma
 
 plot3mb <- final3b %>% 
   ggplot(aes(x=z_minus)) +
   geom_histogram(aes(y=after_stat(density)), bins=80, fill=my_palette[1], na.rm = TRUE) +
-  geom_line(data=analytic2 %>% filter(type=="z_minus"), aes(x=z,y=P), linewidth=0.6) +
+  geom_line(data=analytic2 %>% filter(type=="z_minus"), aes(x=z,y=P), linewidth=1) +
   theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
-  scale_x_continuous(breaks = c(1e4,2e4), labels = function(x) format(x, scientific = TRUE),limits = c(0,2.5e4)) +
+  scale_x_continuous(labels = function(x) format(x, scientific = TRUE),
+                     limits = c(0,3e7)) +
+  scale_y_continuous(labels = function(x) format(x, scientific = TRUE),
+                     breaks = c(0,1.5e-7,3e-7)) +
   labs(x="z-",y="p(z-)")
 
 plot3mc <- final3c %>% 
   ggplot(aes(x=z_minus)) +
-  geom_histogram(aes(y=after_stat(density)), bins=80, fill=my_palette[1], na.rm = TRUE) +
-  geom_line(data=analytic3 %>% filter(type=="z_minus"), aes(x=z,y=P), linewidth=0.6) +
+  geom_histogram(aes(y=after_stat(density)), bins=100, fill=my_palette[1], na.rm = TRUE) +
+  geom_line(data=analytic3 %>% filter(type=="z_minus"), aes(x=z,y=P), linewidth=1) +
   theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
-  scale_x_continuous(breaks = c(1e4,2e4), labels = function(x) format(x, scientific = TRUE),limits = c(0,2.5e4)) +
+  scale_x_continuous(labels = function(x) format(x, scientific = TRUE),
+                     limits = c(0,3e7)) +
+  scale_y_continuous(labels = function(x) format(x, scientific = TRUE),
+                     breaks = c(0,1.5e-7,3e-7)) +
   labs(x="z-",y="p(z-)")
 
-(plot3ma + plot3mb + plot3mc)
+plot3ma / plot3mb / plot3mc
+ggsave("./pz/pmz_3_15t.png",  width = 5, height = 10, dpi = 600)
 
 # plus
-
 plot3pa <- final3a %>% 
   ggplot(aes(x=z_plus)) +
-  geom_histogram(aes(y=after_stat(density)), bins=150, fill=my_palette[2], na.rm = TRUE) +
-  geom_line(data=analytic1 %>% filter(type=="z_plus"), aes(x=z,y=P), linewidth=0.6) +
+  geom_histogram(aes(y=after_stat(density)), bins = 100, fill=my_palette[2], na.rm = TRUE) + 
+  geom_line(data=analytic1 %>% filter(type=="z_plus"), aes(x=z,y=P), linewidth=1) +
   theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
-  scale_x_continuous(breaks = c(2e4,4e4), labels = function(x) format(x, scientific = TRUE),limits = c(0,5e4)) +
-  scale_y_continuous(labels = function(x) format(x, scientific = TRUE),limits = c(0,2e-4)) +
+  scale_x_continuous(labels = function(x) format(x, scientific = TRUE),
+                     limits = c(0,7e7)) +
+  scale_y_continuous(labels = function(x) format(x, scientific = TRUE),
+                     limits = c(0,2e-7),
+                     breaks = c(0,1e-7,2e-7)) +
   labs(x="z+",y="p(z+)")
 plot3pa
 
 plot3pb <- final3b %>% 
   ggplot(aes(x=z_plus)) +
-  geom_histogram(aes(y=after_stat(density)), bins=150, fill=my_palette[2], na.rm = TRUE) +
-  geom_line(data=analytic2 %>% filter(type=="z_plus"), aes(x=z,y=P), linewidth=0.6) +
+  geom_histogram(aes(y=after_stat(density)), bins=90, fill=my_palette[2], na.rm = TRUE) +
+  geom_line(data=analytic2 %>% filter(type=="z_plus"), aes(x=z,y=P), linewidth=1) +
   theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
-  scale_x_continuous(breaks = c(2e4,4e4), labels = function(x) format(x, scientific = TRUE),limits = c(0,5e4)) +
-  scale_y_continuous(labels = function(x) format(x, scientific = TRUE),limits = c(0,2e-4)) +
+  scale_x_continuous(labels = function(x) format(x, scientific = TRUE),
+                     limits = c(0,7e7)) +
+  scale_y_continuous(labels = function(x) format(x, scientific = TRUE),
+                     limits = c(0,2e-7),
+                     breaks = c(0,1e-7,2e-7)) +
   labs(x="z+",y="p(z+)")
 
 plot3pc <- final3c %>% 
   ggplot(aes(x=z_plus)) +
-  geom_histogram(aes(y=after_stat(density)), bins=150, fill=my_palette[2], na.rm = TRUE) +
-  geom_line(data=analytic3 %>% filter(type=="z_plus"), aes(x=z,y=P), linewidth=0.6) +
+  geom_histogram(aes(y=after_stat(density)), bins=90, fill=my_palette[2], na.rm = TRUE) +
+  geom_line(data=analytic3 %>% filter(type=="z_plus"), aes(x=z,y=P), linewidth=1) +
   theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
-  scale_x_continuous(breaks = c(2e4,4e4), labels = function(x) format(x, scientific = TRUE),limits = c(0,5e4)) +
-  scale_y_continuous(labels = function(x) format(x, scientific = TRUE),limits = c(0,2e-4)) +
+  scale_x_continuous(labels = function(x) format(x, scientific = TRUE),
+                     limits = c(0,7e7)) +
+  scale_y_continuous(labels = function(x) format(x, scientific = TRUE),
+                     limits = c(0,2e-7),
+                     breaks = c(0,1e-7,2e-7)) +
   labs(x="z+",y="p(z+)")
 
-plot3pa + plot3pb + plot3pc
-(plot3ma + plot3mb + plot3mc) / (plot3pa + plot3pb + plot3pc)
+plot3pa / plot3pb / plot3pc
+ggsave("./pz/ppz_3_15t.png",  width = 5, height = 10, dpi = 600)
 ggsave("./third_case.png",  width = 16, height = 8, dpi = 600)
 
 # size
@@ -566,36 +584,57 @@ final3a <- final3a %>% mutate(z = z_plus + z_minus)
 final3b <- final3b %>% mutate(z = z_plus + z_minus)
 final3c <- final3c %>% mutate(z = z_plus + z_minus)
 
-analytic1tot <- read.csv("1_1.5_0.01_0.001_8t_tot.csv") %>% tibble::as_tibble()
-analytic2tot <- read.csv("1_1.5_0.005_8t_tot.csv") %>% tibble::as_tibble()
-analytic3tot <- read.csv("1_1.5_0.001_0.01_8t_tot.csv") %>% tibble::as_tibble()
+analytic1tot <- read.csv("./PEPI/analytics/1_1.5_0.01_0.001_15t_tot.csv") %>% tibble::as_tibble()
+analytic2tot <- read.csv("./PEPI/analytics/1_1.5_0.005_15t_tot.csv") %>% tibble::as_tibble()
+analytic3tot <- read.csv("./PEPI/analytics/1_1.5_0.001_0.01_15t_tot.csv") %>% tibble::as_tibble()
 
 plot3a <- final3a %>% 
   ggplot(aes(x=z)) +
-  geom_histogram(aes(y=after_stat(density)), bins=150, fill=my_palette[3], na.rm = TRUE) +
-  geom_line(data=analytic1tot, aes(x=z,y=p), linewidth=0.6) +
+  geom_histogram(aes(y=after_stat(density)), bins=100, fill=my_palette[3], alpha=0.9, na.rm = TRUE) +
+  geom_line(data=analytic1tot, aes(x=z,y=P), linewidth=1) +
   theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
-  scale_x_continuous(labels = function(x) format(x, scientific = TRUE), breaks = c(2e4,4e4)) +
-  scale_y_continuous(labels = function(x) format(x, scientific = TRUE)) +
+  scale_x_continuous(labels = function(x) format(x, scientific = TRUE), 
+                     limits = c(0,1e8),
+                     breaks = c(0,3e7,6e7,9e7)) +
+  scale_y_continuous(labels = function(x) format(x, scientific = TRUE),
+                     limits = c(0,2e-7),
+                     breaks = c(0,1e-7,2e-7)) +
   labs(x="z",y="p(z)")
 
 plot3b <- final3b %>% 
   ggplot(aes(x=z)) +
-  geom_histogram(aes(y=after_stat(density)), bins=150, fill="#9581BC", na.rm = TRUE) +
-  geom_line(data=analytic2tot, aes(x=z,y=p), linewidth=0.6) +
+  geom_histogram(aes(y=after_stat(density)), bins=100, fill=my_palette[3], alpha=0.7, na.rm = TRUE) + 
+  geom_line(data=analytic2tot, aes(x=z,y=P), linewidth=1) +
   theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
-  scale_x_continuous(labels = function(x) format(x, scientific = TRUE), limits = c(0,9e4), breaks = c(4e4,8e4)) +
-  scale_y_continuous(labels = function(x) format(x, scientific = TRUE)) +
+  scale_x_continuous(labels = function(x) format(x, scientific = TRUE), 
+                     limits = c(0,1e8),
+                     breaks = c(0,3e7,6e7,9e7)) +
+  scale_y_continuous(labels = function(x) format(x, scientific = TRUE),
+                     limits = c(0,2e-7),
+                     breaks = c(0,1e-7,2e-7)) +
   labs(x="z",y="p(z)")
 
 plot3c <- final3c %>% 
   ggplot(aes(x=z)) +
-  geom_histogram(aes(y=after_stat(density)), bins=150, fill="#AA9BCB", na.rm = TRUE) +
-  geom_line(data=analytic3tot, aes(x=z,y=p), linewidth=0.6) +
+  geom_histogram(aes(y=after_stat(density)), bins=100,fill=my_palette[3], alpha=0.5, na.rm = TRUE) +
+  geom_line(data=analytic3tot, aes(x=z,y=P), linewidth=1) +
   theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
-  scale_x_continuous(labels = function(x) format(x, scientific = TRUE), limits = c(0,9e4), breaks = c(4e4,8e4)) +
-  scale_y_continuous(labels = function(x) format(x, scientific = TRUE), limits = c(0,3e-4)) +
+  scale_x_continuous(labels = function(x) format(x, scientific = TRUE), 
+                     limits = c(0,1e8),
+                     breaks = c(0,3e7,6e7,9e7)) +
+  scale_y_continuous(labels = function(x) format(x, scientific = TRUE),
+                     limits = c(0,2e-7),
+                     breaks = c(0,1e-7,2e-7)) +
   labs(x="z",y="p(z)")
 
-plot3a + plot3b + plot3c
+plot3a / plot3b / plot3c
+ggsave("./pz/ptz_3_15t.png",  width = 5, height = 10, dpi = 600)
 ggsave("./third_case_size.png",  width = 16, height = 5, dpi = 600)
+
+# JOINT
+final3a_j = final3a %>% filter(z_plus > 10)
+
+# create analytic distribution
+x3a <- rexp(1000, rate = as.numeric(rate2a[1]))
+y3a <- sapply(x2a, function(x) x*as.numeric(rate2a[1])/as.numeric(rate2a[2]))
+joint2a <- data.frame(x2a,y2a)
