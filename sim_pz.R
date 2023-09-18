@@ -5,6 +5,7 @@ library(reshape2)
 library(patchwork)
 library(plotly)
 library(stabledist)
+library(pdqr)
 
 Pz_exp <- function(dat,lm,lp,om,op) {
   time <- mean(dat$time)
@@ -48,6 +49,13 @@ final3c <- final3c[,2:4]
 rate1a <- Pz_exp(final1a,1.5,1.0,0.01,0.001)
 rate1b <- Pz_exp(final1b,1.5,1.0,0.005,0.005)
 rate1c <- Pz_exp(final1c,1.5,1.0,0.001,0.01)
+
+ggplot(final1a) +
+  geom_histogram(aes(x=z_minus, y=after_stat(density), fill = "Z-"), bins = 70, na.rm=TRUE) +
+  geom_histogram(aes(x=z_plus, y=after_stat(density), fill = "Z+"), bins = 70, na.rm=TRUE) +
+  scale_fill_manual(values = my_palette) +
+  theme(legend.title = element_blank(), legend.text = element_text(size = 16))
+ggsave("./legend_marginals.png",dpi=600)
 
 # minus
 plot1ma <- final1a %>% 
@@ -632,9 +640,72 @@ ggsave("./pz/ptz_3_15t.png",  width = 5, height = 10, dpi = 600)
 ggsave("./third_case_size.png",  width = 16, height = 5, dpi = 600)
 
 # JOINT
-final3a_j = final3a %>% filter(z_plus > 10)
+powerlaw_coeff_plus <- function(am,ap,lm,lp,om,op,t) {
+  return(am*op*pi*exp((lm+om*op/(lp-lm)*lm/lp)*t)/(lp*ap*sin(pi*lm/lp)*gamma(1-lm/lp)))
+}
+
+powerlaw_coeff_minus <- function(am,ap,lm,lp,om,op,t) {
+  return(am*op*pi*(om/(lp-lm))^(lm/lp)*exp((lm+om*op/(lp-lm)*lm/lp)*t)/(lp*ap*sin(pi*lm/lp)*gamma(1-lm/lp)))
+}
+
+powerlaw_coeff1m <- powerlaw_coeff_minus(am = 1.0,ap = 1.5,lm = 1.0, lp = 1.5, om = 0.01,op = 0.001, t = mean(final3a$time))
+powerlaw_coeff1p <- powerlaw_coeff_plus(am = 1.0,ap = 1.5,lm = 1.0, lp = 1.5, om = 0.01,op = 0.001, t = mean(final3a$time))
+
+powerlaw <- function(x,coeff,exponent) {
+  return(coeff*x^exponent)
+}
+
+support <- seq(1e4, 1e10, 1e5)
+probs <- powerlaw(support, powerlaw_coeff1p, -1-1/1.5)
+probs <- probs/sum(probs) 
+sim_pl <- data.frame("z" = support, "p" = probs)
+ggplot(sim_pl) +
+  geom_line(aes(x=z,y=p)) + xlim(0,1e8) + ylim(0,1e-6)
+
+colnames(sim_pl) = c("x","y")
+new_r(sim_pl, type = "continuous")(1000)
+
+plot(support, probs, type = "l")
+
+final3a %>% 
+  mutate(pw=powerlaw_coeff1m*z_minus^(-1-1.0/1.5)) %>%
+  ggplot(aes(x=z_minus)) +
+  geom_histogram(aes(y=after_stat(density)), bins=150, fill=my_palette[1], na.rm = TRUE) +
+  stat_function(fun = powerlaw, args = list(coeff = powerlaw_coeff1m, exponent = -1-1/1.5)) +
+  #geom_line(aes(y=pw), color='black') +
+  xlim(0,150666402) + ylim(0,2.5e-7)
+
+final3a %>% 
+  mutate(pw=powerlaw_coeff1p*z_plus^(-1-1.0/1.5)) %>%
+  ggplot(aes(x=z_plus)) +
+  geom_histogram(aes(y=after_stat(density)), bins=150, fill=my_palette[2], na.rm = TRUE) +
+  #geom_line(aes(y=pw), color='black') +
+  stat_function(fun = powerlaw, args = list(coeff = powerlaw_coeff1p, exponent = -1-1/1.5)) +
+  xlim(0,2e8) + ylim(0,2e-7)
 
 # create analytic distribution
-x3a <- rexp(1000, rate = as.numeric(rate2a[1]))
-y3a <- sapply(x2a, function(x) x*as.numeric(rate2a[1])/as.numeric(rate2a[2]))
-joint2a <- data.frame(x2a,y2a)
+y3a <- new_r(sim_pl, type = "continuous")(1000)
+x3a <- sapply(y3a, function(x) x*0.5/0.01)
+joint3a <- data.frame(x3a,y3a)
+
+final3a_j = final3a %>% filter(z_plus < 1e8 & z_minus < 3e7)
+ggplot() +
+  geom_point(final3a_j,mapping = aes(x=z_minus, y=z_plus), size=0.3) +
+  stat_density_2d_filled(joint3a, 
+                         mapping = aes(x=x3a,y=y3a), 
+                         contour_var = "ndensity", 
+                         alpha = 0.4, bins = 8) +
+  geom_density_2d(joint3a, mapping = aes(x=x3a,y=y3a), 
+                  contour_var = "ndensity", 
+                  colour = "black", bins = 8) +
+  scale_x_continuous(trans = "log10",
+                     limits = c(5e4,2e7)) +
+  scale_y_continuous(trans = "log10", 
+                     labels = function(x) format(x, scientific = TRUE),
+                     limits = c(1e3,1e6))
+
+ggplot() +
+  geom_point(final3a_j,mapping = aes(x=z_minus, y=z_plus), size=0.3) +
+  scale_x_continuous(trans = "log10") +
+  scale_y_continuous(trans = "log10", 
+                     labels = function(x) format(x, scientific = TRUE))
