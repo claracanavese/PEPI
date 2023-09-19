@@ -41,7 +41,7 @@ simulation1 = function(i){
     initial_state = initial_state,
     reactions = reactions,
     params = params,
-    final_time = 12,
+    final_time = 14,
     method = ssa_exact(),
     sim_name = sim_name,
     log_firings = TRUE
@@ -58,17 +58,22 @@ simulation1 = function(i){
   second_switch[i+400] <<- ss[1,]$time
 }
 
-easypar::run( FUN = simulation1,
-              PARAMS = lapply(1:2, list),
-              parallel = TRUE,
-              filter_errors = FALSE,
-              export = ls(globalenv())
-)
+# easypar::run( FUN = simulation1,
+#               PARAMS = lapply(1:2, list),
+#               parallel = TRUE,
+#               filter_errors = FALSE,
+#               export = ls(globalenv())
+# )
+
+pz <- data.frame()
+first_switch = list()
+second_switch = list()
+
 prova <- lapply(1:100, simulation1)
 
-# pz <- data.frame()
-# first_switch = list()
-# second_switch = list()
+saveRDS(first_switch, file="./R/1.0_1.5_0.005_14t_fs.RData")
+saveRDS(second_switch, file="./R/1.0_1.5_0.005_14t_ss.RData")
+saveRDS(pz,"./R/1.0_1.5_0.005_14t.rds")
 
 
 # for (i in seq(1,500)) {
@@ -85,13 +90,10 @@ sd(unlist(first_switch), na.rm = TRUE)
 median(unlist(second_switch), na.rm = TRUE)
 sd(unlist(second_switch), na.rm = TRUE)
 
-saveRDS(first_switch, file="./R/1.0_1.5_0.01_0.001_14t_fs.RData")
-saveRDS(second_switch, file="./R/1.0_1.5_0.01_0.001_14t_ss.RData")
-saveRDS(pz,"./R/1.0_1.5_0.01_0.001_14t.rds")
 
-pz <- readRDS("./R/1.0_1.5_0.01_0.001_14t.rds")
-first_switch <- readRDS("./R/1.0_1.5_0.01_0.001_14t_fs.RData")
-second_switch <- readRDS("./R/1.0_1.5_0.01_0.001_14t_ss.RData") 
+pz <- readRDS("./R/1.0_1.5_0.005_14t.rds")
+first_switch <- readRDS("./R/1.0_1.5_0.005_14t_fs.RData")
+second_switch <- readRDS("./R/1.0_1.5_0.005_14t_ss.RData")
   
 # explicit tau-leap
 set.seed(1)
