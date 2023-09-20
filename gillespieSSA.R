@@ -23,7 +23,7 @@ reactions <- list(
 
 simulation1 = function(i){
   library("GillespieSSA2")
-  params <- c(am=1.0, bm=0.0, ap=1.5, bp=0.0, om=0.005, op=0.005)
+  params <- c(am=1.5, bm=0.0, ap=1.0, bp=0.0, om=0.01, op=0.001)
   sim_name <- paste0("Switching Process ",i)
   # initial state
   initial_state <- c(zm=1, zp=0)
@@ -41,7 +41,7 @@ simulation1 = function(i){
     initial_state = initial_state,
     reactions = reactions,
     params = params,
-    final_time = 14,
+    final_time = 11,
     method = ssa_exact(),
     sim_name = sim_name,
     log_firings = TRUE
@@ -52,10 +52,10 @@ simulation1 = function(i){
   colnames(state)[1] <- "time"
   
   pz <<- bind_rows(pz,state[nrow(state),])
-  fs = filter(state, switch_to_plus > 0)
+  #fs = filter(state, switch_to_plus > 0)
   ss = filter(state, switch_to_minus > 0)
-  first_switch[i+400] <<- fs[1,]$time
-  second_switch[i+400] <<- ss[1,]$time
+  #first_switch[i+400] <<- fs[1,]$time
+  second_switch[i] <<- ss[1,]$time
 }
 
 # easypar::run( FUN = simulation1,
@@ -71,9 +71,9 @@ second_switch = list()
 
 prova <- lapply(1:100, simulation1)
 
-saveRDS(first_switch, file="./R/1.0_1.5_0.005_14t_fs.RData")
-saveRDS(second_switch, file="./R/1.0_1.5_0.005_14t_ss.RData")
-saveRDS(pz,"./R/1.0_1.5_0.005_14t.rds")
+saveRDS(first_switch, file="./R/1.5_1.0_0.01_0.001_11t_fs.RData")
+saveRDS(second_switch, file="./R/1.5_1.0_0.01_0.001_11t_ss.RData")
+saveRDS(pz,"./R/1.5_1.0_0.01_0.001_11t.rds")
 
 
 # for (i in seq(1,500)) {
