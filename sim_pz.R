@@ -19,7 +19,7 @@ Pz_exp <- function(dat,lm,lp,om,op) {
   rates <- list(exprate_minus,exprate_plus)
   return(rates)
 }
-my_palette <- c("#72B8B5","#FFCB0A","#265450")
+my_palette <- c("#72B8B5","#FFCA0A","#265450")
 
 # upload simulated distributions
 
