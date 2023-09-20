@@ -6,7 +6,7 @@ library(reshape2)
 library(patchwork)
 library(bayesplot)
 
-simulation_py <- read.csv("./PEPI/sim_1.5_1.0_0.001_0.01/simulation_3.csv") %>% tibble::as_tibble()
+simulation_py <- read.csv("./PEPI/sim_1.5_1.0_0.001_0.01/simulation_5.csv") %>% tibble::as_tibble()
 # colnames(simulation_py) <- c('time','z_minus','z_plus','var_minus','var_plus','cov')
 samples <- simulation_py[seq(2,21, by = 2),]
 
@@ -42,7 +42,7 @@ fit <- rstan::sampling(model, data_list, chains=4, warmup=3000, iter=6000, cores
 
 print(fit, pars = c("lambda_minus", "lambda_plus", "rate_minus", "rate_plus"), digits_summary = 5)
 print(fit, digits_summary = 5)
-saveRDS(fit,"./fit_new_ode/ssa - 10/1_1.5_0.001_0.01_sim3.rds")
+saveRDS(fit,"./fit_new_ode/ssa - 10/1_1.5_0.001_0.01_sim5.rds")
 
 bayesplot::mcmc_trace(fit, pars = c("lambda_minus", "lambda_plus", "rate_minus", "rate_plus"))
 #ggsave("./GitHub/switching_process/Gillespy2/1.5_1.2_0.015_0.005_5t_51p/gamma_1.5_280/traceplot_0.png", width = 14, height = 12, dpi = 600)
