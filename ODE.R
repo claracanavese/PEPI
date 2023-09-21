@@ -254,18 +254,18 @@ z0 <- as.array(c(1000,100))
 t <- seq(0,10, length=100)
 input <- lapply(t, function(time) {
   dplyr::tibble(
-    zmin = zmin_ode(time, z0 = z0, lambda_minus = 1.5, lambda_plus = 1.0, omega_minus = .001, omega_plus = .01),
-    zplus = zplus_ode(time, z0, lambda_minus = 1.5, lambda_plus = 1.0, omega_minus = .001, omega_plus = .01)
+    zmin = zmin_ode(time, z0 = z0, lambda_minus = 1., lambda_plus = 1.5, omega_minus = .01, omega_plus = .001),
+    zplus = zplus_ode(time, z0, lambda_minus = 1., lambda_plus = 1.5, omega_minus = .01, omega_plus = .001)
     )
 }) %>% do.call('bind_rows', .)
 output <- lapply(t, function(time) {
   dplyr::tibble(
-    zmin = zmin_ode(time, z0 = z0, lambda_minus = 1.504, lambda_plus = 1.06, omega_minus = 0.005, omega_plus = 0.0084),
-    zplus = zplus_ode(time, z0, lambda_minus = 1.504, lambda_plus = 1.06, omega_minus = 0.005, omega_plus = 0.0084)
+    zmin = zmin_ode(time, z0 = z0, lambda_minus = 1.016, lambda_plus = 1.55, omega_minus = 0.007, omega_plus = 0.011),
+    zplus = zplus_ode(time, z0, lambda_minus = 1.016, lambda_plus = 1.55, omega_minus = 0.007, omega_plus = 0.011)
   )
 }) %>% do.call('bind_rows', .)
 
-sim <- read.csv("./PEPI/sim_1.5_1.0_0.001_0.01/simulation_5.csv")
+sim <- read.csv("./PEPI/sim_1.0_1.5_0.01_0.001/simulation_3.csv")
 
 #sim <- sim[1:(nrow(sim)-1),]
 input$t <- t
