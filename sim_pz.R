@@ -215,7 +215,7 @@ plot1aj <- ggplot() +
                      breaks = c(1e3,1e5)) +
   theme(axis.text = element_text(size = 16), axis.title = element_text(size = 20)) +
   #guides(fill=guide_legend(title="density")) +
-  #theme(legend.position="none") +
+  theme(legend.position="none") +
   labs(x = "z-", y = "z+")
 
 final1b_j = final1b %>% filter(z_plus > 10 & z_minus > 1e4)
@@ -243,7 +243,7 @@ plot1bj <- ggplot() +
                      breaks = c(1e3,1e5)) +
   theme(axis.text = element_text(size = 16), axis.title = element_text(size = 20)) +
   #guides(fill=guide_legend(title="density")) +
-  #theme(legend.position="none") +
+  theme(legend.position="none") +
   labs(x = "z-", y = "z+")
 
 final1c_j = final1c %>% filter(z_plus > 10 & z_minus > 1e4)
@@ -271,13 +271,14 @@ plot1cj <- ggplot() +
                      labels = function(x) format(x, scientific = TRUE),
                      breaks = c(1e3,1e5)) +
   theme(axis.text = element_text(size = 16), axis.title = element_text(size = 20)) +
-  #theme(legend.position="none") +
+  #guides(fill=guide_legend(title="density")) +
+  theme(legend.position="none") +
   labs(x = "z-", y = "z+")
 
 
-plot1aj / plot1bj / plot1cj
-ggsave("./pz/pjz_1_10t.png",  width = 5, height = 10, dpi = 600)
-ggsave("./first_case_joint.png",  width = 16, height = 6, dpi = 600)
+plot1aj + plot1bj + plot1cj
+ggsave("./pz/pjz_1_10t.png",  width = 13, height = 4, dpi = 600)
+#ggsave("./legend_joint.png",  width = 6, height = 4, dpi = 600)
 
 # CASE 2
 rate2a <- Pz_exp(final2a,1.2,1.2,0.01,0.001)
@@ -451,8 +452,8 @@ plot2aj <- ggplot() +
                      labels = function(x) format(x, scientific = TRUE),
                      limits = c(1e3,1e8)) +
   theme(axis.text = element_text(size = 16), axis.title = element_text(size = 20)) +
-  guides(fill=guide_legend(title="density")) +
-  #theme(legend.position="none") +
+  #guides(fill=guide_legend(title="density")) +
+  theme(legend.position="none") +
   labs(x = "z-", y = "z+")
 
 final2b_j = final2b %>% filter(z_plus > 10)
@@ -480,8 +481,8 @@ plot2bj <- ggplot() +
                      labels = function(x) format(x, scientific = TRUE),
                      limits = c(1e3,1e8)) +
   theme(axis.text = element_text(size = 16), axis.title = element_text(size = 20)) +
-  guides(fill=guide_legend(title="density")) +
-  #theme(legend.position="none") +
+  #guides(fill=guide_legend(title="density")) +
+  theme(legend.position="none") +
   labs(x = "z-", y = "z+")
 
 final2c_j = final2c %>% filter(z_plus > 10)
@@ -509,12 +510,12 @@ plot2cj <- ggplot() +
                      labels = function(x) format(x, scientific = TRUE),
                      limits = c(1e3,1e8)) +
   theme(axis.text = element_text(size = 16), axis.title = element_text(size = 20)) +
-  #theme(legend.position="none") +
+  theme(legend.position="none") +
   labs(x = "z-", y = "z+")
 
 
-plot2aj / plot2bj / plot2cj
-ggsave("./pz/pjz_2_15t.png",  width = 5, height = 10, dpi = 600)
+plot2aj + plot2bj + plot2cj
+ggsave("./pz/pjz_2_15t.png",  width = 13, height = 4, dpi = 600)
 
 # CASE 3
 
