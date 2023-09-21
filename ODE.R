@@ -4,7 +4,7 @@ library(reshape2)
 library(magrittr)
 library(dplyr)
 library(ggplot2)
-my_palette <- c("#72B8B5","#FFCB0A","#265450")
+my_palette <- c("#3bc2ce","#FFCA0A","#ef1a4c")
 
 # (co)variances
 covariances <- function(t, state, parameters) {
@@ -47,34 +47,34 @@ out1_df = out1_df %>% mutate(V1 = S1 - M1**2,V2 = S2 - M2**2)
 parameters_cov1a <- c(lambda_min = 1.5, lambda_plus = 1.0, omega_min = 0.001, omega_plus = 0.01, alpha_min = 1.5, beta_min = 0, alpha_plus = 1.0, beta_plus = 0)
 parameters_cov1b <- c(lambda_min = 1.5, lambda_plus = 1.0, omega_min = 0.005, omega_plus = 0.005, alpha_min = 1.5, beta_min = 0, alpha_plus = 1.0, beta_plus = 0)
 parameters_cov1c <- c(lambda_min = 1.5, lambda_plus = 1.0, omega_min = 0.01, omega_plus = 0.001, alpha_min = 1.5, beta_min = 0, alpha_plus = 1.0, beta_plus = 0)
-out1a <- ode(y = state, times = seq(0, 20, by = 0.01), func = covariances, parms = parameters_cov1a)
-out1b <- ode(y = state, times = seq(0, 20, by = 0.01), func = covariances, parms = parameters_cov1b)
-out1c <- ode(y = state, times = seq(0, 20, by = 0.01), func = covariances, parms = parameters_cov1c)
-out1a_df <- data.frame(t = out1a[,1], M1 = out1a[,2], M2 = out1a[,3], S1 = out1a[,4], S2 = out1a[,5], C = out1a[,6])
-out1b_df <- data.frame(t = out1b[,1], M1 = out1b[,2], M2 = out1b[,3], S1 = out1b[,4], S2 = out1b[,5], C = out1b[,6])
-out1c_df <- data.frame(t = out1c[,1], M1 = out1c[,2], M2 = out1c[,3], S1 = out1c[,4], S2 = out1c[,5], C = out1c[,6])
+out1a <- ode(y = state2, times = seq(0, 40, by = 0.01), func = covariances2, parms = parameters_cov1a)
+out1b <- ode(y = state2, times = seq(0, 40, by = 0.01), func = covariances2, parms = parameters_cov1b)
+out1c <- ode(y = state2, times = seq(0, 40, by = 0.01), func = covariances2, parms = parameters_cov1c)
+out1a_df <- data.frame(t = out1a[,1], M1 = out1a[,2], M2 = out1a[,3], V1 = out1a[,4], V2 = out1a[,5], C = out1a[,6])
+out1b_df <- data.frame(t = out1b[,1], M1 = out1b[,2], M2 = out1b[,3], V1 = out1b[,4], V2 = out1b[,5], C = out1b[,6])
+out1c_df <- data.frame(t = out1c[,1], M1 = out1c[,2], M2 = out1c[,3], V1 = out1c[,4], V2 = out1c[,5], C = out1c[,6])
 
 # case 2
 parameters_cov2a <- c(lambda_min = 1.2, lambda_plus = 1.2, omega_min = 0.001, omega_plus = 0.01, alpha_min = 1.2, beta_min = 0, alpha_plus = 1.2, beta_plus = 0)
 parameters_cov2b <- c(lambda_min = 1.2, lambda_plus = 1.2, omega_min = 0.005, omega_plus = 0.005, alpha_min = 1.2, beta_min = 0, alpha_plus = 1.2, beta_plus = 0)
 parameters_cov2c <- c(lambda_min = 1.2, lambda_plus = 1.2, omega_min = 0.01, omega_plus = 0.001, alpha_min = 1.2, beta_min = 0, alpha_plus = 1.2, beta_plus = 0)
-out2a <- ode(y = state, times = seq(0, 50, by = 0.01), func = covariances, parms = parameters_cov2a)
-out2b <- ode(y = state, times = seq(0, 50, by = 0.01), func = covariances, parms = parameters_cov2b)
-out2c <- ode(y = state, times = seq(0, 50, by = 0.01), func = covariances, parms = parameters_cov2c)
-out2a_df <- data.frame(t = out2a[,1], M1 = out2a[,2], M2 = out2a[,3], S1 = out2a[,4], S2 = out2a[,5], C = out2a[,6])
-out2b_df <- data.frame(t = out2b[,1], M1 = out2b[,2], M2 = out2b[,3], S1 = out2b[,4], S2 = out2b[,5], C = out2b[,6])
-out2c_df <- data.frame(t = out2c[,1], M1 = out2c[,2], M2 = out2c[,3], S1 = out2c[,4], S2 = out2c[,5], C = out2c[,6])
+out2a <- ode(y = state2, times = seq(0, 40, by = 0.01), func = covariances2, parms = parameters_cov2a)
+out2b <- ode(y = state2, times = seq(0, 40, by = 0.01), func = covariances2, parms = parameters_cov2b)
+out2c <- ode(y = state2, times = seq(0, 40, by = 0.01), func = covariances2, parms = parameters_cov2c)
+out2a_df <- data.frame(t = out2a[,1], M1 = out2a[,2], M2 = out2a[,3], V1 = out2a[,4], V2 = out2a[,5], C = out2a[,6])
+out2b_df <- data.frame(t = out2b[,1], M1 = out2b[,2], M2 = out2b[,3], V1 = out2b[,4], V2 = out2b[,5], C = out2b[,6])
+out2c_df <- data.frame(t = out2c[,1], M1 = out2c[,2], M2 = out2c[,3], V1 = out2c[,4], V2 = out2c[,5], C = out2c[,6])
 
 # case 3
 parameters_cov3a <- c(lambda_min = 1.0, lambda_plus = 1.5, omega_min = 0.001, omega_plus = 0.01, alpha_min = 1.0, beta_min = 0, alpha_plus = 1.5, beta_plus = 0)
 parameters_cov3b <- c(lambda_min = 1.0, lambda_plus = 1.5, omega_min = 0.005, omega_plus = 0.05, alpha_min = 1.0, beta_min = 0, alpha_plus = 1.5, beta_plus = 0)
 parameters_cov3c <- c(lambda_min = 1.0, lambda_plus = 1.5, omega_min = 0.01, omega_plus = 0.001, alpha_min = 1.0, beta_min = 0, alpha_plus = 1.5, beta_plus = 0)
-out3a <- ode(y = state, times = seq(0, 50, by = 0.01), func = covariances, parms = parameters_cov3a)
-out3b <- ode(y = state, times = seq(0, 50, by = 0.01), func = covariances, parms = parameters_cov3b)
-out3c <- ode(y = state, times = seq(0, 50, by = 0.01), func = covariances, parms = parameters_cov3c)
-out3a_df <- data.frame(t = out3a[,1], M1 = out3a[,2], M2 = out3a[,3], S1 = out3a[,4], S2 = out3a[,5], C = out3a[,6])
-out3b_df <- data.frame(t = out3b[,1], M1 = out3b[,2], M2 = out3b[,3], S1 = out3b[,4], S2 = out3b[,5], C = out3b[,6])
-out3c_df <- data.frame(t = out3c[,1], M1 = out3c[,2], M2 = out3c[,3], S1 = out3c[,4], S2 = out3c[,5], C = out3c[,6])
+out3a <- ode(y = state2, times = seq(0, 40, by = 0.01), func = covariances2, parms = parameters_cov3a)
+out3b <- ode(y = state2, times = seq(0, 40, by = 0.01), func = covariances2, parms = parameters_cov3b)
+out3c <- ode(y = state2, times = seq(0, 40, by = 0.01), func = covariances2, parms = parameters_cov3c)
+out3a_df <- data.frame(t = out3a[,1], M1 = out3a[,2], M2 = out3a[,3], V1 = out3a[,4], V2 = out3a[,5], C = out3a[,6])
+out3b_df <- data.frame(t = out3b[,1], M1 = out3b[,2], M2 = out3b[,3], V1 = out3b[,4], V2 = out3b[,5], C = out3b[,6])
+out3c_df <- data.frame(t = out3c[,1], M1 = out3c[,2], M2 = out3c[,3], V1 = out3c[,4], V2 = out3c[,5], C = out3c[,6])
 
 simulation <- read.csv("./GitHub/switching_process/Gillespy2/1.5_1.2_0.015_0.005_5t_51p/simulations/switching_results_avg.csv") %>% tibble::as_tibble()
 
@@ -109,7 +109,7 @@ ggsave("./GitHub/switching_process/Gillespy2/1.5_1.2_0.015_0.005_5t_51p/gamma_1.
 
 # plot standard deviation over mean
 plotsm1a <- out1a_df %>% 
-  mutate(V1 = S1 - M1**2,V2 = S2 - M2**2) %>% 
+  #mutate(V1 = S1 - M1**2,V2 = S2 - M2**2) %>% 
   mutate(D1 = sqrt(V1), D2 = sqrt(V2)) %>% 
   mutate(R1 = D1/M1, R2 = D2/M2) %>% 
   ggplot() +
@@ -121,19 +121,19 @@ plotsm1a <- out1a_df %>%
   theme(legend.position="none")
 
 plotsm1b <- out1b_df %>% 
-  mutate(V1 = S1 - M1**2,V2 = S2 - M2**2) %>%
+  #mutate(V1 = S1 - M1**2,V2 = S2 - M2**2) %>%
   mutate(D1 = sqrt(V1), D2 = sqrt(V2)) %>% 
   mutate(R1 = D1/M1, R2 = D2/M2) %>% 
   ggplot() +
   geom_line(aes(x = t,y = R1, color = "z-"), linewidth = 1) +
   geom_line(aes(x = t,y = R2, color = "z+"), linewidth = 1) +
-  labs(x = "t", y = expression(sigma/mu), color = NULL) + ylim(0,2) +
+  labs(x = "t", y = expression(sigma/mu), color = NULL) + ylim(0,3) +
   scale_color_manual(values=c(my_palette[1],my_palette[2])) +
   theme(axis.text = element_text(size = 16), axis.title = element_text(size = 18)) +
   theme(legend.position="none")
 
 plotsm1c <- out1c_df %>% 
-  mutate(V1 = S1 - M1**2,V2 = S2 - M2**2) %>% 
+  #mutate(V1 = S1 - M1**2,V2 = S2 - M2**2) %>% 
   mutate(D1 = sqrt(V1), D2 = sqrt(V2)) %>% 
   mutate(R1 = D1/M1, R2 = D2/M2) %>% 
   ggplot() +
@@ -148,7 +148,7 @@ plotsm1a / plotsm1b / plotsm1c
 ggsave("./variance_first_case.png",  width = 4, height = 10, dpi = 600)
 
 plotsm2a <- out2a_df %>% 
-  mutate(V1 = S1 - M1**2,V2 = S2 - M2**2) %>% 
+  #mutate(V1 = S1 - M1**2,V2 = S2 - M2**2) %>% 
   mutate(D1 = sqrt(V1), D2 = sqrt(V2)) %>% 
   mutate(R1 = D1/M1, R2 = D2/M2) %>% 
   ggplot() +
@@ -159,18 +159,18 @@ plotsm2a <- out2a_df %>%
   theme(axis.text = element_text(size = 16), axis.title = element_text(size = 18)) +
   theme(legend.position="none") 
 plotsm2b <- out2b_df %>% 
-  mutate(V1 = S1 - M1**2,V2 = S2 - M2**2) %>%
+  #mutate(V1 = S1 - M1**2,V2 = S2 - M2**2) %>%
   mutate(D1 = sqrt(V1), D2 = sqrt(V2)) %>% 
   mutate(R1 = D1/M1, R2 = D2/M2) %>% 
   ggplot() +
   geom_line(aes(x = t,y = R1, color = "z-"), linewidth = 1) +
   geom_line(aes(x = t,y = R2, color = "z+"), linewidth = 1) +
-  labs(x = "t", y = expression(sigma/mu), color = NULL) + ylim(0,2) +
+  labs(x = "t", y = expression(sigma/mu), color = NULL) + ylim(0,3) +
   scale_color_manual(values=c(my_palette[1],my_palette[2])) +
   theme(axis.text = element_text(size = 16), axis.title = element_text(size = 18)) +
   theme(legend.position="none") 
 plotsm2c <- out2c_df %>% 
-  mutate(V1 = S1 - M1**2,V2 = S2 - M2**2) %>% 
+  #mutate(V1 = S1 - M1**2,V2 = S2 - M2**2) %>% 
   mutate(D1 = sqrt(V1), D2 = sqrt(V2)) %>% 
   mutate(R1 = D1/M1, R2 = D2/M2) %>% 
   ggplot() +
@@ -184,7 +184,7 @@ plotsm2a / plotsm2b / plotsm2c
 ggsave("./variance_second_case.png",  width = 4, height = 10, dpi = 600)
 
 plotsm3a <- out3a_df %>% 
-  mutate(V1 = S1 - M1**2,V2 = S2 - M2**2) %>% 
+  #mutate(V1 = S1 - M1**2,V2 = S2 - M2**2) %>% 
   mutate(D1 = sqrt(V1), D2 = sqrt(V2)) %>% 
   mutate(R1 = D1/M1, R2 = D2/M2) %>% 
   ggplot() +
@@ -195,18 +195,18 @@ plotsm3a <- out3a_df %>%
   theme(axis.text = element_text(size = 16), axis.title = element_text(size = 18)) +
   theme(legend.position="none") 
 plotsm3b <- out3b_df %>% 
-  mutate(V1 = S1 - M1**2,V2 = S2 - M2**2) %>%
+  #mutate(V1 = S1 - M1**2,V2 = S2 - M2**2) %>%
   mutate(D1 = sqrt(V1), D2 = sqrt(V2)) %>% 
   mutate(R1 = D1/M1, R2 = D2/M2) %>% 
   ggplot() +
   geom_line(aes(x = t,y = R1, color = "z-"), linewidth = 1) +
   geom_line(aes(x = t,y = R2, color = "z+"), linewidth = 1) +
-  labs(x = "t", y = expression(sigma/mu), color = NULL) + ylim(0,20) +
+  labs(x = "t", y = expression(sigma/mu), color = NULL) + ylim(0,3) +
   scale_color_manual(values=c(my_palette[1],my_palette[2])) +
   theme(axis.text = element_text(size = 16), axis.title = element_text(size = 18)) +
   theme(legend.position="none") 
 plotsm3c <- out3c_df %>% 
-  mutate(V1 = S1 - M1**2,V2 = S2 - M2**2) %>% 
+  #mutate(V1 = S1 - M1**2,V2 = S2 - M2**2) %>% 
   mutate(D1 = sqrt(V1), D2 = sqrt(V2)) %>% 
   mutate(R1 = D1/M1, R2 = D2/M2) %>% 
   ggplot() +
@@ -221,7 +221,8 @@ plotsm3a / plotsm3b / plotsm3c
 ggsave("./variance_legend.png", width = 6, height = 6)
 ggsave("./variance_third_case.png",  width = 4, height = 10, dpi = 600)
 
-(plotsm1a + plotsm1b + plotsm1c) / (plotsm2a + plotsm2b + plotsm2c) / (plotsm3a + plotsm3b + plotsm3c)
+plotsm1b + plotsm2b + plotsm3b
+ggsave("./variance_p1PRL.png",  width = 10, height = 3, dpi = 600)
 
 
 
