@@ -6,10 +6,10 @@ library(reshape2)
 library(patchwork)
 library(bayesplot)
 
-simulation_py <- read.csv("./PEPI/sim_1.0_1.5_0.01_0.001/simulation_5.csv") %>% tibble::as_tibble()
+simulation_py <- read.csv("./PEPI/sim_1.2_0.001_0.01/simulation_0.csv") %>% tibble::as_tibble()
 # colnames(simulation_py) <- c('time','z_minus','z_plus','var_minus','var_plus','cov')
-samples <- simulation_py[seq(2,21, by = 2),]
-
+samples <- simulation_py[seq(1,21, by = 2),]
+samples <- simulation_py[t,]
 # simulation_py <- simulation_py[,-1]
 # t_samples = seq(1.00, 8.00, by = 0.70) %>% round(., 3)
 # samples = simulation_py %>% filter(simulation_py$time %in% t_samples)
@@ -42,7 +42,7 @@ fit <- rstan::sampling(model, data_list, chains=4, warmup=3000, iter=6000, cores
 
 print(fit, pars = c("lambda_minus", "lambda_plus", "rate_minus", "rate_plus"), digits_summary = 5)
 print(fit, digits_summary = 5)
-saveRDS(fit,"./fit_new_ode/ssa - 10/1.0_1.5_0.01_0.001_sim5.rds")
+saveRDS(fit,"./fit_new_ode/ssa - 10/1.0_1.5_0.005_sim5.rds")
 
 bayesplot::mcmc_trace(fit, pars = c("lambda_minus", "lambda_plus", "rate_minus", "rate_plus"))
 #ggsave("./GitHub/switching_process/Gillespy2/1.5_1.2_0.015_0.005_5t_51p/gamma_1.5_280/traceplot_0.png", width = 14, height = 12, dpi = 600)
@@ -69,15 +69,15 @@ pluspred
 
 posterior = as.data.frame(fit)
 posterior_lambda_min = posterior %>% ggplot() + geom_density(aes(x = lambda_minus, y = after_stat(density))) + ggtitle("Posterior") + xlim(0,5) + xlab("lambda_minus") + theme(plot.title = element_text(hjust = 0.5)) + 
-  geom_vline(xintercept = 1., color = "forestgreen")
+  geom_vline(xintercept = 1.2, color = "forestgreen")
 posterior_lambda_plus = posterior %>% ggplot() + geom_density(aes(x = lambda_plus, y = after_stat(density))) + ggtitle("Posterior") + xlim(0,5) + xlab("lambda_plus") + theme(plot.title = element_text(hjust = 0.5)) + 
-  geom_vline(xintercept = 1.5, color = "forestgreen")
+  geom_vline(xintercept = 1.2, color = "forestgreen")
 # posterior_omega_min = posterior %>% ggplot() + geom_density(aes(x = omega_minus, y = after_stat(density))) + ggtitle("Posterior") + xlim(0,0.03) + xlab("omega_minus") + theme(plot.title = element_text(hjust = 0.5)) + geom_vline(xintercept = 0.01, color = "forestgreen")
 # posterior_omega_plus = posterior %>% ggplot() + geom_density(aes(x = omega_plus, y = after_stat(density))) + ggtitle("Posterior") + xlim(0,0.03) + xlab("omega_plus") + theme(plot.title = element_text(hjust = 0.5)) + geom_vline(xintercept = 0.001, color = "forestgreen")
 posterior_omega_min = posterior %>% ggplot() + geom_density(aes(x = rate_minus, y = after_stat(density))) + ggtitle("Posterior") + xlim(0,0.03) + xlab("rate_minus") + theme(plot.title = element_text(hjust = 0.5)) + 
-  geom_vline(xintercept = 0.01/1.5, color = "forestgreen")
+  geom_vline(xintercept = 0.001/1.2, color = "forestgreen")
 posterior_omega_plus = posterior %>% ggplot() + geom_density(aes(x = rate_plus, y = after_stat(density))) + ggtitle("Posterior") + xlim(0,0.03) + xlab("rate_plus") + theme(plot.title = element_text(hjust = 0.5)) + 
-  geom_vline(xintercept = 0.001/1., color = "forestgreen")
+  geom_vline(xintercept = 0.01/1.2, color = "forestgreen")
 
 posterior_lambda_min / prior_lambda
 #ggsave("./GitHub/switching_process/Gillespy2/1.5_1.0_005_001/beta_2_80/lambda_minus_posterior.png", width = 12, height = 7, dpi = 600)
