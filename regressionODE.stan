@@ -2,8 +2,6 @@ functions {
   vector switching_process(real t,
                           vector z,
                           real[] theta //lambda_minus,lambda_plus, omega_minus, omega_plus
-                          // real[] x_r,
-                          // int[] x_i
                           ) {
     vector[5] dzdt;
     real lambda_minus = theta[1];
@@ -27,17 +25,17 @@ functions {
 
 data {
   int<lower=1> n_times; 
-  vector[5] z0
+  vector[5] z0;
   real t0;
   vector[n_times] zminus;
   vector[n_times] zplus;
   array[n_times] real t;
 }
 
-transformed data {
-  real x_r[0];
-  int x_i[0];
-}
+// transformed data {
+//   real x_r[0];
+//   int x_i[0];
+// }
 
 parameters {
   real<lower=0> lambda_minus;
@@ -62,8 +60,8 @@ model {
   
   target += gamma_lpdf(lambda_minus | 2., 1.);
   target += gamma_lpdf(lambda_plus | 2., 1.);
-  target += gamma_lpdf(rate_minus | 1.5, 280);
-  target += gamma_lpdf(rate_plus | 1.5, 280);
+  target += gamma_lpdf(rate_minus | 1, 1000);
+  target += gamma_lpdf(rate_plus | 2, 400);
 
   // z_hat = integrate_ode_rk45(switching_process, z0, t0, t, theta, x_r, x_i);
   
