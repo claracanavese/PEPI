@@ -14,12 +14,23 @@ samples <- simulation_py[t,]
 # t_samples = seq(1.00, 8.00, by = 0.70) %>% round(., 3)
 # samples = simulation_py %>% filter(simulation_py$time %in% t_samples)
 
-prior_lambda = ggplot() + stat_function(fun=dgamma, args = list(shape = 2., rate = 1.)) +
-  xlim(0,5) + ggtitle("Prior") + xlab("lambda") + theme(plot.title = element_text(hjust = 0.5)) + ylab("density")
-# prior_omega = ggplot() + stat_function(fun=dcauchy, args = list(location = 0.01, scale = 0.01)) +
-#   ggtitle("Prior") + xlab("omega") + theme(plot.title = element_text(hjust = 0.5)) + ylab("density") + xlim(0.,0.03)
-prior_omega = ggplot() + stat_function(fun = dgamma, args = list(shape = 1.5, rate = 280)) +
-  ggtitle("Prior") + xlab("omega") + theme(plot.title = element_text(hjust = 0.5)) + ylab("density") + xlim(0.,0.03)
+prior_lambda = ggplot() + 
+  stat_function(fun=dgamma, args = list(shape = 2., rate = 1.), linewidth = 1) +
+  xlim(0,5) + 
+  #ggtitle("Prior distribution") + 
+  xlab(expression(lambda)) + 
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  ylab(expression(p(lambda))) +
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18))
+
+prior_omega = ggplot() + 
+  stat_function(fun = dgamma, args = list(shape = 1.5, rate = 280), linewidth = 1) +
+  #ggtitle("Prior distribution") + 
+  xlab(expression(omega)) + 
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  ylab("density") + 
+  xlim(0.,0.03) +
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18))
   # geom_vline(xintercept = 0.01, color = "red") + geom_vline(xintercept = 0.001, color = "green")
 
 ggplot() + stat_function(fun = dgamma, args = list(shape = 1.5, rate = 280), color = "red") + xlim(0,0.03)
