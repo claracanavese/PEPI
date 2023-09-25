@@ -6,9 +6,9 @@ library(reshape2)
 library(patchwork)
 library(bayesplot)
 
-simulation_py <- read.csv("./PEPI/sim_1.2_0.001_0.01/simulation_0.csv") %>% tibble::as_tibble()
+simulation_py <- read.csv("./PEPI/sim_1.0_1.5_0.01_0.001/simulation_4.csv") %>% tibble::as_tibble()
 # colnames(simulation_py) <- c('time','z_minus','z_plus','var_minus','var_plus','cov')
-samples <- simulation_py[seq(1,21, by = 2),]
+samples <- simulation_py[seq(12,51, by = 2),]
 samples <- simulation_py[t,]
 # simulation_py <- simulation_py[,-1]
 # t_samples = seq(1.00, 8.00, by = 0.70) %>% round(., 3)
@@ -21,19 +21,25 @@ prior_lambda = ggplot() +
   xlab(expression(lambda)) + 
   theme(plot.title = element_text(hjust = 0.5)) + 
   ylab(expression(p(lambda))) +
-  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18))
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
+  geom_vline(xintercept = 1.0, color = "#379237", linewidth = 0.8) +
+  geom_vline(xintercept = 1.2, color = "#54B435", linewidth = 0.8) +
+  geom_vline(xintercept = 1.5, color = "#82CD47", linewidth = 0.8)
 
 prior_omega = ggplot() + 
   stat_function(fun = dgamma, args = list(shape = 1.5, rate = 280), linewidth = 1) +
   #ggtitle("Prior distribution") + 
-  xlab(expression(omega)) + 
+  xlab(expression(hat(omega))) + 
   theme(plot.title = element_text(hjust = 0.5)) + 
-  ylab("density") + 
+  ylab(expression(p(hat(omega)))) + 
   xlim(0.,0.03) +
-  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18))
-  # geom_vline(xintercept = 0.01, color = "red") + geom_vline(xintercept = 0.001, color = "green")
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
+  geom_vline(xintercept = 0.001, color = "#7b2cbf", linewidth = 0.8) +
+  geom_vline(xintercept = 0.005, color = "#9d4edd", linewidth = 0.8) +
+  geom_vline(xintercept = 0.01, color = "#c77dff", linewidth = 0.8)
 
-ggplot() + stat_function(fun = dgamma, args = list(shape = 1.5, rate = 280), color = "red") + xlim(0,0.03)
+prior_lambda + prior_omega
+ggsave("./priors.png",width = 12, height = 4, dpi = 600)
 
 # NEW MODEL
 
@@ -80,15 +86,15 @@ pluspred
 
 posterior = as.data.frame(fit)
 posterior_lambda_min = posterior %>% ggplot() + geom_density(aes(x = lambda_minus, y = after_stat(density))) + ggtitle("Posterior") + xlim(0,5) + xlab("lambda_minus") + theme(plot.title = element_text(hjust = 0.5)) + 
-  geom_vline(xintercept = 1.2, color = "forestgreen")
+  geom_vline(xintercept = 1.0, color = "forestgreen")
 posterior_lambda_plus = posterior %>% ggplot() + geom_density(aes(x = lambda_plus, y = after_stat(density))) + ggtitle("Posterior") + xlim(0,5) + xlab("lambda_plus") + theme(plot.title = element_text(hjust = 0.5)) + 
-  geom_vline(xintercept = 1.2, color = "forestgreen")
+  geom_vline(xintercept = 1.5, color = "forestgreen")
 # posterior_omega_min = posterior %>% ggplot() + geom_density(aes(x = omega_minus, y = after_stat(density))) + ggtitle("Posterior") + xlim(0,0.03) + xlab("omega_minus") + theme(plot.title = element_text(hjust = 0.5)) + geom_vline(xintercept = 0.01, color = "forestgreen")
 # posterior_omega_plus = posterior %>% ggplot() + geom_density(aes(x = omega_plus, y = after_stat(density))) + ggtitle("Posterior") + xlim(0,0.03) + xlab("omega_plus") + theme(plot.title = element_text(hjust = 0.5)) + geom_vline(xintercept = 0.001, color = "forestgreen")
 posterior_omega_min = posterior %>% ggplot() + geom_density(aes(x = rate_minus, y = after_stat(density))) + ggtitle("Posterior") + xlim(0,0.03) + xlab("rate_minus") + theme(plot.title = element_text(hjust = 0.5)) + 
-  geom_vline(xintercept = 0.001/1.2, color = "forestgreen")
+  geom_vline(xintercept = 0.01/1.5, color = "forestgreen")
 posterior_omega_plus = posterior %>% ggplot() + geom_density(aes(x = rate_plus, y = after_stat(density))) + ggtitle("Posterior") + xlim(0,0.03) + xlab("rate_plus") + theme(plot.title = element_text(hjust = 0.5)) + 
-  geom_vline(xintercept = 0.01/1.2, color = "forestgreen")
+  geom_vline(xintercept = 0.001/1.0, color = "forestgreen")
 
 posterior_lambda_min / prior_lambda
 #ggsave("./GitHub/switching_process/Gillespy2/1.5_1.0_005_001/beta_2_80/lambda_minus_posterior.png", width = 12, height = 7, dpi = 600)
