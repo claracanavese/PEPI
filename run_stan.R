@@ -18,33 +18,41 @@ prior_lambda = ggplot() +
   #stat_function(fun=dgamma, args = list(shape = 2., rate = 1.), linewidth = 1) +
   stat_function(fun=dgamma, args = list(shape = 2., rate = 1.5), linewidth = 1) +
   xlim(0,5) + 
-  #ggtitle("Prior distribution") + 
+  ggtitle(expression("Gamma"~"("*alpha*" = 2, "*beta*" = 1.5)")) + 
+  theme(plot.title = element_text(size = 18)) +
   xlab(expression(lambda)) + 
   theme(plot.title = element_text(hjust = 0.5)) + 
   ylab(expression(p(lambda))) +
-  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18))
-  # geom_vline(xintercept = 1.0, color = "#379237", linewidth = 0.8) +
-  # geom_vline(xintercept = 1.2, color = "#54B435", linewidth = 0.8) +
-  # geom_vline(xintercept = 1.5, color = "#82CD47", linewidth = 0.8)
+  theme(axis.text = element_text(size = 16), axis.title = element_text(size = 18)) +
+  geom_vline(xintercept = 1.0, color = "#379237", linewidth = 0.8) +
+  geom_vline(xintercept = 1.2, color = "#54B435", linewidth = 0.8) +
+  geom_vline(xintercept = 1.5, color = "#82CD47", linewidth = 0.8)
 
 prior_omega_p = ggplot() + 
   stat_function(fun = dgamma, args = list(shape = 1, rate = 1000), linewidth = 1) +
-  #ggtitle("Prior distribution") + 
+  ggtitle(expression("Gamma"~"("*alpha*" = 1, "*beta*" = 1000)")) + 
+  theme(plot.title = element_text(size = 18)) +
   xlab(expression(hat(omega))) + 
   theme(plot.title = element_text(hjust = 0.5)) + 
   ylab(expression(p(hat(omega)))) + 
-  xlim(0.,0.03)
+  scale_x_continuous(limits = c(0,0.02), breaks = c(0,0.005, 0.01,0.015,0.02)) +
+  theme(axis.text = element_text(size = 16), axis.title = element_text(size = 18)) +
+  geom_vline(xintercept = .001, color = "#7b2cbf", linewidth = 0.8)
 
 prior_omega = ggplot() + 
   stat_function(fun = dgamma, args = list(shape = 3, rate = 500), linewidth = 1) +
-  #ggtitle("Prior distribution") + 
+  ggtitle(expression("Gamma"~"("*alpha*" = 3, "*beta*" = 500)")) + 
+  theme(plot.title = element_text(size = 18)) +
   xlab(expression(hat(omega))) + 
   theme(plot.title = element_text(hjust = 0.5)) + 
   ylab(expression(p(hat(omega)))) + 
-  xlim(0.,0.03)
+  scale_x_continuous(limits = c(0,0.02), breaks = c(0,0.005, 0.01,0.015,0.02)) +
+  theme(axis.text = element_text(size = 16), axis.title = element_text(size = 18)) +
+  geom_vline(xintercept = .005, color = "#9d4edd", linewidth = 0.8) +
+  geom_vline(xintercept = .01, color = "#c77dff", linewidth = 0.8)
 
-prior_lambda + prior_omega
-ggsave("./priors.png",width = 12, height = 4, dpi = 600)
+prior_lambda + prior_omega + prior_omega_p
+ggsave("./priors.png",width = 15, height = 4, dpi = 600)
 
 # NEW MODEL
 
