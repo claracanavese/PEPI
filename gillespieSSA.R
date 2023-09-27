@@ -23,7 +23,7 @@ reactions <- list(
 
 simulation1 = function(i){
   library("GillespieSSA2")
-  params <- c(am=1.5, bm=0.0, ap=1.0, bp=0.0, om=0.005, op=0.005)
+  params <- c(am=1.5, bm=0.0, ap=1.0, bp=0.0, om=0.001, op=0.01)
   sim_name <- paste0("Switching Process ",i)
   # initial state
   initial_state <- c(zm=1, zp=0)
@@ -52,10 +52,10 @@ simulation1 = function(i){
   colnames(state)[1] <- "time"
   
   pz <<- bind_rows(pz,state[nrow(state),])
-  #fs = filter(state, switch_to_plus > 0)
+  fs = filter(state, switch_to_plus > 0)
   ss = filter(state, switch_to_minus > 0)
-  #first_switch[i+400] <<- fs[1,]$time
-  second_switch[i+300] <<- ss[1,]$time
+  first_switch[i+200] <<- fs[1,]$time
+  second_switch[i+200] <<- ss[1,]$time
 }
 
 # easypar::run( FUN = simulation1,
@@ -71,9 +71,9 @@ second_switch = list()
 
 prova <- lapply(1:200, simulation1)
 
-#saveRDS(first_switch, file="./R/1.5_1.0_0.01_0.001_11t_fs.RData")
-saveRDS(second_switch, file="./R_times/1.5_1.0_0.005_11t_ss.RData")
-saveRDS(pz,"./R_times/1.5_1.0_0.005_11t.rds")
+saveRDS(first_switch, file="./R_times/1.5_1.0_0.001_0.01_11t_fs.RData")
+saveRDS(second_switch, file="./R_times/1.5_1.0_0.001_0.01_11t_ss.RData")
+saveRDS(pz,"./R_times/1.5_1.0_0.001_0.01_11t.rds")
 
 
 # for (i in seq(1,500)) {
@@ -91,9 +91,9 @@ median(unlist(second_switch), na.rm = TRUE)
 sd(unlist(second_switch), na.rm = TRUE)
 
 
-pz <- readRDS("./R_times/1.5_1.0_0.01_0.001_11t.rds")
+pz <- readRDS("./R_times/1.5_1.0_0.005_11t.rds")
 first_switch <- readRDS("./R/1.0_1.5_0.005_14t_fs.RData")
-second_switch <- readRDS("./R_times/1.5_1.0_0.01_0.001_11t_ss.RData")
+second_switch <- readRDS("./R_times/1.5_1.0_0.005_11t_ss.RData")
   
 # explicit tau-leap
 set.seed(1)

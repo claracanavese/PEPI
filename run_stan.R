@@ -8,7 +8,7 @@ library(bayesplot)
 
 simulation_py <- read.csv("./PEPI/sim_1.0_1.5_0.01_0.001/simulation_4 copy.csv") %>% tibble::as_tibble()
 # colnames(simulation_py) <- c('time','z_minus','z_plus','var_minus','var_plus','cov')
-samples <- simulation_py[seq(2,51, by = 8),]
+samples <- simulation_py[seq(12,51, by = 2),]
 samples <- simulation_py[t,]
 # simulation_py <- simulation_py[,-1]
 # t_samples = seq(1.00, 8.00, by = 0.70) %>% round(., 3)
