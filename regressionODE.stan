@@ -60,8 +60,8 @@ model {
   
   target += gamma_lpdf(lambda_minus | 2., 1.5);
   target += gamma_lpdf(lambda_plus | 2., 1.5);
-  target += gamma_lpdf(rate_minus | 1, 1000);
-  target += gamma_lpdf(rate_plus | 3, 500);
+  target += gamma_lpdf(rate_minus | 3, 500);
+  target += gamma_lpdf(rate_plus | 1, 1000);
 
   // z_hat = integrate_ode_rk45(switching_process, z0, t0, t, theta, x_r, x_i);
   
