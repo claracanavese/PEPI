@@ -109,15 +109,15 @@ pluspred
 
 posterior = as.data.frame(fit)
 posterior_lambda_min = posterior %>% ggplot() + geom_density(aes(x = lambda_minus, y = after_stat(density))) + ggtitle("Posterior") + xlim(0,5) + xlab("lambda_minus") + theme(plot.title = element_text(hjust = 0.5)) + 
-  geom_vline(xintercept = 1.5, color = "forestgreen")
+  geom_vline(xintercept = 1.2, color = "forestgreen")
 posterior_lambda_plus = posterior %>% ggplot() + geom_density(aes(x = lambda_plus, y = after_stat(density))) + ggtitle("Posterior") + xlim(0,5) + xlab("lambda_plus") + theme(plot.title = element_text(hjust = 0.5)) + 
-  geom_vline(xintercept = 1., color = "forestgreen")
+  geom_vline(xintercept = 1.2, color = "forestgreen")
 # posterior_omega_min = posterior %>% ggplot() + geom_density(aes(x = omega_minus, y = after_stat(density))) + ggtitle("Posterior") + xlim(0,0.03) + xlab("omega_minus") + theme(plot.title = element_text(hjust = 0.5)) + geom_vline(xintercept = 0.01, color = "forestgreen")
 # posterior_omega_plus = posterior %>% ggplot() + geom_density(aes(x = omega_plus, y = after_stat(density))) + ggtitle("Posterior") + xlim(0,0.03) + xlab("omega_plus") + theme(plot.title = element_text(hjust = 0.5)) + geom_vline(xintercept = 0.001, color = "forestgreen")
 posterior_omega_min = posterior %>% ggplot() + geom_density(aes(x = rate_minus, y = after_stat(density))) + ggtitle("Posterior") + xlim(0,0.03) + xlab("rate_minus") + theme(plot.title = element_text(hjust = 0.5)) + 
-  geom_vline(xintercept = 0.01/1., color = "forestgreen")
+  geom_vline(xintercept = 0.01/1.2, color = "forestgreen")
 posterior_omega_plus = posterior %>% ggplot() + geom_density(aes(x = rate_plus, y = after_stat(density))) + ggtitle("Posterior") + xlim(0,0.03) + xlab("rate_plus") + theme(plot.title = element_text(hjust = 0.5)) + 
-  geom_vline(xintercept = 0.001/1.5, color = "forestgreen")
+  geom_vline(xintercept = 0.001/1.2, color = "forestgreen")
 
 posterior_lambda_min / prior_lambda
 #ggsave("./GitHub/switching_process/Gillespy2/1.5_1.0_005_001/beta_2_80/lambda_minus_posterior.png", width = 12, height = 7, dpi = 600)
