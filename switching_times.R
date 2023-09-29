@@ -3,74 +3,141 @@ library(RColorBrewer)
 library(tidyverse)
 library(patchwork)
 
-fs1 <- readRDS("./R_times/1.5_1.0_0.01_0.001_10t_fs.RData")
-ss1 <- readRDS("./R_times/1.5_1.0_0.01_0.001_11t_ss.RData")
-fs1_df = data.frame(unlist(fs1))
-colnames(fs1_df) = c("fs")
-ss1_df = data.frame(unlist(ss1))
-colnames(ss1_df) = c("ss")
+fs1a <- readRDS("./R_times/1.5_1.0_0.01_0.001_10t_fs.RData")
+ss1a <- readRDS("./R_times/1.5_1.0_0.01_0.001_11t_ss.RData")
+fs1a_df = data.frame(unlist(fs1a))
+colnames(fs1a_df) = c("fs")
+ss1a_df = data.frame(unlist(ss1a))
+colnames(ss1a_df) = c("ss")
 
-fs1_theory <- read.csv("./R_times/1.5_1.0_0.01_0.001_fs.csv") %>%
+fs1a_theory <- read.csv("./R_times/1.5_1.0_0.01_0.001_fs.csv") %>%
   tibble::as_tibble()
-ss1_theory <- read.csv("./R_times/1.5_1.0_0.01_0.001_ss.csv") %>%
+ss1a_theory <- read.csv("./R_times/1.5_1.0_0.01_0.001_ss.csv") %>%
   tibble::as_tibble()
 
-ggplot() +
-  geom_histogram(data = fs1_df, aes(x = fs, y = after_stat(density)), fill = "#52B5D0", alpha = 0.8, bins = 70) +
-  geom_line(data = fs1_theory, aes(x = fs, y = p), linewidth = 1) +
-  geom_histogram(data = ss1_df, aes(x = ss, y = after_stat(density)), fill = "#8267ae", alpha = 0.8, bins = 60) +
-  geom_line(data = ss1_theory, aes(x = ss, y = p), linewidth = 1) +
+st1a <- ggplot() +
+  geom_histogram(data = fs1a_df, aes(x = fs, y = after_stat(density)), fill = "#52B5D0", alpha = 0.8, bins = 45) +
+  geom_line(data = fs1a_theory, aes(x = fs, y = p), linewidth = 1) +
+  geom_histogram(data = ss1a_df, aes(x = ss, y = after_stat(density)), fill = "#8267ae", alpha = 0.8, bins = 50) +
+  geom_line(data = ss1a_theory, aes(x = ss, y = p), linewidth = 1) +
   theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
   labs(x="t",y="p(t)")
 
-median(unlist(fs1), na.rm = TRUE)
-sd(unlist(fs1), na.rm = TRUE)
-median(unlist(ss1), na.rm = TRUE)
-sd(unlist(ss1), na.rm = TRUE)
+median(unlist(fs1a), na.rm = TRUE)
+sd(unlist(fs1a), na.rm = TRUE)
+median(unlist(ss1a), na.rm = TRUE)
+sd(unlist(ss1a), na.rm = TRUE)
 
-fs2 <- readRDS("./R_times/1.5_1.0_0.005_10t_fs.RData")
-ss2 <- readRDS("./R_times/1.5_1.0_0.005_11t_ss.RData")
-fs2_df = data.frame(unlist(fs2))
-colnames(fs2_df) = c("fs")
-ss2_df = data.frame(unlist(ss2))
-colnames(ss2_df) = c("ss")
+fs2a <- readRDS("./R_times/1.5_1.0_0.005_10t_fs.RData")
+ss2a <- readRDS("./R_times/1.5_1.0_0.005_11t_ss.RData")
+fs2a_df = data.frame(unlist(fs2a))
+colnames(fs2a_df) = c("fs")
+ss2a_df = data.frame(unlist(ss2a))
+colnames(ss2a_df) = c("ss")
 
-fs2_theory <- read.csv("./R_times/1.5_1.0_0.005_fs.csv") %>%
+fs2a_theory <- read.csv("./R_times/1.5_1.0_0.005_fs.csv") %>%
   tibble::as_tibble()
-ss2_theory <- read.csv("./R_times/1.5_1.0_0.005_ss.csv") %>%
+ss2a_theory <- read.csv("./R_times/1.5_1.0_0.005_ss.csv") %>%
   tibble::as_tibble()
 
-ggplot() +
-  geom_histogram(data = fs2_df, aes(x = fs, y = after_stat(density)), fill = "#52B5D0", alpha = 0.8, bins = 70) +
-  geom_line(data = fs2_theory, aes(x = fs, y = p), linewidth = 1) +
-  geom_histogram(data = ss2_df, aes(x = ss, y = after_stat(density)), fill = "#8267ae", alpha = 0.8, bins = 60) +
-  geom_line(data = ss2_theory, aes(x = ss, y = p), linewidth = 1) +
+st2a <- ggplot() +
+  geom_histogram(data = fs2a_df, aes(x = fs, y = after_stat(density)), fill = "#52B5D0", alpha = 0.8, bins = 50) +
+  geom_line(data = fs2a_theory, aes(x = fs, y = p), linewidth = 1) +
+  geom_histogram(data = ss2a_df, aes(x = ss, y = after_stat(density)), fill = "#8267ae", alpha = 0.8, bins = 50) +
+  geom_line(data = ss2a_theory, aes(x = ss, y = p), linewidth = 1) +
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
+  labs(x="t",y="p(t)") + ylim(0,0.41)
+
+fs3a <- readRDS("./R_times/1.5_1.0_0.001_0.01_11t_fs.RData")
+ss3a <- readRDS("./R_times/1.5_1.0_0.001_0.01_11t_ss.RData")
+fs3a_df = data.frame(unlist(fs3a))
+colnames(fs3a_df) = c("fs")
+ss3a_df = data.frame(unlist(ss3a))
+colnames(ss3a_df) = c("ss")
+
+fs3a_theory <- read.csv("./R_times/1.5_1.0_0.001_0.01_fs.csv") %>%
+  tibble::as_tibble()
+ss3a_theory <- read.csv("./R_times/1.5_1.0_0.001_0.01_ss.csv") %>%
+  tibble::as_tibble()
+
+st3a <- ggplot() +
+  geom_histogram(data = fs3a_df, aes(x = fs, y = after_stat(density)), fill = "#52B5D0", alpha = 0.8, bins = 50) +
+  geom_line(data = fs3a_theory, aes(x = fs, y = p), linewidth = 1) +
+  geom_histogram(data = ss3a_df, aes(x = ss, y = after_stat(density)), fill = "#8267ae", alpha = 0.8, bins = 50) +
+  geom_line(data = ss3a_theory, aes(x = ss, y = p), linewidth = 1) +
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
+  labs(x="t",y="p(t)") + ylim(0,0.41)
+
+st1a + st2a + st3a
+
+ggsave("./switching_times_sim_1.png",width = 15, height = 4, dpi = 600)
+
+fs1b <- readRDS("./R_times/1.2_0.01_0.001_10t_fs.RData")
+ss1b <- readRDS("./R_times/1.2_0.01_0.001_10t_ss.RData")
+fs1b_df = data.frame(unlist(fs1b))
+colnames(fs1b_df) = c("fs")
+ss1b_df = data.frame(unlist(ss1b))
+colnames(ss1b_df) = c("ss")
+
+fs1b_theory <- read.csv("./R_times/1.2_0.01_0.001_fs.csv") %>%
+  tibble::as_tibble()
+ss1b_theory <- read.csv("./R_times/1.2_0.01_0.001_ss.csv") %>%
+  tibble::as_tibble()
+
+st1b <- ggplot() +
+  geom_histogram(data = fs1b_df, aes(x = fs, y = after_stat(density)), fill = "#52B5D0", alpha = 0.8, bins = 50) +
+  geom_line(data = fs1b_theory, aes(x = fs, y = p), linewidth = 1) +
+  geom_histogram(data = ss1b_df, aes(x = ss, y = after_stat(density)), fill = "#8267ae", alpha = 0.8, bins = 50) +
+  geom_line(data = ss1b_theory, aes(x = ss, y = p), linewidth = 1) +
   theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
   labs(x="t",y="p(t)")
 
-fs3 <- readRDS("./R_times/1.5_1.0_0.001_0.01_10t_fs.RData")
-ss3 <- readRDS("./R_times/1.5_1.0_0.001_0.01_10t_ss.RData")
-fs3_df = data.frame(unlist(fs3))
-colnames(fs3_df) = c("fs")
-ss3_df = data.frame(unlist(ss3))
-colnames(ss3_df) = c("ss")
+median(unlist(fs1b), na.rm = TRUE)
+sd(unlist(fs1b), na.rm = TRUE)
+median(unlist(ss1b), na.rm = TRUE)
+sd(unlist(ss1b), na.rm = TRUE)
 
-fs3_theory <- read.csv("./R_times/1.5_1.0_0.001_0.01_fs.csv") %>%
+fs2b <- readRDS("./R_times/1.2_0.005_10t_fs.RData")
+ss2b <- readRDS("./R_times/1.2_0.005_10t_ss.RData")
+fs2b_df = data.frame(unlist(fs2b))
+colnames(fs2b_df) = c("fs")
+ss2b_df = data.frame(unlist(ss2b))
+colnames(ss2b_df) = c("ss")
+
+fs2b_theory <- read.csv("./R_times/1.2_0.005_fs.csv") %>%
   tibble::as_tibble()
-ss3_theory <- read.csv("./R_times/1.5_1.0_0.001_0.01_ss.csv") %>%
+ss2b_theory <- read.csv("./R_times/1.2_0.005_ss.csv") %>%
   tibble::as_tibble()
 
-ggplot() +
-  geom_histogram(data = fs3_df, aes(x = fs, y = after_stat(density)), fill = "#52B5D0", alpha = 0.8, bins = 70) +
-  geom_line(data = fs3_theory, aes(x = fs, y = p), linewidth = 1) +
-  geom_histogram(data = ss3_df, aes(x = ss, y = after_stat(density)), fill = "#8267ae", alpha = 0.8, bins = 60) +
-  geom_line(data = ss3_theory, aes(x = ss, y = p), linewidth = 1) +
+st2b <- ggplot() +
+  geom_histogram(data = fs2b_df, aes(x = fs, y = after_stat(density)), fill = "#52B5D0", alpha = 0.8, bins = 50) +
+  geom_line(data = fs2b_theory, aes(x = fs, y = p), linewidth = 1) +
+  geom_histogram(data = ss2b_df, aes(x = ss, y = after_stat(density)), fill = "#8267ae", alpha = 0.8, bins = 50) +
+  geom_line(data = ss2b_theory, aes(x = ss, y = p), linewidth = 1) +
   theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
   labs(x="t",y="p(t)")
 
+fs3b <- readRDS("./R_times/1.2_0.001_0.01_10t_fs.RData")
+ss3b <- readRDS("./R_times/1.2_0.001_0.01_10t_ss.RData")
+fs3b_df = data.frame(unlist(fs3b))
+colnames(fs3b_df) = c("fs")
+ss3b_df = data.frame(unlist(ss3b))
+colnames(ss3b_df) = c("ss")
 
+fs3b_theory <- read.csv("./R_times/1.2_0.001_0.01_fs.csv") %>%
+  tibble::as_tibble()
+ss3b_theory <- read.csv("./R_times/1.2_0.001_0.01_ss.csv") %>%
+  tibble::as_tibble()
 
+st3b <- ggplot() +
+  geom_histogram(data = fs3b_df, aes(x = fs, y = after_stat(density)), fill = "#52B5D0", alpha = 0.8, bins = 50) +
+  geom_line(data = fs3b_theory, aes(x = fs, y = p), linewidth = 1) +
+  geom_histogram(data = ss3b_df, aes(x = ss, y = after_stat(density)), fill = "#8267ae", alpha = 0.8, bins = 50) +
+  geom_line(data = ss3b_theory, aes(x = ss, y = p), linewidth = 1) +
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
+  labs(x="t",y="p(t)") + ylim(0,0.41)
 
+st1a + st2a + st3a
 
 
 
