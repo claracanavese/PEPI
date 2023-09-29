@@ -6,8 +6,8 @@ library(magrittr)
 library(ggplot2)
 
 # parameters
-params <- c(am=1.5, bm=0.0, ap=1.0, bp=0.0, om=0.005, op=0.005)
-final_time <- 5
+params <- c(am=1.5, bm=0.0, ap=1.0, bp=0.0, om=0.01, op=0.001)
+final_time <- 10
 sim_name <- "Switching Process"
 # initial state
 initial_state <- c(zm=1000, zp=100)
@@ -23,7 +23,7 @@ reactions <- list(
 
 simulation1 = function(i){
   library("GillespieSSA2")
-  params <- c(am=1.5, bm=0.0, ap=1.0, bp=0.0, om=0.001, op=0.01)
+  params <- c(am=1.2, bm=0.0, ap=1.2, bp=0.0, om=0.005, op=0.005)
   sim_name <- paste0("Switching Process ",i)
   # initial state
   initial_state <- c(zm=1, zp=0)
@@ -41,7 +41,7 @@ simulation1 = function(i){
     initial_state = initial_state,
     reactions = reactions,
     params = params,
-    final_time = 11,
+    final_time = 13,
     method = ssa_exact(),
     sim_name = sim_name,
     log_firings = TRUE
@@ -51,11 +51,11 @@ simulation1 = function(i){
   state <- as.data.frame(cbind(out$time,out$state,out$firings))
   colnames(state)[1] <- "time"
   
-  pz <<- bind_rows(pz,state[nrow(state),])
-  fs = filter(state, switch_to_plus > 0)
+  #pz <<- bind_rows(pz,state[nrow(state),])
+  #fs = filter(state, switch_to_plus > 0)
   ss = filter(state, switch_to_minus > 0)
-  first_switch[i+200] <<- fs[1,]$time
-  second_switch[i+200] <<- ss[1,]$time
+  #first_switch[i+300] <<- fs[1,]$time
+  second_switch[i+138] <<- ss[1,]$time
 }
 
 # easypar::run( FUN = simulation1,
@@ -69,10 +69,10 @@ pz <- data.frame()
 first_switch = list()
 second_switch = list()
 
-prova <- lapply(1:200, simulation1)
+prova <- lapply(1:362, simulation1)
 
 saveRDS(first_switch, file="./R_times/1.5_1.0_0.001_0.01_11t_fs.RData")
-saveRDS(second_switch, file="./R_times/1.5_1.0_0.001_0.01_11t_ss.RData")
+saveRDS(second_switch, file="./R_times/1.2_0.01_0.001_13t_ss.RData")
 saveRDS(pz,"./R_times/1.5_1.0_0.001_0.01_11t.rds")
 
 
@@ -91,9 +91,9 @@ median(unlist(second_switch), na.rm = TRUE)
 sd(unlist(second_switch), na.rm = TRUE)
 
 
-pz <- readRDS("./R_times/1.5_1.0_0.005_11t.rds")
-first_switch <- readRDS("./R/1.0_1.5_0.005_14t_fs.RData")
-second_switch <- readRDS("./R_times/1.5_1.0_0.005_11t_ss.RData")
+pz <- readRDS("./R_times/1.5_1.0_0.001_0.01_11t.rds")
+first_switch <- readRDS("./R_times/1.5_1.0_0.001_0.01_11t_fs.RData")
+second_switch <- readRDS("./R_times/1.5_1.0_0.001_0.01_11t_ss.RData")
   
 # explicit tau-leap
 set.seed(1)
@@ -103,11 +103,13 @@ out <- ssa(
   initial_state = initial_state,
   reactions = reactions,
   params = params,
-  final_time = final_time,
+  final_time = 8.5,
   method = ssa_exact(),
   sim_name = sim_name,
-  log_firings = TRUE
+  log_firings = TRUE,
+  verbose = TRUE
 )
+saveRDS(out, file = "./out_test.Rdata")
 # create dataframe to save
 state <- as.data.frame(cbind(out$time,out$state,out$firings))
 colnames(state)[1] <- "time"
@@ -116,6 +118,7 @@ saveRDS(state, file = "./R/simulation_name.rds")
 plot_ssa(out)
 
 firings <- as.data.frame(cbind(out$time,out$firings))
+firings <- as.data.frame(out$firings)
 colnames(firings)[1] <- "time"
 sum(firings$switch_to_plus)
 sum(firings$switch_to_minus)
