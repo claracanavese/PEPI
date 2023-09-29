@@ -42,8 +42,8 @@ data {
 parameters {
   real<lower=0> lambda_minus;
   real<lower=0> lambda_plus;
-  real<lower=0, upper=0.01> rate_minus; // omega_minus / lambda_plus
-  real<lower=0, upper=0.01> rate_plus; // omega_plus / lambda_minus
+  real<lower=0, upper=0.02> rate_minus; // omega_minus / lambda_plus
+  real<lower=0, upper=0.02> rate_plus; // omega_plus / lambda_minus
 }
 
 transformed parameters {
@@ -61,7 +61,7 @@ model {
   target += gamma_lpdf(lambda_minus | 2., 1.5);
   target += gamma_lpdf(lambda_plus | 2., 1.5);
   target += gamma_lpdf(rate_minus | 3, 500);
-  target += gamma_lpdf(rate_plus | 1, 1000);
+  target += gamma_lpdf(rate_plus | 3, 500);
 
   // z_hat = integrate_ode_rk45(switching_process, z0, t0, t, theta, x_r, x_i);
   
