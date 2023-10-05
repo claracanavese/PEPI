@@ -254,14 +254,21 @@ z0 <- as.array(c(1000,100))
 t <- seq(0,10, length=101)
 input <- lapply(t, function(time) {
   dplyr::tibble(
-    zmin = zmin_ode(time, z0 = z0, lambda_minus = 1, lambda_plus = 1.5, omega_minus = 0.01, omega_plus = 0.001),
-    zplus = zplus_ode(time, z0, lambda_minus = 1, lambda_plus = 1.5, omega_minus = 0.01, omega_plus = 0.001)
+    zmin = zmin_ode(time, z0 = z0, lambda_minus = 1.5, lambda_plus = 1., omega_minus = 0.005, omega_plus = 0.005),
+    zplus = zplus_ode(time, z0, lambda_minus = 1.5, lambda_plus = 1., omega_minus = 0.005, omega_plus = 0.005)
     )
 }) %>% do.call('bind_rows', .)
 output <- lapply(t, function(time) {
   dplyr::tibble(
-    zmin = zmin_ode(time, z0 = z0, lambda_minus = 1.01084, lambda_plus = 1.53423, omega_minus = 0.00793, omega_plus = 0.00125),
-    zplus = zplus_ode(time, z0, lambda_minus = 1.01084, lambda_plus = 1.53423, omega_minus = 0.00793, omega_plus = 0.00125)
+    zmin = zmin_ode(time, z0 = z0, lambda_minus = 1.50372, lambda_plus = 1.02052, omega_minus = 0.00611, omega_plus = 0.00474),
+    zplus = zplus_ode(time, z0, lambda_minus = 1.50372, lambda_plus = 1.02052, omega_minus = 0.00611, omega_plus = 0.00474)
+  )
+}) %>% do.call('bind_rows', .)
+
+output2 <- lapply(t, function(time) {
+  dplyr::tibble(
+    zmin = zmin_ode(time, z0 = z0, lambda_minus = 1.50099, lambda_plus = 0.9756, omega_minus = 0.0058, omega_plus = 0.00534),
+    zplus = zplus_ode(time, z0, lambda_minus = 1.50099, lambda_plus = 0.9756, omega_minus = 0.0058, omega_plus = 0.00534)
   )
 }) %>% do.call('bind_rows', .)
 
@@ -270,6 +277,7 @@ sim <- read.csv("./PEPI/sim_1.2_0.001_0.01/simulation_3 copy.csv")
 #sim <- sim[1:(nrow(sim)-1),]
 input$t <- t
 output$t <- t
+output2$t <- t
 input %>% 
   tidyr::pivot_longer(!t) %>% 
   ggplot(mapping = aes(x=t, y=value, col=name)) +
@@ -277,9 +285,10 @@ input %>%
 
 compmin = ggplot() +
   geom_line(data = input, aes(x = t, y = zmin, color = "ode_min"), linewidth = 0.8) +
-  geom_line(data = output, aes(x = t, y = zmin, color = "inf_min"), size = 0.8) + xlim(6,10) +
-  #geom_point(data = simulation1, aes(x = time, y = z_minus, color = "sim1"), size = 1) + xlim(6,10) +
-  geom_point(data = simulation3, aes(x = time, y = z_minus, color = "sim3"), size = 1)
+  geom_line(data = output, aes(x = t, y = zmin, color = "inf4_min"), size = 0.8) + xlim(6,10) +
+  geom_line(data = output2, aes(x = t, y = zmin, color = "inf5_min"), size = 0.8) +
+  geom_point(data = simulation5, aes(x = time, y = z_minus, color = "sim4"), size = 1) + 
+  geom_point(data = simulation4, aes(x = time, y = z_minus, color = "sim5"), size = 1)
   # geom_point(data = sim1, aes(x = time, y = z_minus, color = "sim_1"), size = 0.8) +
   # geom_point(data = sim2, aes(x = time, y = z_minus, color = "sim_2"), size = 0.8) +
   # geom_point(data = sim3, aes(x = time, y = z_minus, color = "sim_3"), size = 0.8) +
@@ -291,9 +300,10 @@ compmin = ggplot() +
   
 compplus = ggplot() +
   geom_line(data = input, aes(x = t, y = zplus, color = "ode_plus"), linewidth = 0.8) +
-  geom_line(data = output, aes(x = t, y = zplus, color = "inf_plus"), size = 0.8) + xlim(6,10) +
-  #geom_point(data = simulation1, aes(x = time, y = z_plus, color = "sim1"), size = 1) + xlim(6,10) +
-  geom_point(data = simulation3, aes(x = time, y = z_plus, color = "sim3"), size = 1) 
+  geom_line(data = output, aes(x = t, y = zplus, color = "inf4_plus"), size = 0.8) + xlim(6,10) +
+  geom_line(data = output2, aes(x = t, y = zplus, color = "inf5_plus"), size = 0.8) +
+  geom_point(data = simulation4, aes(x = time, y = z_plus, color = "sim4"), size = 1) + 
+  geom_point(data = simulation5, aes(x = time, y = z_plus, color = "sim5"), size = 1) 
   # geom_point(data = sim1, aes(x = time, y = z_plus, color = "sim_1"), size = 0.8) +
   # geom_point(data = sim2, aes(x = time, y = z_plus, color = "sim_2"), size = 0.8) +
   # geom_point(data = sim3, aes(x = time, y = z_plus, color = "sim_3"), size = 0.8) +

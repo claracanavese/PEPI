@@ -12,11 +12,11 @@ library(easypar)
 stan_fit = function(i){
   
   model <- rstan::stan_model("/Users/claracanavese/Documents/PEPI/PEPI/regressionODE.stan")
-  simulation1 <- read.csv(paste0("./sim_1.5_1.0_0.01_0.001/simulation_",i,".csv")) %>% tibble::as_tibble()
-  simulation2 <- read.csv(paste0("./sim_1.2_0.01_0.001/simulation_",i,".csv")) %>% tibble::as_tibble()
-  simulation3 <- read.csv(paste0("./sim_1.0_1.5_0.01_0.001/simulation_",i,".csv")) %>% tibble::as_tibble()
+  simulation1 <- read.csv(paste0("./sim_1.5_1.0_0.005/simulation_",i,".csv")) %>% tibble::as_tibble()
+  simulation2 <- read.csv(paste0("./sim_1.2_0.005/simulation_",i,".csv")) %>% tibble::as_tibble()
+  simulation3 <- read.csv(paste0("./sim_1.0_1.5_0.005/simulation_",i,".csv")) %>% tibble::as_tibble()
   print(paste0("simulation_",i))
-  samples1 <- simulation1[c(2,3,4,5,6,7,9,10,11,12,13,15,16,17,18,19,20,21),]
+  samples1 <- simulation1[c(2,5,8,11,14,17,20,23,26,29,32,35,38,41,44,47,50,51),]
   samples2 <- simulation2[c(2,3,4,5,6,7,9,10,11,12,13,15,16,17,18,19,20,21),]
   samples3 <- simulation3[c(2,5,8,11,14,17,20,23,26,29,32,35,38,41,44,47,50,51),]
   data_list1 <- list(
@@ -27,7 +27,7 @@ stan_fit = function(i){
     zplus = samples1$z_plus,
     t = samples1$time
   )
-  fit1 <- rstan::sampling(model, data_list1, chains=4, warmup=4000, iter=8000, cores=4)
+  fit1 <- rstan::sampling(model, data_list1, chains=4, warmup=5000, iter=10000, cores=4)
   data_list2 <- list(
     n_times = nrow(samples2),
     z0 = c(1000,100,0,0,0),
@@ -36,7 +36,7 @@ stan_fit = function(i){
     zplus = samples2$z_plus,
     t = samples2$time
   )
-  fit2 <- rstan::sampling(model, data_list2, chains=4, warmup=4000, iter=8000, cores=4)
+  fit2 <- rstan::sampling(model, data_list2, chains=4, warmup=5000, iter=10000, cores=4)
   data_list3 <- list(
     n_times = nrow(samples3),
     z0 = c(1000,100,0,0,0),
@@ -45,25 +45,24 @@ stan_fit = function(i){
     zplus = samples3$z_plus,
     t = samples3$time
   )
-  fit3 <- rstan::sampling(model, data_list3, chains=4, warmup=4000, iter=8000, cores=4)
-  saveRDS(fit1,paste0("./fit_18/fit_1.5_1.0_0.01_0.001/fit_",i,".rds"))
-  saveRDS(fit2,paste0("./fit_18/fit_1.2_0.01_0.001/fit_",i,".rds"))
-  saveRDS(fit3,paste0("./fit_18/fit_1.0_1.5_0.01_0.001/fit_",i,".rds"))
+  fit3 <- rstan::sampling(model, data_list3, chains=4, warmup=5000, iter=10000, cores=4)
+  saveRDS(fit1,paste0("./fit_18/fit_1.5_1.0_0.005/fit_",i,".rds"))
+  saveRDS(fit2,paste0("./fit_18/fit_1.2_0.005/fit_",i,".rds"))
+  saveRDS(fit3,paste0("./fit_18/fit_1.0_1.5_0.005/fit_",i,".rds"))
 
 }
 
-simulation3 <- read.csv(paste0("./sim_1.0_1.5_0.01_0.001/simulation_",3,".csv")) %>% tibble::as_tibble()
-simulation19 <- read.csv(paste0("./sim_1.0_1.5_0.01_0.001/simulation_",19,".csv")) %>% tibble::as_tibble()
-simulation33 <- read.csv(paste0("./sim_1.0_1.5_0.01_0.001/simulation_",33,".csv")) %>% tibble::as_tibble()
+simulation4 <- read.csv(paste0("./sim_1.5_1.0_0.005/simulation_",4,".csv")) %>% tibble::as_tibble()
+simulation5 <- read.csv(paste0("./sim_1.5_1.0_0.005/simulation_",5,".csv")) %>% tibble::as_tibble()
 
-samples3 <- simulation3[c(6,29,51),]
-samples19 <- simulation19[c(6,29,51),]
-samples33 <- simulation33[c(6,29,51),]
 
-fit3 <- readRDS("./fit_3/fit_1.0_1.5_0.005/fit_3.rds")
-fit19 <- readRDS("./fit_1.0_1.5_0.01_0.001/fit_19.rds")
-fit33 <- readRDS("./fit_1.0_1.5_0.01_0.001/fit_33.rds")
-print(fit33, digits_summary = 5)
+samples4 <- simulation4[c(2,5,8,11,14,17,20,23,26,29,32,35,38,41,44,47,50,51),]
+samples5 <- simulation5[c(2,5,8,11,14,17,20,23,26,29,32,35,38,41,44,47,50,51),]
+
+fit4 <- readRDS("./fit_18/fit_1.5_1.0_0.005/fit_4.rds")
+fit5 <- readRDS("./fit_18/fit_1.5_1.0_0.005/fit_5.rds")
+# fit33 <- readRDS("./fit_1.0_1.5_0.01_0.001/fit_33.rds")
+print(fit5, digits_summary = 5)
 # stan_fit(1)
 # 
 # fit1 = readRDS("./fit_3/fit_1.rds")
