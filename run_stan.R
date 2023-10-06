@@ -90,9 +90,9 @@ bayesplot::mcmc_trace(fit, pars = c("lambda_minus", "lambda_plus", "rate_minus",
 # options(scipen = 1)
 # color_scheme_set("pink")
 minuspred = bayesplot::ppc_intervals(
-  y = samples5$z_minus,
-  yrep = rstan::extract(fit5, pars = c("pred_minus"))$pred_minus %>% as.matrix(),
-  x = samples5$time,
+  y = samples4$z_minus,
+  yrep = rstan::extract(fit4, pars = c("pred_minus"))$pred_minus %>% as.matrix(),
+  x = samples4$time,
   prob = 0.5
 ) + xlab("t") + ylab("z-") + scale_x_continuous(breaks = pretty) + scale_y_continuous(labels = function(x) format(x, scientific = TRUE))
 #ggsave("./GitHub/switching_process/Gillespy2/1.5_1.0_005_001/beta_2_80/zminus_pred.png", width = 10, height = 7, dpi = 600)
