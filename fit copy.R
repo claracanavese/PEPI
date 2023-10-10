@@ -16,9 +16,9 @@ stan_fit = function(i){
   simulation2 <- read.csv(paste0("./sim_1.2_0.005/simulation_",i,".csv")) %>% tibble::as_tibble()
   simulation3 <- read.csv(paste0("./sim_1.0_1.5_0.005/simulation_",i,".csv")) %>% tibble::as_tibble()
   print(paste0("simulation_",i))
-  samples1 <- simulation1[c(4,29,51),]
-  samples2 <- simulation2[c(2,12,21),]
-  samples3 <- simulation3[c(4,29,51),]
+  samples1 <- simulation1[c(3,11,19,26,34,41,46,51),]
+  samples2 <- simulation2[c(2,5,8,11,14,17,19,21),]
+  samples3 <- simulation3[c(3,11,19,26,34,41,46,51),]
   data_list1 <- list(
     n_times = nrow(samples1),
     z0 = c(1000,100,0,0,0),
@@ -46,9 +46,9 @@ stan_fit = function(i){
     t = samples3$time
   )
   fit3 <- rstan::sampling(model, data_list3, chains=4, warmup=4000, iter=8000, cores=4)
-  saveRDS(fit1,paste0("./fit_3/fit_1.5_1.0_0.005/fit_",i,".rds"))
-  saveRDS(fit2,paste0("./fit_3/fit_1.2_0.005/fit_",i,".rds"))
-  saveRDS(fit3,paste0("./fit_3/fit_1.0_1.5_0.005/fit_",i,".rds"))
+  saveRDS(fit1,paste0("./fit_8/fit_1.5_1.0_0.005/fit_",i,".rds"))
+  saveRDS(fit2,paste0("./fit_8/fit_1.2_0.005/fit_",i,".rds"))
+  saveRDS(fit3,paste0("./fit_8/fit_1.0_1.5_0.005/fit_",i,".rds"))
 
 }
 
