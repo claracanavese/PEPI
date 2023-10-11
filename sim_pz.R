@@ -191,14 +191,19 @@ ggsave("./pz/ptz_1_10t.png",  width = 5, height = 10, dpi = 600)
 ggsave("./first_case_size.png",  width = 16, height = 5, dpi = 600)
 
 # JOINT
+joint1a_wolfram = read.csv("./PEPI/joint_wolfram.csv")
 final1a_j = final1a %>% filter(z_plus > 10 & z_minus > 1e4)
 # create analytic distribution
 x1a <- rexp(1000, rate = as.numeric(rate1a[1]))
 y1a <- sapply(x1a, function(x) x*as.numeric(rate1a[1])/as.numeric(rate1a[2]))
 joint1a <- data.frame(x1a,y1a)
+write.csv(joint1a, "./joint1_R.csv", row.names=FALSE)
+
+ggplot() +
+  geom_histogram(data = as.data.frame(y1a), aes(x=y1a,y=after_stat(density)), bins=35)
 
 plot1aj <- ggplot() +
-  geom_point(final1a_j,mapping = aes(x=z_minus, y=z_plus), size=0.3) +
+ # geom_point(final1a_j,mapping = aes(x=z_minus, y=z_plus), size=0.3) +
   stat_density_2d_filled(joint1a, 
                          mapping = aes(x=x1a,y=y1a), 
                          contour_var = "ndensity", 
@@ -217,6 +222,22 @@ plot1aj <- ggplot() +
   #guides(fill=guide_legend(title="density")) +
   theme(legend.position="none") +
   labs(x = "z-", y = "z+")
+
+ggplot() +
+  stat_density_2d_filled(joint1a_wolfram, 
+                         mapping = aes(x=x,y=y), 
+                         contour_var = "ndensity", 
+                         alpha = 0.4, bins = 4) +
+  geom_density_2d(joint1a_wolfram, mapping = aes(x=x,y=y), 
+                  contour_var = "ndensity", 
+                  colour = "black", bins = 4, linewidth = 0.5) +
+  scale_x_continuous(trans = "log10",
+                     limits = c(1e4,5e7),
+                     breaks = c(1e5,1e7)) +
+  scale_y_continuous(trans = "log10",
+                     limits = c(5e1,5e5),
+                     labels = function(x) format(x, scientific = TRUE),
+                     breaks = c(1e3,1e5))
 
 final1b_j = final1b %>% filter(z_plus > 10 & z_minus > 1e4)
 # final1b_j = final1b_j[1:500,]
