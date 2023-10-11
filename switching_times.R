@@ -73,7 +73,7 @@ st1a + st2a + st3a
 ggsave("./switching_times_sim_1.png",width = 15, height = 4, dpi = 600)
 
 fs1b <- readRDS("./R_times/1.2_0.01_0.001_10t_fs.RData")
-ss1b <- readRDS("./R_times/1.2_0.01_0.001_10t_ss.RData")
+ss1b <- readRDS("./R_times/1.2_0.01_0.001_13t_ss.RData")
 fs1b_df = data.frame(unlist(fs1b))
 colnames(fs1b_df) = c("fs")
 ss1b_df = data.frame(unlist(ss1b))
@@ -90,7 +90,7 @@ st1b <- ggplot() +
   geom_histogram(data = ss1b_df, aes(x = ss, y = after_stat(density)), fill = "#8267ae", alpha = 0.8, bins = 50) +
   geom_line(data = ss1b_theory, aes(x = ss, y = p), linewidth = 1) +
   theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
-  labs(x="t",y="p(t)")
+  labs(x="t",y="p(t)") + ylim(0,0.4)
 
 median(unlist(fs1b), na.rm = TRUE)
 sd(unlist(fs1b), na.rm = TRUE)
@@ -98,7 +98,7 @@ median(unlist(ss1b), na.rm = TRUE)
 sd(unlist(ss1b), na.rm = TRUE)
 
 fs2b <- readRDS("./R_times/1.2_0.005_10t_fs.RData")
-ss2b <- readRDS("./R_times/1.2_0.005_10t_ss.RData")
+ss2b <- readRDS("./R_times/1.2_0.005_13t_ss.RData")
 fs2b_df = data.frame(unlist(fs2b))
 colnames(fs2b_df) = c("fs")
 ss2b_df = data.frame(unlist(ss2b))
@@ -110,15 +110,18 @@ ss2b_theory <- read.csv("./R_times/1.2_0.005_ss.csv") %>%
   tibble::as_tibble()
 
 st2b <- ggplot() +
-  geom_histogram(data = fs2b_df, aes(x = fs, y = after_stat(density)), fill = "#52B5D0", alpha = 0.8, bins = 50) +
+  geom_histogram(data = fs2b_df, aes(x = fs, y = after_stat(density), fill = "1"), alpha = 0.8, bins = 50) +
   geom_line(data = fs2b_theory, aes(x = fs, y = p), linewidth = 1) +
-  geom_histogram(data = ss2b_df, aes(x = ss, y = after_stat(density)), fill = "#8267ae", alpha = 0.8, bins = 50) +
+  geom_histogram(data = ss2b_df, aes(x = ss, y = after_stat(density), fill = "2"), alpha = 0.8, bins = 50) +
   geom_line(data = ss2b_theory, aes(x = ss, y = p), linewidth = 1) +
   theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
-  labs(x="t",y="p(t)")
+  labs(x="t",y="p(t)") + ylim(0,0.4)
+  # scale_fill_manual(values=c("#52B5D0","#8267ae"), labels = expression(p(tau[1]),p(tau[2]))) +
+  # theme(legend.title = element_blank(), legend.text = element_text(size = 16))
+# ggsave("./time_legend.png", width=5,height = 3, dpi = 600)
 
 fs3b <- readRDS("./R_times/1.2_0.001_0.01_10t_fs.RData")
-ss3b <- readRDS("./R_times/1.2_0.001_0.01_10t_ss.RData")
+ss3b <- readRDS("./R_times/1.2_0.001_0.01_13t_ss.RData")
 fs3b_df = data.frame(unlist(fs3b))
 colnames(fs3b_df) = c("fs")
 ss3b_df = data.frame(unlist(ss3b))
@@ -135,10 +138,80 @@ st3b <- ggplot() +
   geom_histogram(data = ss3b_df, aes(x = ss, y = after_stat(density)), fill = "#8267ae", alpha = 0.8, bins = 50) +
   geom_line(data = ss3b_theory, aes(x = ss, y = p), linewidth = 1) +
   theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
-  labs(x="t",y="p(t)") + ylim(0,0.41)
+  labs(x="t",y="p(t)") + ylim(0,0.4)
 
-st1a + st2a + st3a
+st1b + st2b + st3b
 
+ggsave("./switching_times_sim_2.png",width = 15, height = 4, dpi = 600)
+
+# third case
+fs1c <- readRDS("./R_times/1.0_1.5_0.01_0.001_14t_fs.RData")
+ss1c <- readRDS("./R_times/1.0_1.5_0.01_0.001_14t_ss.RData")
+fs1c_df = data.frame(unlist(fs1c))
+colnames(fs1c_df) = c("fs")
+ss1c_df = data.frame(unlist(ss1c))
+colnames(ss1c_df) = c("ss")
+
+fs1c_theory <- read.csv("./R_times/1.0_1.5_0.01_0.001_fs.csv") %>%
+  tibble::as_tibble()
+ss1c_theory <- read.csv("./R_times/1.0_1.5_0.01_0.001_ss.csv") %>%
+  tibble::as_tibble()
+
+st1c <- ggplot() +
+  geom_histogram(data = fs1c_df, aes(x = fs, y = after_stat(density)), fill = "#52B5D0", alpha = 0.8, bins = 50) +
+  geom_line(data = fs1c_theory, aes(x = fs, y = p), linewidth = 1) +
+  geom_histogram(data = ss1c_df, aes(x = ss, y = after_stat(density)), fill = "#8267ae", alpha = 0.8, bins = 50) +
+  geom_line(data = ss1c_theory, aes(x = ss, y = p), linewidth = 1) +
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
+  labs(x="t",y="p(t)") + ylim(0,0.4)
+
+median(unlist(fs1b), na.rm = TRUE)
+sd(unlist(fs1b), na.rm = TRUE)
+median(unlist(ss1b), na.rm = TRUE)
+sd(unlist(ss1b), na.rm = TRUE)
+
+fs2c <- readRDS("./R_times/1.0_1.5_0.005_14t_fs.RData")
+ss2c <- readRDS("./R_times/1.0_1.5_0.005_14t_ss.RData")
+fs2c_df = data.frame(unlist(fs2c))
+colnames(fs2c_df) = c("fs")
+ss2c_df = data.frame(unlist(ss2c))
+colnames(ss2c_df) = c("ss")
+
+fs2c_theory <- read.csv("./R_times/1.0_1.5_0.005_fs.csv") %>%
+  tibble::as_tibble()
+ss2c_theory <- read.csv("./R_times/1.0_1.5_0.005_ss.csv") %>%
+  tibble::as_tibble()
+
+st2c <- ggplot() +
+  geom_histogram(data = fs2c_df, aes(x = fs, y = after_stat(density)), fill = "#52B5D0", alpha = 0.8, bins = 60) +
+  geom_line(data = fs2c_theory, aes(x = fs, y = p), linewidth = 1) +
+  geom_histogram(data = ss2c_df, aes(x = ss, y = after_stat(density)), fill = "#8267ae", alpha = 0.8, bins = 60) +
+  geom_line(data = ss2c_theory, aes(x = ss, y = p), linewidth = 1) +
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
+  labs(x="t",y="p(t)") + ylim(0,0.4)
+
+fs3c <- readRDS("./R_times/1.0_1.5_0.001_0.01_12t_fs.RData")
+ss3c <- readRDS("./R_times/1.0_1.5_0.001_0.01_13t_ss.RData")
+fs3c_df = data.frame(unlist(fs3c))
+colnames(fs3c_df) = c("fs")
+ss3c_df = data.frame(unlist(ss3c))
+colnames(ss3c_df) = c("ss")
+
+fs3c_theory <- read.csv("./R_times/1.0_1.5_0.001_0.01_fs.csv") %>%
+  tibble::as_tibble()
+ss3c_theory <- read.csv("./R_times/1.0_1.5_0.001_0.01_ss.csv") %>%
+  tibble::as_tibble()
+
+st3c <- ggplot() +
+  geom_histogram(data = fs3c_df, aes(x = fs, y = after_stat(density)), fill = "#52B5D0", alpha = 0.8, bins = 50) +
+  geom_line(data = fs3c_theory, aes(x = fs, y = p), linewidth = 1) +
+  geom_histogram(data = ss3c_df, aes(x = ss, y = after_stat(density)), fill = "#8267ae", alpha = 0.8, bins = 50) +
+  geom_line(data = ss3c_theory, aes(x = ss, y = p), linewidth = 1) +
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18)) +
+  labs(x="t",y="p(t)") + ylim(0,0.4)
+
+st3a + st3b + st3c
+ggsave("./switching_times_sim_3.png",width = 15, height = 4, dpi = 600)
 
 
 df1_theory <- data.frame(case = c(1,1,2,2,3,3),times = c(4.875,7.484,3.803,6.873,3.340,7.484))
@@ -178,8 +251,8 @@ plot2 <- ggplot() +
   theme(legend.position = "none")
 plot2
 
-fs <- readRDS("./R/1.0_1.5_0.001_0.01_10t_fs.RData")
-ss <- readRDS("./R/1.0_1.5_0.001_0.01_10t_ss.RData")
+fs <- readRDS("./R_times/1.0_1.5_0.001_0.01_12t_fs.RData")
+ss <- readRDS("./R_times/1.0_1.5_0.001_0.01_12t_ss.RData")
 median(unlist(fs), na.rm = TRUE)
 sd(unlist(fs), na.rm = TRUE)
 median(unlist(ss), na.rm = TRUE)
