@@ -13,12 +13,12 @@ stan_fit = function(i){
   
   model <- rstan::stan_model("/Users/claracanavese/Documents/PEPI/PEPI/regressionODE.stan")
   simulation1 <- read.csv(paste0("./sim_1.5_1.0_0.001_0.01/simulation_",i,".csv")) %>% tibble::as_tibble()
-  simulation2 <- read.csv(paste0("./sim_1.2_0.001_0.01/simulation_",i,".csv")) %>% tibble::as_tibble()
-  simulation3 <- read.csv(paste0("./sim_1.0_1.5_0.001_0.01/simulation_",i,".csv")) %>% tibble::as_tibble()
+  # simulation2 <- read.csv(paste0("./sim_1.2_0.001_0.01/simulation_",i,".csv")) %>% tibble::as_tibble()
+  # simulation3 <- read.csv(paste0("./sim_1.0_1.5_0.001_0.01/simulation_",i,".csv")) %>% tibble::as_tibble()
   print(paste0("simulation_",i))
-  samples1 <- simulation1[c(2,5,8,11,14,17,19,21),]
-  samples2 <- simulation2[c(2,5,8,11,14,17,19,21),]
-  samples3 <- simulation3[c(2,5,8,11,14,17,19,21),]
+  samples1 <- simulation1[seq(3,21,by=9),]
+  # samples2 <- simulation2[seq(3,21,by=9),]
+  # samples3 <- simulation3[seq(3,21,by=9),]
   data_list1 <- list(
     n_times = nrow(samples1),
     z0 = c(1000,100,0,0,0),
@@ -28,27 +28,27 @@ stan_fit = function(i){
     t = samples1$time
   )
   fit1 <- rstan::sampling(model, data_list1, chains=4, warmup=4000, iter=8000, cores=4)
-  data_list2 <- list(
-    n_times = nrow(samples2),
-    z0 = c(1000,100,0,0,0),
-    t0 = simulation2$time[1],
-    zminus = samples2$z_minus,
-    zplus = samples2$z_plus,
-    t = samples2$time
-  )
-  fit2 <- rstan::sampling(model, data_list2, chains=4, warmup=4000, iter=8000, cores=4)
-  data_list3 <- list(
-    n_times = nrow(samples3),
-    z0 = c(1000,100,0,0,0),
-    t0 = simulation3$time[1],
-    zminus = samples3$z_minus,
-    zplus = samples3$z_plus,
-    t = samples3$time
-  )
-  fit3 <- rstan::sampling(model, data_list3, chains=4, warmup=4000, iter=8000, cores=4)
-  saveRDS(fit1,paste0("./fit_8/fit_1.5_1.0_0.001_0.01/fit_",i,".rds"))
-  saveRDS(fit2,paste0("./fit_8/fit_1.2_0.001_0.01/fit_",i,".rds"))
-  saveRDS(fit3,paste0("./fit_8/fit_1.0_1.5_0.001_0.01/fit_",i,".rds"))
+  # data_list2 <- list(
+  #   n_times = nrow(samples2),
+  #   z0 = c(1000,100,0,0,0),
+  #   t0 = simulation2$time[1],
+  #   zminus = samples2$z_minus,
+  #   zplus = samples2$z_plus,
+  #   t = samples2$time
+  # )
+  # fit2 <- rstan::sampling(model, data_list2, chains=4, warmup=4000, iter=8000, cores=4)
+  # data_list3 <- list(
+  #   n_times = nrow(samples3),
+  #   z0 = c(1000,100,0,0,0),
+  #   t0 = simulation3$time[1],
+  #   zminus = samples3$z_minus,
+  #   zplus = samples3$z_plus,
+  #   t = samples3$time
+  # )
+  # fit3 <- rstan::sampling(model, data_list3, chains=4, warmup=4000, iter=8000, cores=4)
+  saveRDS(fit1,paste0("./fit_3/fit_1.5_1.0_0.001_0.01/fit_",i,".rds"))
+  # saveRDS(fit2,paste0("./fit_3/fit_1.2_0.001_0.01/fit_",i,".rds"))
+  # saveRDS(fit3,paste0("./fit_3/fit_1.0_1.5_0.001_0.01/fit_",i,".rds"))
 
 }
 
