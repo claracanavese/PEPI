@@ -6,7 +6,7 @@ library(reshape2)
 library(patchwork)
 library(bayesplot)
 
-simulation_py <- read.csv("./sim_1.2_0.001_0.01/simulation_4.csv") %>% tibble::as_tibble()
+simulation_py <- read.csv("./sim_1.2_0.005/simulation_2.csv") %>% tibble::as_tibble()
 # colnames(simulation_py) <- c('time','z_minus','z_plus','var_minus','var_plus','cov')
 samples <- simulation_py[seq(3,21,by=9),]
 samples <- simulation_py[t,]
@@ -80,6 +80,7 @@ model <- rstan::stan_model("/Users/claracanavese/Documents/PEPI/PEPI/regressionO
 fit <- rstan::sampling(model, data_list, chains=4, warmup=4000, iter=8000, cores=4)
 # fit1 <- readRDS("./fit_new_ode/ssa - 10/1.2_0.01_0.001_sim4.rds")
 
+fit = readRDS("/Users/claracanavese/Documents/PEPI/fit_new_ode/ssa - 10/1.2_0.005_sim2.rds")
 print(fit, pars = c("lambda_minus", "lambda_plus", "rate_minus", "rate_plus"), digits_summary = 5)
 print(fit, digits_summary = 5)
 saveRDS(fit,"./fit_3/fit_1.0_1.5_0.005/fit_2.rds")
@@ -131,7 +132,7 @@ posterior_lambda_min / prior_lambda
 #ggsave("./GitHub/switching_process/Gillespy2/1.5_1.0_005_001/beta_2_80/lambda_minus_posterior.png", width = 12, height = 7, dpi = 600)
 posterior_lambda_plus / prior_lambda
 #ggsave("./GitHub/switching_process/Gillespy2/1.5_1.0_005_001/beta_2_80/lambda_plus_posterior.png", width = 12, height = 7, dpi = 600)
-posterior_omega_min / prior_omega_p
+posterior_omega_min / prior_omega
 #ggsave("./GitHub/switching_process/Gillespy2/1.5_1.0_005_001/beta_2_80/omega_minus_posterior.png", width = 12, height = 7, dpi = 600)
 posterior_omega_plus / prior_omega
 
