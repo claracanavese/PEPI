@@ -7,8 +7,7 @@ library(plotly)
 library(stabledist)
 library(pdqr)
 
-Pz_exp <- function(dat,lm,lp,om,op) {
-  time <- mean(dat$time)
+Pz_exp <- function(time,lm,lp,om,op) {
   if (lm > lp) {
     exprate_minus <- exp(-(lm+om*op/(lm-lp))*time)
     exprate_plus <- (lm - lp)/op*exp(-(lm+om*op/(lm-lp))*time)
@@ -763,3 +762,166 @@ ggplot() +
   scale_x_continuous(trans = "log10") +
   scale_y_continuous(trans = "log10", 
                      labels = function(x) format(x, scientific = TRUE))
+
+# analytic joint
+# case 1
+rate1a <- Pz_exp(10,1.5,1.0,0.01,0.001)
+rate1b <- Pz_exp(10,1.5,1.0,0.005,0.005)
+rate1c <- Pz_exp(10,1.5,1.0,0.001,0.01)
+
+palette_joint <- c("#6700C7","#0FE3FF","#FF1F35")
+
+x1a <- rexp(1000, rate = as.numeric(rate1a[1]))
+y1a <- sapply(x1a, function(x) x*as.numeric(rate1a[1])/as.numeric(rate1a[2]))
+joint1a <- data.frame(x1a,y1a)
+x1b <- rexp(1000, rate = as.numeric(rate1b[1]))
+y1b <- sapply(x1b, function(x) x*as.numeric(rate1b[1])/as.numeric(rate1b[2]))
+joint1b <- data.frame(x1b,y1b)
+x1c <- rexp(1000, rate = as.numeric(rate1c[1]))
+y1c <- sapply(x1c, function(x) x*as.numeric(rate1c[1])/as.numeric(rate1c[2]))
+joint1c <- data.frame(x1c,y1c)
+
+plot1a_omega <- ggplot() +
+  geom_density_2d(joint1a, mapping = aes(x=x1a,y=y1a,color="1"), 
+                  contour_var = "ndensity", 
+                  bins = 5, linewidth = 0.5) +
+  geom_density_2d(joint1b, mapping = aes(x=x1b,y=y1b,color="2"), 
+                  contour_var = "ndensity", 
+                  bins = 5, linewidth = 0.5) +
+  geom_density_2d(joint1c, mapping = aes(x=x1c,y=y1c,color="3"), 
+                  contour_var = "ndensity", 
+                  bins = 5, linewidth = 0.5) +
+  scale_x_continuous(trans = "log10",
+                     limits = c(5e3,2e7),
+                     breaks = c(1e4,1e5,1e6,1e7)) +
+  scale_y_continuous(trans = "log10",
+                     limits = c(5e1,5e5),
+                     labels = function(x) format(x, scientific = TRUE),
+                     breaks = c(1e2,1e3,1e4,1e5)) +
+  theme(axis.text = element_text(size = 16), axis.title = element_text(size = 20)) +
+  scale_color_manual(values = palette_joint) +
+  #guides(fill=guide_legend(title="density")) +
+  theme(legend.position="none") +
+  labs(x = "z-", y = "z+")
+
+# case 2
+rate2a <- Pz_exp(10,1.2,1.2,0.01,0.001)
+rate2b <- Pz_exp(10,1.2,1.2,0.005,0.005)
+rate2c <- Pz_exp(10,1.2,1.2,0.001,0.01)
+
+x2a <- rexp(1000, rate = as.numeric(rate2a[1]))
+y2a <- sapply(x2a, function(x) x*as.numeric(rate2a[1])/as.numeric(rate2a[2]))
+joint2a <- data.frame(x2a,y2a)
+x2b <- rexp(1000, rate = as.numeric(rate2b[1]))
+y2b <- sapply(x2b, function(x) x*as.numeric(rate2b[1])/as.numeric(rate2b[2]))
+joint2b <- data.frame(x2b,y2b)
+x2c <- rexp(1000, rate = as.numeric(rate2c[1]))
+y2c <- sapply(x2c, function(x) x*as.numeric(rate2c[1])/as.numeric(rate2c[2]))
+joint2c <- data.frame(x2c,y2c)
+
+plot2a_omega <- ggplot() +
+  geom_density_2d(joint2a, mapping = aes(x=x2a,y=y2a,color="1"), 
+                  contour_var = "ndensity", 
+                  bins = 5, linewidth = 0.5) +
+  geom_density_2d(joint2b, mapping = aes(x=x2b,y=y2b,color="2"), 
+                  contour_var = "ndensity", 
+                  bins = 5, linewidth = 0.5) +
+  geom_density_2d(joint2c, mapping = aes(x=x2c,y=y2c,color="3"), 
+                  contour_var = "ndensity", 
+                  bins = 5, linewidth = 0.5) +
+  scale_x_continuous(trans = "log10",
+                     limits = c(5e3,2e7),
+                     breaks = c(1e4,1e5,1e6,1e7)) +
+  scale_y_continuous(trans = "log10",
+                     limits = c(5e1,5e5),
+                     labels = function(x) format(x, scientific = TRUE),
+                     breaks = c(1e2,1e3,1e4,1e5)) +
+  theme(axis.text = element_text(size = 16), axis.title = element_text(size = 20)) +
+  scale_color_manual(name = element_blank(),values = palette_joint) +
+  #guides(fill=guide_legend(title="density")) +
+  theme(legend.position="none") +
+  labs(x = "z-", y = "z+")
+ 
+plot1a_omega/plot2a_omega
+
+palette_joint_time <- c("#ab80ff","#6700C7","#2f008b")
+
+rate1_8 <- Pz_exp(8,1.5,1.0,0.01,0.001)
+rate1_10 <- Pz_exp(10,1.5,1.0,0.01,0.001)
+rate1_12 <- Pz_exp(12,1.5,1.0,0.01,0.001)
+
+x1_8 <- rexp(1000, rate = as.numeric(rate1_8[1]))
+y1_8 <- sapply(x1_8, function(x) x*as.numeric(rate1_8[1])/as.numeric(rate1_8[2]))
+joint1_8 <- data.frame(x1_8,y1_8)
+x1_10 <- rexp(1000, rate = as.numeric(rate1_10[1]))
+y1_10 <- sapply(x1_10, function(x) x*as.numeric(rate1_10[1])/as.numeric(rate1_10[2]))
+joint1_10 <- data.frame(x1_10,y1_10)
+x1_12 <- rexp(1000, rate = as.numeric(rate1_12[1]))
+y1_12 <- sapply(x1_12, function(x) x*as.numeric(rate1_12[1])/as.numeric(rate1_12[2]))
+joint1_12 <- data.frame(x1_12,y1_12)
+
+plot1a_time <- ggplot() +
+  geom_density_2d(joint1_8, mapping = aes(x=x1_8,y=y1_8,colour="1"), 
+                  contour_var = "ndensity",
+                  bins = 5, linewidth = 0.5) +
+  geom_density_2d(joint1_10, mapping = aes(x=x1_10,y=y1_10,colour="2"), 
+                  contour_var = "ndensity",
+                  bins = 5, linewidth = 0.5) +
+  geom_density_2d(joint1_12, mapping = aes(x=x1_12,y=y1_12,colour="3"), 
+                  contour_var = "ndensity", 
+                  bins = 5, linewidth = 0.5) +
+  scale_x_continuous(trans = "log10",
+                     limits = c(1e3,5e8),
+                     breaks = c(1e3,5e5,1e8)) +
+  scale_y_continuous(trans = "log10",
+                     limits = c(1e1,1e6),
+                     labels = function(x) format(x, scientific = TRUE),
+                     breaks = c(1e1,2e2,4e3,8e4)) +
+  theme(axis.text = element_text(size = 16), axis.title = element_text(size = 20)) +
+  scale_color_manual(name = element_blank(),values = palette_joint_time) +
+  #guides(fill=guide_legend(title="density")) +
+  theme(legend.position="none") +
+  labs(x = "z-", y = "z+")
+
+rate2_8 <- Pz_exp(8,1.2,1.2,0.01,0.001)
+rate2_10 <- Pz_exp(10,1.2,1.2,0.01,0.001)
+rate2_12 <- Pz_exp(12,1.2,1.2,0.01,0.001)
+
+x2_8 <- rexp(1000, rate = as.numeric(rate2_8[1]))
+y2_8 <- sapply(x2_8, function(x) x*as.numeric(rate2_8[1])/as.numeric(rate2_8[2]))
+joint2_8 <- data.frame(x2_8,y2_8)
+x2_10 <- rexp(1000, rate = as.numeric(rate2_10[1]))
+y2_10 <- sapply(x2_10, function(x) x*as.numeric(rate2_10[1])/as.numeric(rate2_10[2]))
+joint2_10 <- data.frame(x2_10,y2_10)
+x2_12 <- rexp(1000, rate = as.numeric(rate2_12[1]))
+y2_12 <- sapply(x2_12, function(x) x*as.numeric(rate2_12[1])/as.numeric(rate2_12[2]))
+joint2_12 <- data.frame(x2_12,y2_12)
+
+plot2a_time <- ggplot() +
+  geom_density_2d(joint2_8, mapping = aes(x=x2_8,y=y2_8,colour="1"), 
+                  contour_var = "ndensity",
+                  bins = 5, linewidth = 0.5) +
+  geom_density_2d(joint2_10, mapping = aes(x=x2_10,y=y2_10,colour="2"), 
+                  contour_var = "ndensity",
+                  bins = 5, linewidth = 0.5) +
+  geom_density_2d(joint2_12, mapping = aes(x=x2_12,y=y2_12,colour="3"), 
+                  contour_var = "ndensity", 
+                  bins = 5, linewidth = 0.5) +
+  scale_x_continuous(trans = "log10",
+                     limits = c(1e3,5e8),
+                     breaks = c(1e3,5e5,1e8)) +
+  scale_y_continuous(trans = "log10",
+                     limits = c(1e1,1e6),
+                     labels = function(x) format(x, scientific = TRUE),
+                     breaks = c(1e1,2e2,4e3,8e4)) +
+  theme(axis.text = element_text(size = 16), axis.title = element_text(size = 20)) +
+  scale_colour_manual(name = element_blank(),values = palette_joint_time) +
+  #guides(fill=guide_legend(title="density")) +
+  theme(legend.position="none") +
+  labs(x = "z-", y = "z+")
+
+ggsave("./legend_time_time.png",dpi=600,width=4,height = 4)
+plot1a_time / plot2a_time
+
+( plot1a_omega +plot2a_omega) / (plot1a_time + plot2a_time)
+ggsave("./joint_theory.png",dpi=600,width=10,height = 9)

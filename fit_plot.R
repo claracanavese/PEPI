@@ -1,34 +1,45 @@
 
-lm = 0; lp = 0; om = 0; op = 0;
-for (i in seq(9,900, by = 9)) {
-  fit = readRDS(paste0("./fit_15/fit_",i,".rds"))
+# fit 3
+lm = 0; lp = 0; rm = 0; rp = 0;
+for (i in seq(0,99)) {
+  fit = readRDS(paste0("./fit_3/fit_1.0_1.5_0.005/fit_",i,".rds"))
   lm = lm + mean(unlist(rstan::extract(fit, pars = c("lambda_minus"))))
   lp = lp + mean(unlist(rstan::extract(fit, pars = c("lambda_plus"))))
-  om = om + mean(unlist(rstan::extract(fit, pars = c("omega_minus"))))
-  op = op + mean(unlist(rstan::extract(fit, pars = c("omega_plus"))))
+  rm = rm + mean(unlist(rstan::extract(fit, pars = c("rate_minus"))))
+  rp = rp + mean(unlist(rstan::extract(fit, pars = c("rate_plus"))))
   print(i)
 }
 
-err_lm = abs(1.2 - lm/100)/1.2
-err_lp = abs(1.2 - lp/100)/1.2
-err_om = abs(0.005 - om/100)/0.005
-err_op = abs(0.005 - op/100)/0.005
+err_lm = abs(1. - lm/100)/1.
+err_lp = abs(1.5 - lp/100)/1.5
+err_rm = abs(0.005/1.5 - rm/100)/(0.005/1.5)
+err_rp = abs(0.005/1 - rp/100)/(0.005/1)
 
-err15_9 = c(err_lm, err_lp, err_om, err_op)
-err15_8 = c(err_lm, err_lp, err_om, err_op)
-err15_7 = c(err_lm, err_lp, err_om, err_op)
-err15_6 = c(err_lm, err_lp, err_om, err_op)
-err15_5 = c(err_lm, err_lp, err_om, err_op)
-err15_4 = c(err_lm, err_lp, err_om, err_op)
-err15_3 = c(err_lm, err_lp, err_om, err_op)
-err15_2 = c(err_lm, err_lp, err_om, err_op)
-err15_1 = c(err_lm, err_lp, err_om, err_op)
+err3_1 = c(err_lm, err_lp, err_rm, err_rp) # 1.5_1.0_0.01_0.001 ok
+err3_2 = c(err_lm, err_lp, err_rm, err_rp) # 1.5_1.0_0.005 ok
+err3_3 = c(err_lm, err_lp, err_rm, err_rp) # 1.5_1.0_0.001_0.01 NO
 
-err15 = data.frame()
-err15 = rbind(err15,err15_9)
-colnames(err15) = c("lm","lp","om","op")
+err3_4 = c(err_lm, err_lp, err_rm, err_rp) # 1.2_0.01_0.001 ok
+err3_5 = c(err_lm, err_lp, err_rm, err_rp) # 1.2_0.005 ni
+err3_6 = c(err_lm, err_lp, err_rm, err_rp) # 1.2_0.001_0.01 NO
 
-err15 = err15 %>% mutate(ID = 15)
+err3_7 = c(err_lm, err_lp, err_rm, err_rp) # 1.0_1.5_0.01_0.001 ok
+err3_8 = c(err_lm, err_lp, err_rm, err_rp) # 1.0_1.5_0.005
+err3_9 = c(err_lm, err_lp, err_rm, err_rp) # 1.0_1.5_0.001_0.01
+
+err3 = data.frame()
+err3 = rbind(err3,err3_1)
+err3 = rbind(err3,err3_2)
+err3 = rbind(err3,err3_3)
+err3 = rbind(err3,err3_4)
+err3 = rbind(err3,err3_5)
+err3 = rbind(err3,err3_6)
+err3 = rbind(err3,err3_7)
+err3 = rbind(err3,err3_8)
+err3 = rbind(err3,err3_9)
+colnames(err3) = c("lm","lp","om","op")
+
+err3 = err3 %>% mutate(ID = 3)
 
 err = data.frame()
 err = rbind(err,err3)

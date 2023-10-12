@@ -222,7 +222,7 @@ plot1 <- ggplot() +
   geom_point(data=df1_sim, aes(x=case,y=times,color="simulation"),size=3) +
   geom_errorbar(data=df1_sim, aes(x=case, ymin=times-errors, ymax=times+errors),width=.08,color="black") +
   scale_x_continuous(breaks = c(1,2,3)) +
-  scale_color_manual(values=c("black","#BE202F")) +
+  scale_color_manual(values=c("black","#91a740")) +
   labs(col=NULL) +
   guides(colour = guide_legend(override.aes = list(shape = c(16,17)))) +
   labs(y="t") + ylim(2,10) +

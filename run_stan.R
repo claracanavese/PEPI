@@ -6,9 +6,9 @@ library(reshape2)
 library(patchwork)
 library(bayesplot)
 
-simulation_py <- read.csv("./PEPI/sim_1.0_1.5_0.01_0.001/simulation_4 copy.csv") %>% tibble::as_tibble()
+simulation_py <- read.csv("./sim_1.2_0.001_0.01/simulation_4.csv") %>% tibble::as_tibble()
 # colnames(simulation_py) <- c('time','z_minus','z_plus','var_minus','var_plus','cov')
-samples <- simulation_py[seq(12,51, by = 2),]
+samples <- simulation_py[seq(3,21,by=9),]
 samples <- simulation_py[t,]
 # simulation_py <- simulation_py[,-1]
 # t_samples = seq(1.00, 8.00, by = 0.70) %>% round(., 3)
@@ -76,58 +76,69 @@ data_list <- list(
 # )
 
 #model <- rstan::stan_model("./PEPI/old/regression.stan")
-model <- rstan::stan_model("./PEPI/regressionODE.stan")
+model <- rstan::stan_model("/Users/claracanavese/Documents/PEPI/PEPI/regressionODE.stan")
 fit <- rstan::sampling(model, data_list, chains=4, warmup=4000, iter=8000, cores=4)
 # fit1 <- readRDS("./fit_new_ode/ssa - 10/1.2_0.01_0.001_sim4.rds")
 
 print(fit, pars = c("lambda_minus", "lambda_plus", "rate_minus", "rate_plus"), digits_summary = 5)
 print(fit, digits_summary = 5)
-saveRDS(fit,"./fit_new_ode/ssa - 10/1.0_1.5_0.005_sim5.rds")
+saveRDS(fit,"./fit_3/fit_1.0_1.5_0.005/fit_2.rds")
 
 bayesplot::mcmc_trace(fit, pars = c("lambda_minus", "lambda_plus", "rate_minus", "rate_plus"))
-#ggsave("./GitHub/switching_process/Gillespy2/1.5_1.2_0.015_0.005_5t_51p/gamma_1.5_280/traceplot_0.png", width = 14, height = 12, dpi = 600)
+ggsave("./traceplot_example.png", width = 6, height = 4, dpi = 600)
 
 # options(scipen = 1)
 # color_scheme_set("pink")
 minuspred = bayesplot::ppc_intervals(
-  y = samples4$z_minus,
-  yrep = rstan::extract(fit4, pars = c("pred_minus"))$pred_minus %>% as.matrix(),
-  x = samples4$time,
+  y = samples$z_minus,
+  yrep = rstan::extract(fit, pars = c("pred_minus"))$pred_minus %>% as.matrix(),
+  x = samples$time,
   prob = 0.5
-) + xlab("t") + ylab("z-") + scale_x_continuous(breaks = pretty) + scale_y_continuous(labels = function(x) format(x, scientific = TRUE))
+) + xlab("t") + ylab("z-") + 
+  scale_x_continuous(breaks = pretty) + scale_y_continuous(labels = function(x) format(x, scientific = TRUE)) +
+  theme(axis.text = element_text(size = 16), axis.title = element_text(size = 18)) +
+  theme(legend.text = element_text(size = 16), axis.text = element_text(size = 16), axis.title = element_text(size = 18))
 #ggsave("./GitHub/switching_process/Gillespy2/1.5_1.0_005_001/beta_2_80/zminus_pred.png", width = 10, height = 7, dpi = 600)
 minuspred
 
 pluspred = bayesplot::ppc_intervals(
-  y = samples5$z_plus,
-  yrep = rstan::extract(fit5, pars = c("pred_plus"))$pred_plus %>% as.matrix(),
-  x = samples5$time,
+  y = samples$z_plus,
+  yrep = rstan::extract(fit, pars = c("pred_plus"))$pred_plus %>% as.matrix(),
+  x = samples$time,
   prob = 0.5
-) + xlab("t") + ylab("z+") + scale_x_continuous(breaks = pretty) + scale_y_continuous(labels = function(x) format(x, scientific = TRUE))     
+) + xlab("t") + ylab("z+") + scale_x_continuous(breaks = pretty) + 
+  scale_y_continuous(labels = function(x) format(x, scientific = TRUE)) +
+  theme(axis.text = element_text(size = 16), axis.title = element_text(size = 18)) +
+  theme(legend.text = element_text(size = 16), axis.text = element_text(size = 16), axis.title = element_text(size = 18))
 #ggsave("./GitHub/switching_process/Gillespy2/1.5_1.0_005_001/beta_2_80/zplus_pred.png", width = 10, height = 7, dpi = 600)
 pluspred
+minuspred + pluspred
+ggsave("./prediction_example.png", dpi = 600, width = 11, height = 4)
 
-posterior = as.data.frame(fit5)
-posterior_lambda_min = posterior %>% ggplot() + geom_density(aes(x = lambda_minus, y = after_stat(density))) + ggtitle("Posterior") + xlim(0,5) + xlab("lambda_minus") + theme(plot.title = element_text(hjust = 0.5)) + 
-  geom_vline(xintercept = 1.5, color = "forestgreen")
-posterior_lambda_plus = posterior %>% ggplot() + geom_density(aes(x = lambda_plus, y = after_stat(density))) + ggtitle("Posterior") + xlim(0,5) + xlab("lambda_plus") + theme(plot.title = element_text(hjust = 0.5)) + 
-  geom_vline(xintercept = 1.0, color = "forestgreen")
+posterior = as.data.frame(fit)
+posterior_lambda_min = posterior %>% ggplot() + geom_density(aes(x = lambda_minus, y = after_stat(density))) + ggtitle("Posterior") + xlim(0,3) + xlab("lambda_minus") + theme(plot.title = element_text(hjust = 0.5)) + 
+  geom_vline(xintercept = 1.2, color = "forestgreen")
+posterior_lambda_plus = posterior %>% ggplot() + geom_density(aes(x = lambda_plus, y = after_stat(density))) + ggtitle("Posterior") + xlim(0,3) + xlab("lambda_plus") + theme(plot.title = element_text(hjust = 0.5)) + 
+  geom_vline(xintercept = 1.2, color = "forestgreen")
 # posterior_omega_min = posterior %>% ggplot() + geom_density(aes(x = omega_minus, y = after_stat(density))) + ggtitle("Posterior") + xlim(0,0.03) + xlab("omega_minus") + theme(plot.title = element_text(hjust = 0.5)) + geom_vline(xintercept = 0.01, color = "forestgreen")
 # posterior_omega_plus = posterior %>% ggplot() + geom_density(aes(x = omega_plus, y = after_stat(density))) + ggtitle("Posterior") + xlim(0,0.03) + xlab("omega_plus") + theme(plot.title = element_text(hjust = 0.5)) + geom_vline(xintercept = 0.001, color = "forestgreen")
 posterior_omega_min = posterior %>% ggplot() + geom_density(aes(x = rate_minus, y = after_stat(density))) + ggtitle("Posterior") + xlim(0,0.02) + xlab("rate_minus") + theme(plot.title = element_text(hjust = 0.5)) + 
-  geom_vline(xintercept = 0.005/1., color = "forestgreen")
+  geom_vline(xintercept = 0.001/1.2, color = "forestgreen")
 posterior_omega_plus = posterior %>% ggplot() + geom_density(aes(x = rate_plus, y = after_stat(density))) + ggtitle("Posterior") + xlim(0,0.02) + xlab("rate_plus") + theme(plot.title = element_text(hjust = 0.5)) + 
-  geom_vline(xintercept = 0.005/1.5, color = "forestgreen")
+  geom_vline(xintercept = 0.01/1.2, color = "forestgreen")
 
 posterior_lambda_min / prior_lambda
 #ggsave("./GitHub/switching_process/Gillespy2/1.5_1.0_005_001/beta_2_80/lambda_minus_posterior.png", width = 12, height = 7, dpi = 600)
 posterior_lambda_plus / prior_lambda
 #ggsave("./GitHub/switching_process/Gillespy2/1.5_1.0_005_001/beta_2_80/lambda_plus_posterior.png", width = 12, height = 7, dpi = 600)
-posterior_omega_min / prior_omega
+posterior_omega_min / prior_omega_p
 #ggsave("./GitHub/switching_process/Gillespy2/1.5_1.0_005_001/beta_2_80/omega_minus_posterior.png", width = 12, height = 7, dpi = 600)
 posterior_omega_plus / prior_omega
 
 #ggsave("./GitHub/switching_process/Gillespy2/1.5_1.0_005_001/beta_2_80/omega_plus_posterior.png", width = 12, height = 7, dpi = 600)
+
+(posterior_lambda_min + posterior_lambda_plus) / (posterior_omega_min + posterior_omega_plus) 
+ggsave("./posterior_example.png", dpi = 600, width = 6, height = 5)
 
 (minuspred + pluspred) / (posterior_lambda_min + posterior_lambda_plus) / (prior_lambda + prior_lambda) / (posterior_omega_min + posterior_omega_plus) / (prior_omega + prior_omega)
 ggsave("./GitHub/switching_process/Gillespy2/5t/1.2_1.5_0.01_0.001_5t_51p/gamma_1.5_280/panel_avg.png", width = 12, height = 14, dpi = 600)
