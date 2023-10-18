@@ -1,177 +1,659 @@
 
 # fit 3
+err3_1.5_1.0_0.01_0.001 = data.frame()
+err3_1.5_1.0_0.005 = data.frame()
+err3_1.5_1.0_0.001_0.01 = data.frame()
+
+err3_1.2_0.01_0.001 = data.frame()
+err3_1.2_0.005 = data.frame()
+err3_1.2_0.001_0.01 = data.frame()
+
+err3_1.0_1.5_0.01_0.001 = data.frame()
+err3_1.0_1.5_0.005 = data.frame()
+err3_1.0_1.5_0.001_0.01 = data.frame()
+
+saveRDS(err3_1.5_1.0_0.01_0.001,"./err3_1.5_1.0_0.01_0.001.rds")
+saveRDS(err3_1.5_1.0_0.005,"./err3_1.5_1.0_0.005.rds")
+saveRDS(err3_1.5_1.0_0.001_0.01,"./err3_1.5_1.0_0.001_0.01.rds")
+
+saveRDS(err3_1.2_0.01_0.001,"./err3_1.2_0.01_0.001.rds")
+saveRDS(err3_1.2_0.005,"./err3_1.2_0.005.rds")
+saveRDS(err3_1.2_0.001_0.01,"./err3_1.2_0.001_0.01.rds")
+
+saveRDS(err3_1.0_1.5_0.01_0.001,"./err3_1.0_1.5_0.01_0.001.rds")
+saveRDS(err3_1.0_1.5_0.005,"./err3_1.0_1.5_0.005.rds")
+saveRDS(err3_1.0_1.5_0.001_0.01,"./err3_1.0_1.5_0.001_0.01.rds")
+
 lm = 0; lp = 0; rm = 0; rp = 0;
-for (i in seq(0,80)) {
-  fit = readRDS(paste0("./fit_3/fit_1.2_0.001_0.01/fit_",i,".rds"))
-  lm = lm + mean(unlist(rstan::extract(fit, pars = c("lambda_minus"))))
-  lp = lp + mean(unlist(rstan::extract(fit, pars = c("lambda_plus"))))
-  rm = rm + mean(unlist(rstan::extract(fit, pars = c("rate_minus"))))
-  rp = rp + mean(unlist(rstan::extract(fit, pars = c("rate_plus"))))
+for (i in seq(0,99)) {
+  fit = readRDS(paste0("./fit_3/fit_1.0_1.5_0.001_0.01/fit_",i,".rds"))
+  lm = mean(unlist(rstan::extract(fit, pars = c("lambda_minus"))))
+  lp = mean(unlist(rstan::extract(fit, pars = c("lambda_plus"))))
+  rm = mean(unlist(rstan::extract(fit, pars = c("rate_minus"))))
+  rp = mean(unlist(rstan::extract(fit, pars = c("rate_plus"))))
+  err3_1.0_1.5_0.001_0.01 = rbind(err3_1.0_1.5_0.001_0.01,c(lm,lp,rm,rp))
   print(i)
 }
+colnames(err3_1.0_1.5_0.001_0.01) = c("lm","lp","rm","rp")
 
-err_lm = abs(1.5 - lm/81)/1.
-err_lp = abs(1. - lp/81)/1.
-err_rm = abs(0.001/1. - rm/81)/(0.001/1.)
-err_rp = abs(0.01/1.5 - rp/81)/(0.01/1.5)
-
-err3_1 = c(err_lm, err_lp, err_rm, err_rp) # 1.5_1.0_0.01_0.001 ok
-err3_2 = c(err_lm, err_lp, err_rm, err_rp) # 1.5_1.0_0.005 ok
-err3_3 = c(err_lm, err_lp, err_rm, err_rp) # 1.5_1.0_0.001_0.01 81fits
-
-err3_4 = c(err_lm, err_lp, err_rm, err_rp) # 1.2_0.01_0.001 ok
-err3_5 = c(err_lm, err_lp, err_rm, err_rp) # 1.2_0.005 ni
-err3_6 = c(err_lm, err_lp, err_rm, err_rp) # 1.2_0.001_0.01 NO
-
-err3_7 = c(err_lm, err_lp, err_rm, err_rp) # 1.0_1.5_0.01_0.001 ok
-err3_8 = c(err_lm, err_lp, err_rm, err_rp) # 1.0_1.5_0.005 ok
-err3_9 = c(err_lm, err_lp, err_rm, err_rp) # 1.0_1.5_0.001_0.01 NO
-
-err3 = data.frame()
-err3 = rbind(err3,err3_1)
-err3 = rbind(err3,err3_2)
-err3 = rbind(err3,err3_3)
-err3 = rbind(err3,err3_4)
-err3 = rbind(err3,err3_5)
-err3 = rbind(err3,err3_6)
-err3 = rbind(err3,err3_7)
-err3 = rbind(err3,err3_8)
-err3 = rbind(err3,err3_9)
-colnames(err3) = c("lm","lp","rm","rp")
-saveRDS(err3,"./err3.rds")
-
+err3_1.5_1.0_0.005 = readRDS("./err3_1.5_1.0_0.005.rds")
 err3 = err3 %>% mutate(ID = 3)
 
 # fit 8
+err8_1.5_1.0_0.01_0.001 = data.frame()
+err8_1.5_1.0_0.005 = data.frame()
+err8_1.5_1.0_0.001_0.01 = data.frame()
+
+err8_1.2_0.01_0.001 = data.frame()
+err8_1.2_0.005 = data.frame()
+err8_1.2_0.001_0.01 = data.frame()
+
+err8_1.0_1.5_0.01_0.001 = data.frame()
+err8_1.0_1.5_0.005 = data.frame()
+err8_1.0_1.5_0.001_0.01 = data.frame()
+
 lm = 0; lp = 0; rm = 0; rp = 0;
 for (i in seq(0,99)) {
-  fit = readRDS(paste0("./fit_8/fit_1.0_1.5_0.001_0.01/fit_",i,".rds"))
-  lm = lm + mean(unlist(rstan::extract(fit, pars = c("lambda_minus"))))
-  lp = lp + mean(unlist(rstan::extract(fit, pars = c("lambda_plus"))))
-  rm = rm + mean(unlist(rstan::extract(fit, pars = c("rate_minus"))))
-  rp = rp + mean(unlist(rstan::extract(fit, pars = c("rate_plus"))))
+  fit = readRDS(paste0("./fit_8/fit_1.2_0.001_0.01/fit_",i,".rds"))
+  lm = mean(unlist(rstan::extract(fit, pars = c("lambda_minus"))))
+  lp = mean(unlist(rstan::extract(fit, pars = c("lambda_plus"))))
+  rm = mean(unlist(rstan::extract(fit, pars = c("rate_minus"))))
+  rp = mean(unlist(rstan::extract(fit, pars = c("rate_plus"))))
+  err8_1.2_0.001_0.01 = rbind(err8_1.2_0.001_0.01,c(lm,lp,rm,rp))
   print(i)
 }
+colnames(err8_1.2_0.001_0.01) = c("lm","lp","rm","rp")
 
-err_lm = abs(1. - lm/100)/1.
-err_lp = abs(1.5 - lp/100)/1.5
-err_rm = abs(0.001/1.5 - rm/100)/(0.001/1.5)
-err_rp = abs(0.01/1. - rp/100)/(0.01/1.)
+saveRDS(err8_1.5_1.0_0.01_0.001,"./err8_1.5_1.0_0.01_0.001.rds")
+saveRDS(err8_1.5_1.0_0.005,"./err8_1.5_1.0_0.005.rds")
+saveRDS(err8_1.5_1.0_0.001_0.01,"./err8_1.5_1.0_0.001_0.01.rds")
 
-err8_1 = c(err_lm, err_lp, err_rm, err_rp) # 1.5_1.0_0.01_0.001 ok
-err8_2 = c(err_lm, err_lp, err_rm, err_rp) # 1.5_1.0_0.005 ok
-err8_3 = c(err_lm, err_lp, err_rm, err_rp) # 1.5_1.0_0.001_0.01 NO
+saveRDS(err8_1.2_0.01_0.001,"./err8_1.2_0.01_0.001.rds")
+saveRDS(err8_1.2_0.005,"./err8_1.2_0.005.rds")
+saveRDS(err8_1.2_0.001_0.01,"./err8_1.2_0.001_0.01.rds")
 
-err8_4 = c(err_lm, err_lp, err_rm, err_rp) # 1.2_0.01_0.001 ok
-err8_5 = c(err_lm, err_lp, err_rm, err_rp) # 1.2_0.005 ni
-err8_6 = c(err_lm, err_lp, err_rm, err_rp) # 1.2_0.001_0.01 no
-
-err8_7 = c(err_lm, err_lp, err_rm, err_rp) # 1.0_1.5_0.01_0.001 ok
-err8_8 = c(err_lm, err_lp, err_rm, err_rp) # 1.0_1.5_0.005 ok
-err8_9 = c(err_lm, err_lp, err_rm, err_rp) # 1.0_1.5_0.001_0.01 no
-
-err8 = data.frame()
-err8 = rbind(err8,err8_1)
-err8 = rbind(err8,err8_2)
-err8 = rbind(err8,err8_3)
-err8 = rbind(err8,err8_4)
-err8 = rbind(err8,err8_5)
-err8 = rbind(err8,err8_6)
-err8 = rbind(err8,err8_7)
-err8 = rbind(err8,err8_8)
-err8 = rbind(err8,err8_9)
-colnames(err8) = c("lm","lp","rm","rp")
+saveRDS(err8_1.0_1.5_0.01_0.001,"./err8_1.0_1.5_0.01_0.001.rds")
+saveRDS(err8_1.0_1.5_0.005,"./err8_1.0_1.5_0.005.rds")
+saveRDS(err8_1.0_1.5_0.001_0.01,"./err8_1.0_1.5_0.001_0.01.rds")
 
 err8 = err8 %>% mutate(ID = 8)
 
 # fit 13
+err13_1.5_1.0_0.01_0.001 = data.frame()
+err13_1.5_1.0_0.005 = data.frame()
+err13_1.5_1.0_0.001_0.01 = data.frame()
+
+err13_1.2_0.01_0.001 = data.frame()
+err13_1.2_0.005 = data.frame()
+err13_1.2_0.001_0.01 = data.frame()
+
+err13_1.0_1.5_0.01_0.001 = data.frame()
+err13_1.0_1.5_0.005 = data.frame()
+err13_1.0_1.5_0.001_0.01 = data.frame()
+
 lm = 0; lp = 0; rm = 0; rp = 0;
-for (i in seq(0,97)) {
-  fit = readRDS(paste0("./fit_13/fit_1.5_1.0_0.01_0.001/fit_",i,".rds"))
-  lm = lm + mean(unlist(rstan::extract(fit, pars = c("lambda_minus"))))
-  lp = lp + mean(unlist(rstan::extract(fit, pars = c("lambda_plus"))))
-  rm = rm + mean(unlist(rstan::extract(fit, pars = c("rate_minus"))))
-  rp = rp + mean(unlist(rstan::extract(fit, pars = c("rate_plus"))))
+for (i in seq(0,99)) {
+  fit = readRDS(paste0("./fit_13/fit_1.0_1.5_0.001_0.01/fit_",i,".rds"))
+  lm = mean(unlist(rstan::extract(fit, pars = c("lambda_minus"))))
+  lp = mean(unlist(rstan::extract(fit, pars = c("lambda_plus"))))
+  rm = mean(unlist(rstan::extract(fit, pars = c("rate_minus"))))
+  rp = mean(unlist(rstan::extract(fit, pars = c("rate_plus"))))
+  err13_1.0_1.5_0.001_0.01 = rbind(err13_1.0_1.5_0.001_0.01,c(lm,lp,rm,rp))
   print(i)
 }
+colnames(err13_1.0_1.5_0.001_0.01) = c("lm","lp","rm","rp")
 
-err_lm = abs(1.5 - lm/98)/1.5
-err_lp = abs(1. - lp/98)/1.
-err_rm = abs(0.01/1. - rm/98)/(0.01/1.)
-err_rp = abs(0.001/1.5 - rp/98)/(0.001/1.5)
+saveRDS(err13_1.5_1.0_0.01_0.001,"./err13_1.5_1.0_0.01_0.001.rds")
+saveRDS(err13_1.5_1.0_0.005,"./err13_1.5_1.0_0.005.rds")
+saveRDS(err13_1.5_1.0_0.001_0.01,"./err13_1.5_1.0_0.001_0.01.rds")
 
-err13_1 = c(err_lm, err_lp, err_rm, err_rp) # 1.5_1.0_0.01_0.001 
-err13_2 = c(err_lm, err_lp, err_rm, err_rp) # 1.5_1.0_0.005 
-err13_3 = c(err_lm, err_lp, err_rm, err_rp) # 1.5_1.0_0.001_0.01 
+saveRDS(err13_1.2_0.01_0.001,"./err13_1.2_0.01_0.001.rds")
+saveRDS(err13_1.2_0.005,"./err13_1.2_0.005.rds")
+saveRDS(err13_1.2_0.001_0.01,"./err13_1.2_0.001_0.01.rds")
 
-err13_4 = c(err_lm, err_lp, err_rm, err_rp) # 1.2_0.01_0.001 
-err13_5 = c(err_lm, err_lp, err_rm, err_rp) # 1.2_0.005 
-err13_6 = c(err_lm, err_lp, err_rm, err_rp) # 1.2_0.001_0.01 
-
-err13_7 = c(err_lm, err_lp, err_rm, err_rp) # 1.0_1.5_0.01_0.001 
-err13_8 = c(err_lm, err_lp, err_rm, err_rp) # 1.0_1.5_0.005 
-err13_9 = c(err_lm, err_lp, err_rm, err_rp) # 1.0_1.5_0.001_0.01 
-
-err13 = data.frame()
-err13 = rbind(err13, err13_1)
-err13 = rbind(err13, err13_2)
-err13 = rbind(err13, err13_3)
-err13 = rbind(err13, err13_4)
-err13 = rbind(err13, err13_5)
-err13 = rbind(err13, err13_6)
-err13 = rbind(err13, err13_7)
-err13 = rbind(err13, err13_8)
-err13 = rbind(err13, err13_9)
-colnames(err13) = c("lm","lp","rm","rp")
+saveRDS(err13_1.0_1.5_0.01_0.001,"./err13_1.0_1.5_0.01_0.001.rds")
+saveRDS(err13_1.0_1.5_0.005,"./err13_1.0_1.5_0.005.rds")
+saveRDS(err13_1.0_1.5_0.001_0.01,"./err13_1.0_1.5_0.001_0.01.rds")
 
 err13= err13 %>% mutate(ID = 13)
 
 # fit 18
+err18_1.5_1.0_0.01_0.001 = data.frame()
+err18_1.5_1.0_0.005 = data.frame()
+err18_1.5_1.0_0.001_0.01 = data.frame()
+
+err18_1.2_0.01_0.001 = data.frame()
+err18_1.2_0.005 = data.frame()
+err18_1.2_0.001_0.01 = data.frame()
+
+err18_1.0_1.5_0.01_0.001 = data.frame()
+err18_1.0_1.5_0.005 = data.frame()
+err18_1.0_1.5_0.001_0.01 = data.frame()
+
 lm = 0; lp = 0; rm = 0; rp = 0;
-for (i in seq(0,97)) {
-  fit = readRDS(paste0("./fit_18/fit_1.5_1.0_0.01_0.001/fit_",i,".rds"))
-  lm = lm + mean(unlist(rstan::extract(fit, pars = c("lambda_minus"))))
-  lp = lp + mean(unlist(rstan::extract(fit, pars = c("lambda_plus"))))
-  rm = rm + mean(unlist(rstan::extract(fit, pars = c("rate_minus"))))
-  rp = rp + mean(unlist(rstan::extract(fit, pars = c("rate_plus"))))
+for (i in seq(62,99)) {
+  fit = readRDS(paste0("./fit_18/fit_1.0_1.5_0.005/fit_",i,".rds"))
+  lm = mean(unlist(rstan::extract(fit, pars = c("lambda_minus"))))
+  lp = mean(unlist(rstan::extract(fit, pars = c("lambda_plus"))))
+  rm = mean(unlist(rstan::extract(fit, pars = c("rate_minus"))))
+  rp = mean(unlist(rstan::extract(fit, pars = c("rate_plus"))))
+  err18_1.0_1.5_0.005 = rbind(err18_1.0_1.5_0.005,c(lm,lp,rm,rp))
   print(i)
 }
+colnames(err18_1.0_1.5_0.005) = c("lm","lp","rm","rp")
 
-err_lm = abs(1.5 - lm/98)/1.5
-err_lp = abs(1.0 - lp/98)/1.
-err_rm = abs(0.01/1. - rm/98)/(0.01/1.)
-err_rp = abs(0.001/1.5 - rp/98)/(0.001/1.5)
+saveRDS(err18_1.5_1.0_0.01_0.001,"./err18_1.5_1.0_0.01_0.001.rds")
+saveRDS(err18_1.5_1.0_0.005,"./err18_1.5_1.0_0.005.rds")
+saveRDS(err18_1.5_1.0_0.001_0.01,"./err18_1.5_1.0_0.001_0.01.rds")
 
-err18_1 = c(err_lm, err_lp, err_rm, err_rp) # 1.5_1.0_0.01_0.001 
-err18_2 = c(err_lm, err_lp, err_rm, err_rp) # 1.5_1.0_0.005 
-err18_3 = c(err_lm, err_lp, err_rm, err_rp) # 1.5_1.0_0.001_0.01 
+saveRDS(err18_1.2_0.01_0.001,"./err18_1.2_0.01_0.001.rds")
+saveRDS(err18_1.2_0.005,"./err18_1.2_0.005.rds")
+saveRDS(err18_1.2_0.001_0.01,"./err18_1.2_0.001_0.01.rds")
 
-err18_4 = c(err_lm, err_lp, err_rm, err_rp) # 1.2_0.01_0.001 
-err18_5 = c(err_lm, err_lp, err_rm, err_rp) # 1.2_0.005 
-err18_6 = c(err_lm, err_lp, err_rm, err_rp) # 1.2_0.001_0.01 
+saveRDS(err18_1.0_1.5_0.01_0.001,"./err18_1.0_1.5_0.01_0.001.rds")
+saveRDS(err18_1.0_1.5_0.005,"./err18_1.0_1.5_0.005.rds")
+saveRDS(err18_1.0_1.5_0.001_0.01,"./err18_1.0_1.5_0.001_0.01.rds")
 
-err18_7 = c(err_lm, err_lp, err_rm, err_rp) # 1.0_1.5_0.01_0.001 
-err18_8 = c(err_lm, err_lp, err_rm, err_rp) # 1.0_1.5_0.005 
-err18_9 = c(err_lm, err_lp, err_rm, err_rp) # 1.0_1.5_0.001_0.01 
-
-err18 = data.frame()
-err18 = rbind(err18, err18_1)
-err18 = rbind(err18, err18_2)
-err18 = rbind(err18, err18_3)
-err18 = rbind(err18, err18_4)
-err18 = rbind(err18, err18_5)
-err18 = rbind(err18, err18_6)
-err18 = rbind(err18, err18_7)
-err18 = rbind(err18, err18_8)
-err18 = rbind(err18, err18_9)
-colnames(err18) = c("lm","lp","rm","rp")
-
-err18= err18 %>% mutate(ID = 18)
-
-# 1.5_1.0_0.001_0.01
-err_8
 
 # complete error dataframe
+# case 1 A
+err_1.5_1.0_0.01_0.001 = data.frame()
+err_1.5_1.0_0.01_0.001 = rbind(err_1.5_1.0_0.01_0.001, c(mean(err3_1.5_1.0_0.01_0.001$lm),
+                                                         mean(err3_1.5_1.0_0.01_0.001$lp),
+                                                         mean(err3_1.5_1.0_0.01_0.001$rm),
+                                                         mean(err3_1.5_1.0_0.01_0.001$rp),
+                                                         sd(err3_1.5_1.0_0.01_0.001$lm),
+                                                         sd(err3_1.5_1.0_0.01_0.001$lp),
+                                                         sd(err3_1.5_1.0_0.01_0.001$rm),
+                                                         sd(err3_1.5_1.0_0.01_0.001$rp),
+                                                         3))
+err_1.5_1.0_0.01_0.001 = rbind(err_1.5_1.0_0.01_0.001, c(mean(err8_1.5_1.0_0.01_0.001$lm),
+                                                         mean(err8_1.5_1.0_0.01_0.001$lp),
+                                                         mean(err8_1.5_1.0_0.01_0.001$rm),
+                                                         mean(err8_1.5_1.0_0.01_0.001$rp),
+                                                         sd(err8_1.5_1.0_0.01_0.001$lm),
+                                                         sd(err8_1.5_1.0_0.01_0.001$lp),
+                                                         sd(err8_1.5_1.0_0.01_0.001$rm),
+                                                         sd(err8_1.5_1.0_0.01_0.001$rp),
+                                                         8))
+err_1.5_1.0_0.01_0.001 = rbind(err_1.5_1.0_0.01_0.001, c(mean(err13_1.5_1.0_0.01_0.001$lm),
+                                                         mean(err13_1.5_1.0_0.01_0.001$lp),
+                                                         mean(err13_1.5_1.0_0.01_0.001$rm),
+                                                         mean(err13_1.5_1.0_0.01_0.001$rp),
+                                                         sd(err13_1.5_1.0_0.01_0.001$lm),
+                                                         sd(err13_1.5_1.0_0.01_0.001$lp),
+                                                         sd(err13_1.5_1.0_0.01_0.001$rm),
+                                                         sd(err13_1.5_1.0_0.01_0.001$rp),
+                                                         13))
+err_1.5_1.0_0.01_0.001 = rbind(err_1.5_1.0_0.01_0.001, c(mean(err18_1.5_1.0_0.01_0.001$lm),
+                                                         mean(err18_1.5_1.0_0.01_0.001$lp),
+                                                         mean(err18_1.5_1.0_0.01_0.001$rm),
+                                                         mean(err18_1.5_1.0_0.01_0.001$rp),
+                                                         sd(err18_1.5_1.0_0.01_0.001$lm),
+                                                         sd(err18_1.5_1.0_0.01_0.001$lp),
+                                                         sd(err18_1.5_1.0_0.01_0.001$rm),
+                                                         sd(err18_1.5_1.0_0.01_0.001$rp),
+                                                         18))
+
+colnames(err_1.5_1.0_0.01_0.001) = c("lm","lp","rm","rp","slm","slp","srm","srp","obs")
+
+# growth rates
+err_1.5_1.0_0.01_0.001 %>% 
+  ggplot() +
+  geom_point(aes(x = obs, y = lm, color = "lm")) +
+  geom_errorbar(aes(x = obs, ymin=lm-slm, ymax=lm+slm), width=.2) +
+  geom_point(aes(x = obs, y = lp, color = "lp")) +
+  geom_errorbar(aes(x = obs, ymin=lp-slp, ymax=lp+slp), width=.2) +
+  scale_x_continuous(breaks = c(3,8,13,18)) + 
+  labs(color = NULL, x = "# obs", y = "parameter") +
+  theme(legend.text = element_text(size = 16), axis.text = element_text(size = 16), axis.title = element_text(size = 18)) +
+  ylim(0,2)
+
+# switching rates
+err_1.5_1.0_0.01_0.001 %>% 
+  ggplot() +
+  geom_point(aes(x = obs, y = rm, color = "rm")) +
+  geom_errorbar(aes(x = obs, ymin=rm-srm, ymax=rm+srm), width=.2) +
+  geom_point(aes(x = obs, y = rp, color = "rp")) +
+  geom_errorbar(aes(x = obs, ymin=rp-srp, ymax=rp+srp), width=.2) +
+  scale_x_continuous(breaks = c(3,8,13,18)) + 
+  labs(color = NULL, x = "# obs", y = "parameter") +
+  theme(legend.text = element_text(size = 16), axis.text = element_text(size = 16), axis.title = element_text(size = 18)) +
+  ylim(0,0.015)
+
+# % errors
+plot1a = err_1.5_1.0_0.01_0.001 %>% 
+  mutate(err_lm = abs(1.5-lm)/1.5*100,
+         err_lp = abs(1.-lp)/1.*100,
+         err_rm = abs(0.01-rm)/(0.01)*100,
+         err_rp = abs(0.001/1.5-rp)/0.001/(1.5)*100) %>% 
+  ggplot() +
+  geom_jitter(aes(x = obs, y = err_lm, color = "lamba_minus"),size=2.5, width = 0.3) +
+  # geom_errorbar(aes(x = obs, ymin=err_lm-slm, ymax=err_lm+slm), width=.2) +
+  geom_jitter(aes(x = obs, y = err_lp, color = "lamda_plus"),size=2.5,width = 0.3) +
+  # geom_errorbar(aes(x = obs, ymin=err_lp-slp, ymax=err_lp+slp), width=.2) +
+  geom_jitter(aes(x = obs, y = err_rm, color = "rate_minus"),size=2.5,width = 0.3) +
+  # geom_errorbar(aes(x = obs, ymin=err_rm-srm, ymax=err_rm+srm), width=.2) +
+  geom_jitter(aes(x = obs, y = err_rp, color = "rate_plus"),size=2.5, width = 0.3) +
+  # geom_errorbar(aes(x = obs, ymin=err_rp-srp, ymax=err_rp+srp), width=.2) +
+  scale_x_continuous(breaks = c(3,8,13,18)) + 
+  labs(color = NULL, x = "# obs", y = "% error") +
+  theme(axis.text = element_text(size = 16), axis.title = element_text(size = 18), legend.position = "none") +
+  ylim(0,100)
+ggsave("./last_plot.png",dpi = 600,width = 5,height = 4)
+
+
+# case 1 B
+err_1.5_1.0_0.005 = data.frame()
+err_1.5_1.0_0.005 = rbind(err_1.5_1.0_0.005, c(mean(err3_1.5_1.0_0.005$lm),
+                                                mean(err3_1.5_1.0_0.005$lp),
+                                                mean(err3_1.5_1.0_0.005$rm),
+                                                mean(err3_1.5_1.0_0.005$rp),
+                                                sd(err3_1.5_1.0_0.005$lm),
+                                                sd(err3_1.5_1.0_0.005$lp),
+                                                sd(err3_1.5_1.0_0.005$rm),
+                                                sd(err3_1.5_1.0_0.005$rp),
+                                                3))
+err_1.5_1.0_0.005 = rbind(err_1.5_1.0_0.005, c(mean(err8_1.5_1.0_0.005$lm),
+                                               mean(err8_1.5_1.0_0.005$lp),
+                                               mean(err8_1.5_1.0_0.005$rm),
+                                               mean(err8_1.5_1.0_0.005$rp),
+                                               sd(err8_1.5_1.0_0.005$lm),
+                                               sd(err8_1.5_1.0_0.005$lp),
+                                               sd(err8_1.5_1.0_0.005$rm),
+                                               sd(err8_1.5_1.0_0.005$rp),
+                                               8))
+err_1.5_1.0_0.005 = rbind(err_1.5_1.0_0.005, c(mean(err13_1.5_1.0_0.005$lm),
+                                               mean(err13_1.5_1.0_0.005$lp),
+                                               mean(err13_1.5_1.0_0.005$rm),
+                                               mean(err13_1.5_1.0_0.005$rp),
+                                               sd(err13_1.5_1.0_0.005$lm),
+                                               sd(err13_1.5_1.0_0.005$lp),
+                                               sd(err13_1.5_1.0_0.005$rm),
+                                               sd(err13_1.5_1.0_0.005$rp),
+                                               13))
+err_1.5_1.0_0.005 = rbind(err_1.5_1.0_0.005, c(mean(err18_1.5_1.0_0.005$lm),
+                                               mean(err18_1.5_1.0_0.005$lp),
+                                               mean(err18_1.5_1.0_0.005$rm),
+                                               mean(err18_1.5_1.0_0.005$rp),
+                                               sd(err18_1.5_1.0_0.005$lm),
+                                               sd(err18_1.5_1.0_0.005$lp),
+                                               sd(err18_1.5_1.0_0.005$rm),
+                                               sd(err18_1.5_1.0_0.005$rp),
+                                               18))
+
+colnames(err_1.5_1.0_0.005) = c("lm","lp","rm","rp","slm","slp","srm","srp","obs")
+
+# growth rates
+err_1.5_1.0_0.005 %>% 
+  ggplot() +
+  geom_point(aes(x = obs, y = lm, color = "lm")) +
+  geom_errorbar(aes(x = obs, ymin=lm-slm, ymax=lm+slm), width=.2) +
+  geom_point(aes(x = obs, y = lp, color = "lp")) +
+  geom_errorbar(aes(x = obs, ymin=lp-slp, ymax=lp+slp), width=.2) +
+  scale_x_continuous(breaks = c(3,8,13,18)) + 
+  labs(color = NULL, x = "# obs", y = "parameter") +
+  theme(legend.text = element_text(size = 16), axis.text = element_text(size = 16), axis.title = element_text(size = 18)) +
+  ylim(0,2)
+
+# switching rates
+err_1.5_1.0_0.005 %>% 
+  ggplot() +
+  geom_point(aes(x = obs, y = rm, color = "rm")) +
+  geom_errorbar(aes(x = obs, ymin=rm-srm, ymax=rm+srm), width=.2) +
+  geom_point(aes(x = obs, y = rp, color = "rp")) +
+  geom_errorbar(aes(x = obs, ymin=rp-srp, ymax=rp+srp), width=.2) +
+  scale_x_continuous(breaks = c(3,8,13,18)) + 
+  labs(color = NULL, x = "# obs", y = "parameter") +
+  theme(legend.text = element_text(size = 16), axis.text = element_text(size = 16), axis.title = element_text(size = 18)) +
+  ylim(0,0.015)
+
+# % errors
+plot1b = err_1.5_1.0_0.005 %>% 
+  mutate(err_lm = abs(1.5-lm)/1.5*100,
+         err_lp = abs(1.-lp)/1.*100,
+         err_rm = abs(0.005-rm)/(0.005)*100,
+         err_rp = abs(0.005/1.5-rp)/0.005/(1.5)*100) %>% 
+  ggplot() +
+  geom_jitter(aes(x = obs, y = err_lm, color = "lm"),size=2.5,width = 0.3) +
+  geom_jitter(aes(x = obs, y = err_lp, color = "lp"),size=2.5,width = 0.3) +
+  geom_jitter(aes(x = obs, y = err_rm, color = "rm"),size=2.5,width = 0.3) +
+  geom_jitter(aes(x = obs, y = err_rp, color = "rp"),size=2.5,width = 0.3) +
+  scale_x_continuous(breaks = c(3,8,13,18)) + 
+  labs(color = NULL, x = "# obs", y = "% error") +
+  theme(legend.position = "none", axis.text = element_text(size = 16), axis.title = element_text(size = 18)) +
+  ylim(0,100)
+
+# case 2 A
+err_1.2_0.01_0.001 = data.frame()
+err_1.2_0.01_0.001 = rbind(err_1.2_0.01_0.001, c(mean(err3_1.2_0.01_0.001$lm),
+                                               mean(err3_1.2_0.01_0.001$lp),
+                                               mean(err3_1.2_0.01_0.001$rm),
+                                               mean(err3_1.2_0.01_0.001$rp),
+                                               sd(err3_1.2_0.01_0.001$lm),
+                                               sd(err3_1.2_0.01_0.001$lp),
+                                               sd(err3_1.2_0.01_0.001$rm),
+                                               sd(err3_1.2_0.01_0.001$rp),
+                                               3))
+err_1.2_0.01_0.001 = rbind(err_1.2_0.01_0.001, c(mean(err8_1.2_0.01_0.001$lm),
+                                               mean(err8_1.2_0.01_0.001$lp),
+                                               mean(err8_1.2_0.01_0.001$rm),
+                                               mean(err8_1.2_0.01_0.001$rp),
+                                               sd(err8_1.2_0.01_0.001$lm),
+                                               sd(err8_1.2_0.01_0.001$lp),
+                                               sd(err8_1.2_0.01_0.001$rm),
+                                               sd(err8_1.2_0.01_0.001$rp),
+                                               8))
+err_1.2_0.01_0.001 = rbind(err_1.2_0.01_0.001, c(mean(err13_1.2_0.01_0.001$lm),
+                                               mean(err13_1.2_0.01_0.001$lp),
+                                               mean(err13_1.2_0.01_0.001$rm),
+                                               mean(err13_1.2_0.01_0.001$rp),
+                                               sd(err13_1.2_0.01_0.001$lm),
+                                               sd(err13_1.2_0.01_0.001$lp),
+                                               sd(err13_1.2_0.01_0.001$rm),
+                                               sd(err13_1.2_0.01_0.001$rp),
+                                               13))
+err_1.2_0.01_0.001 = rbind(err_1.2_0.01_0.001, c(mean(err18_1.2_0.01_0.001$lm),
+                                               mean(err18_1.2_0.01_0.001$lp),
+                                               mean(err18_1.2_0.01_0.001$rm),
+                                               mean(err18_1.2_0.01_0.001$rp),
+                                               sd(err18_1.2_0.01_0.001$lm),
+                                               sd(err18_1.2_0.01_0.001$lp),
+                                               sd(err18_1.2_0.01_0.001$rm),
+                                               sd(err18_1.2_0.01_0.001$rp),
+                                               18))
+
+colnames(err_1.2_0.01_0.001) = c("lm","lp","rm","rp","slm","slp","srm","srp","obs")
+
+# growth rates
+err_1.2_0.01_0.001 %>% 
+  ggplot() +
+  geom_point(aes(x = obs, y = lm, color = "lm")) +
+  geom_errorbar(aes(x = obs, ymin=lm-slm, ymax=lm+slm), width=.2) +
+  geom_point(aes(x = obs, y = lp, color = "lp")) +
+  geom_errorbar(aes(x = obs, ymin=lp-slp, ymax=lp+slp), width=.2) +
+  scale_x_continuous(breaks = c(3,8,13,18)) + 
+  labs(color = NULL, x = "# obs", y = "parameter") +
+  theme(legend.text = element_text(size = 16), axis.text = element_text(size = 16), axis.title = element_text(size = 18)) +
+  ylim(0,2)
+
+# switching rates
+err_1.2_0.01_0.001 %>% 
+  ggplot() +
+  geom_point(aes(x = obs, y = rm, color = "rm")) +
+  geom_errorbar(aes(x = obs, ymin=rm-srm, ymax=rm+srm), width=.2) +
+  geom_point(aes(x = obs, y = rp, color = "rp")) +
+  geom_errorbar(aes(x = obs, ymin=rp-srp, ymax=rp+srp), width=.2) +
+  scale_x_continuous(breaks = c(3,8,13,18)) + 
+  labs(color = NULL, x = "# obs", y = "parameter") +
+  theme(legend.text = element_text(size = 16), axis.text = element_text(size = 16), axis.title = element_text(size = 18)) +
+  ylim(0,0.015)
+
+# % errors
+plot2a = err_1.2_0.01_0.001 %>% 
+  mutate(err_lm = abs(1.2-lm)/1.2*100,
+         err_lp = abs(1.2-lp)/1.2*100,
+         err_rm = abs(0.01/1.2-rm)/(0.01/1.2)*100,
+         err_rp = abs(0.001/1.2-rp)/(0.001/1.2)*100) %>% 
+  ggplot() +
+  geom_jitter(aes(x = obs, y = err_lm, color = "lm"),size=2.5,width = 0.3) +
+  geom_jitter(aes(x = obs, y = err_lp, color = "lp"),size=2.5,width = 0.3) +
+  geom_jitter(aes(x = obs, y = err_rm, color = "rm"),size=2.5,width = 0.3) +
+  geom_jitter(aes(x = obs, y = err_rp, color = "rp"),size=2.5,width = 0.) +
+  scale_x_continuous(breaks = c(3,8,13,18)) + 
+  labs(color = NULL, x = "# obs", y = "% error") +
+  theme(legend.position = "none", axis.text = element_text(size = 16), axis.title = element_text(size = 18)) +
+  ylim(0,365)
+
+# case 2 B
+err_1.2_0.005 = data.frame()
+err_1.2_0.005 = rbind(err_1.2_0.005, c(mean(err3_1.2_0.005$lm),
+                                                 mean(err3_1.2_0.005$lp),
+                                                 mean(err3_1.2_0.005$rm),
+                                                 mean(err3_1.2_0.005$rp),
+                                                 sd(err3_1.2_0.005$lm),
+                                                 sd(err3_1.2_0.005$lp),
+                                                 sd(err3_1.2_0.005$rm),
+                                                 sd(err3_1.2_0.005$rp),
+                                                 3))
+err_1.2_0.005 = rbind(err_1.2_0.005, c(mean(err8_1.2_0.005$lm),
+                                       mean(err8_1.2_0.005$lp),
+                                       mean(err8_1.2_0.005$rm),
+                                       mean(err8_1.2_0.005$rp),
+                                       sd(err8_1.2_0.005$lm),
+                                       sd(err8_1.2_0.005$lp),
+                                       sd(err8_1.2_0.005$rm),
+                                       sd(err8_1.2_0.005$rp),
+                                       8))
+err_1.2_0.005 = rbind(err_1.2_0.005, c(mean(err13_1.2_0.005$lm),
+                                       mean(err13_1.2_0.005$lp),
+                                       mean(err13_1.2_0.005$rm),
+                                       mean(err13_1.2_0.005$rp),
+                                       sd(err13_1.2_0.005$lm),
+                                       sd(err13_1.2_0.005$lp),
+                                       sd(err13_1.2_0.005$rm),
+                                       sd(err13_1.2_0.005$rp),
+                                       13))
+err_1.2_0.005 = rbind(err_1.2_0.005, c(mean(err18_1.2_0.005$lm),
+                                       mean(err13_1.2_0.005$lp),
+                                       mean(err13_1.2_0.005$rm),
+                                       mean(err13_1.2_0.005$rp),
+                                       sd(err13_1.2_0.005$lm),
+                                       sd(err13_1.2_0.005$lp),
+                                       sd(err13_1.2_0.005$rm),
+                                       sd(err13_1.2_0.005$rp),
+                                       18))
+
+colnames(err_1.2_0.005) = c("lm","lp","rm","rp","slm","slp","srm","srp","obs")
+
+# growth rates
+err_1.2_0.005 %>% 
+  ggplot() +
+  geom_point(aes(x = obs, y = lm, color = "lm")) +
+  geom_errorbar(aes(x = obs, ymin=lm-slm, ymax=lm+slm), width=.2) +
+  geom_point(aes(x = obs, y = lp, color = "lp")) +
+  geom_errorbar(aes(x = obs, ymin=lp-slp, ymax=lp+slp), width=.2) +
+  scale_x_continuous(breaks = c(3,8,13,18)) + 
+  labs(color = NULL, x = "# obs", y = "parameter") +
+  theme(legend.text = element_text(size = 16), axis.text = element_text(size = 16), axis.title = element_text(size = 18)) +
+  ylim(0,2)
+
+# switching rates
+err_1.2_0.005 %>% 
+  ggplot() +
+  geom_point(aes(x = obs, y = rm, color = "rm")) +
+  geom_errorbar(aes(x = obs, ymin=rm-srm, ymax=rm+srm), width=.2) +
+  geom_point(aes(x = obs, y = rp, color = "rp")) +
+  geom_errorbar(aes(x = obs, ymin=rp-srp, ymax=rp+srp), width=.2) +
+  scale_x_continuous(breaks = c(3,8,13,18)) + 
+  labs(color = NULL, x = "# obs", y = "parameter") +
+  theme(legend.text = element_text(size = 16), axis.text = element_text(size = 16), axis.title = element_text(size = 18)) +
+  ylim(0,0.015)
+
+# % errors
+plot2b = err_1.2_0.005 %>% 
+  mutate(err_lm = abs(1.2-lm)/1.2*100,
+         err_lp = abs(1.2-lp)/1.2*100,
+         err_rm = abs(0.005-rm)/(0.005)*100,
+         err_rp = abs(0.005/1.5-rp)/0.005/(1.5)*100) %>% 
+  ggplot() +
+  geom_jitter(aes(x = obs, y = err_lm, color = "lm"),size=2.5,width = 0.3) +
+  geom_jitter(aes(x = obs, y = err_lp, color = "lp"),size=2.5,width = 0.3) +
+  geom_jitter(aes(x = obs, y = err_rm, color = "rm"),size=2.5,width = 0.3) +
+  geom_jitter(aes(x = obs, y = err_rp, color = "rp"),size=2.5,width = 0.3) +
+  scale_x_continuous(breaks = c(3,8,13,18)) + 
+  labs(color = NULL, x = "# obs", y = "% error") +
+  theme(legend.position = "none", axis.text = element_text(size = 16), axis.title = element_text(size = 18)) +
+  ylim(0,100)
+
+# case 3 A
+err_1.0_1.5_0.01_0.001 = data.frame()
+err_1.0_1.5_0.01_0.001 = rbind(err_1.0_1.5_0.01_0.001, c(mean(err3_1.0_1.5_0.01_0.001$lm),
+                                                         mean(err3_1.0_1.5_0.01_0.001$lp),
+                                                         mean(err3_1.0_1.5_0.01_0.001$rm),
+                                                         mean(err3_1.0_1.5_0.01_0.001$rp),
+                                                         sd(err3_1.0_1.5_0.01_0.001$lm),
+                                                         sd(err3_1.0_1.5_0.01_0.001$lp),
+                                                         sd(err3_1.0_1.5_0.01_0.001$rm),
+                                                         sd(err3_1.0_1.5_0.01_0.001$rp),
+                                                         3))
+err_1.0_1.5_0.01_0.001 = rbind(err_1.0_1.5_0.01_0.001, c(mean(err8_1.0_1.5_0.01_0.001$lm),
+                                                         mean(err8_1.0_1.5_0.01_0.001$lp),
+                                                         mean(err8_1.0_1.5_0.01_0.001$rm),
+                                                         mean(err8_1.0_1.5_0.01_0.001$rp),
+                                                         sd(err8_1.0_1.5_0.01_0.001$lm),
+                                                         sd(err8_1.0_1.5_0.01_0.001$lp),
+                                                         sd(err8_1.0_1.5_0.01_0.001$rm),
+                                                         sd(err8_1.0_1.5_0.01_0.001$rp),
+                                                         8))
+err_1.0_1.5_0.01_0.001 = rbind(err_1.0_1.5_0.01_0.001, c(mean(err13_1.0_1.5_0.01_0.001$lm),
+                                                         mean(err13_1.0_1.5_0.01_0.001$lp),
+                                                         mean(err13_1.0_1.5_0.01_0.001$rm),
+                                                         mean(err13_1.0_1.5_0.01_0.001$rp),
+                                                         sd(err13_1.0_1.5_0.01_0.001$lm),
+                                                         sd(err13_1.0_1.5_0.01_0.001$lp),
+                                                         sd(err13_1.0_1.5_0.01_0.001$rm),
+                                                         sd(err13_1.0_1.5_0.01_0.001$rp),
+                                                         13))
+err_1.0_1.5_0.01_0.001 = rbind(err_1.0_1.5_0.01_0.001, c(mean(err18_1.0_1.5_0.01_0.001$lm),
+                                                         mean(err18_1.0_1.5_0.01_0.001$lp),
+                                                         mean(err18_1.0_1.5_0.01_0.001$rm),
+                                                         mean(err18_1.0_1.5_0.01_0.001$rp),
+                                                         sd(err18_1.0_1.5_0.01_0.001$lm),
+                                                         sd(err18_1.0_1.5_0.01_0.001$lp),
+                                                         sd(err18_1.0_1.5_0.01_0.001$rm),
+                                                         sd(err18_1.0_1.5_0.01_0.001$rp),
+                                                         18))
+
+colnames(err_1.0_1.5_0.01_0.001) = c("lm","lp","rm","rp","slm","slp","srm","srp","obs")
+
+# growth rates
+err_1.0_1.5_0.01_0.001 %>% 
+  ggplot() +
+  geom_point(aes(x = obs, y = lm, color = "lm")) +
+  geom_errorbar(aes(x = obs, ymin=lm-slm, ymax=lm+slm), width=.2) +
+  geom_point(aes(x = obs, y = lp, color = "lp")) +
+  geom_errorbar(aes(x = obs, ymin=lp-slp, ymax=lp+slp), width=.2) +
+  scale_x_continuous(breaks = c(3,8,13,18)) + 
+  labs(color = NULL, x = "# obs", y = "parameter") +
+  theme(legend.text = element_text(size = 16), axis.text = element_text(size = 16), axis.title = element_text(size = 18)) +
+  ylim(0,2)
+
+# switching rates
+err_1.0_1.5_0.01_0.001 %>% 
+  ggplot() +
+  geom_point(aes(x = obs, y = rm, color = "rm")) +
+  geom_errorbar(aes(x = obs, ymin=rm-srm, ymax=rm+srm), width=.2) +
+  geom_point(aes(x = obs, y = rp, color = "rp")) +
+  geom_errorbar(aes(x = obs, ymin=rp-srp, ymax=rp+srp), width=.2) +
+  scale_x_continuous(breaks = c(3,8,13,18)) + 
+  labs(color = NULL, x = "# obs", y = "parameter") +
+  theme(legend.text = element_text(size = 16), axis.text = element_text(size = 16), axis.title = element_text(size = 18)) +
+  ylim(0,0.015)
+
+# % errors
+plot3a = err_1.0_1.5_0.01_0.001 %>% 
+  mutate(err_lm = abs(1.-lm)/1.*100,
+         err_lp = abs(1.5-lp)/1.5*100,
+         err_rm = abs(0.01/1.5-rm)/(0.01/1.5)*100,
+         err_rp = abs(0.001/1.-rp)/(0.001/1.)*100) %>% 
+  ggplot() +
+  geom_jitter(aes(x = obs, y = err_lm, color = "lm"),size=2.5,width = 0.3) +
+  geom_jitter(aes(x = obs, y = err_lp, color = "lp"),size=2.5,width = 0.3) +
+  geom_jitter(aes(x = obs, y = err_rm, color = "rm"),size=2.5,width = 0.3) +
+  geom_jitter(aes(x = obs, y = err_rp, color = "rp"),size=2.5,width = 0.3) +
+  scale_x_continuous(breaks = c(3,8,13,18)) + 
+  labs(color = NULL, x = "# obs", y = "% error") +
+  theme(legend.position = "none", axis.text = element_text(size = 16), axis.title = element_text(size = 18)) +
+  ylim(0,100)
+
+# case 3 B
+err_1.0_1.5_0.005 = data.frame()
+err_1.0_1.5_0.005 = rbind(err_1.0_1.5_0.005, c(mean(err3_1.0_1.5_0.005$lm),
+                                               mean(err3_1.0_1.5_0.005$lp),
+                                               mean(err3_1.0_1.5_0.005$rm),
+                                               mean(err3_1.0_1.5_0.005$rp),
+                                               sd(err3_1.0_1.5_0.005$lm),
+                                               sd(err3_1.0_1.5_0.005$lp),
+                                               sd(err3_1.0_1.5_0.005$rm),
+                                               sd(err3_1.0_1.5_0.005$rp),
+                                               3))
+err_1.0_1.5_0.005 = rbind(err_1.0_1.5_0.005, c(mean(err8_1.0_1.5_0.005$lm),
+                                       mean(err8_1.0_1.5_0.005$lp),
+                                       mean(err8_1.0_1.5_0.005$rm),
+                                       mean(err8_1.0_1.5_0.005$rp),
+                                       sd(err8_1.0_1.5_0.005$lm),
+                                       sd(err8_1.0_1.5_0.005$lp),
+                                       sd(err8_1.0_1.5_0.005$rm),
+                                       sd(err8_1.0_1.5_0.005$rp),
+                                       8))
+err_1.0_1.5_0.005 = rbind(err_1.0_1.5_0.005, c(mean(err13_1.0_1.5_0.005$lm),
+                                       mean(err13_1.0_1.5_0.005$lp),
+                                       mean(err13_1.0_1.5_0.005$rm),
+                                       mean(err13_1.0_1.5_0.005$rp),
+                                       sd(err13_1.0_1.5_0.005$lm),
+                                       sd(err13_1.0_1.5_0.005$lp),
+                                       sd(err13_1.0_1.5_0.005$rm),
+                                       sd(err13_1.0_1.5_0.005$rp),
+                                       13))
+err_1.0_1.5_0.005 = rbind(err_1.0_1.5_0.005, c(mean(err18_1.0_1.5_0.005$lm),
+                                       mean(err18_1.0_1.5_0.005$lp),
+                                       mean(err18_1.0_1.5_0.005$rm),
+                                       mean(err18_1.0_1.5_0.005$rp),
+                                       sd(err18_1.0_1.5_0.005$lm),
+                                       sd(err18_1.0_1.5_0.005$lp),
+                                       sd(err18_1.0_1.5_0.005$rm),
+                                       sd(err18_1.0_1.5_0.005$rp),
+                                       18))
+
+colnames(err_1.0_1.5_0.005) = c("lm","lp","rm","rp","slm","slp","srm","srp","obs")
+
+# growth rates
+err_1.0_1.5_0.005 %>% 
+  ggplot() +
+  geom_point(aes(x = obs, y = lm, color = "lm")) +
+  geom_errorbar(aes(x = obs, ymin=lm-slm, ymax=lm+slm), width=.2) +
+  geom_point(aes(x = obs, y = lp, color = "lp")) +
+  geom_errorbar(aes(x = obs, ymin=lp-slp, ymax=lp+slp), width=.2) +
+  scale_x_continuous(breaks = c(3,8,13,18)) + 
+  labs(color = NULL, x = "# obs", y = "parameter") +
+  theme(legend.text = element_text(size = 16), axis.text = element_text(size = 16), axis.title = element_text(size = 18)) +
+  ylim(0,2)
+
+# switching rates
+err_1.0_1.5_0.005 %>% 
+  ggplot() +
+  geom_point(aes(x = obs, y = rm, color = "rm")) +
+  geom_errorbar(aes(x = obs, ymin=rm-srm, ymax=rm+srm), width=.2) +
+  geom_point(aes(x = obs, y = rp, color = "rp")) +
+  geom_errorbar(aes(x = obs, ymin=rp-srp, ymax=rp+srp), width=.2) +
+  scale_x_continuous(breaks = c(3,8,13,18)) + 
+  labs(color = NULL, x = "# obs", y = "parameter") +
+  theme(legend.text = element_text(size = 16), axis.text = element_text(size = 16), axis.title = element_text(size = 18)) +
+  ylim(0,0.015)
+
+# % errors
+plot3b = err_1.0_1.5_0.005 %>% 
+  mutate(err_lm = abs(1.-lm)/1.*100,
+         err_lp = abs(1.5-lp)/1.5*100,
+         err_rm = abs(0.005/1.5-rm)/(0.005/1.5)*100,
+         err_rp = abs(0.005/1.-rp)/0.005/(1.)*100) %>% 
+  ggplot() +
+  geom_jitter(aes(x = obs, y = err_lm, color = "lm"),size=2.5,width = 0.3) +
+  geom_jitter(aes(x = obs, y = err_lp, color = "lp"),size=2.5,width = 0.3) +
+  geom_jitter(aes(x = obs, y = err_rm, color = "rm"),size=2.5,width = 0.3) +
+  geom_jitter(aes(x = obs, y = err_rp, color = "rp"),size=2.5,width = 0.3) +
+  scale_x_continuous(breaks = c(3,8,13,18)) + 
+  labs(color = NULL, x = "# obs", y = "% error") +
+  theme(legend.position = "none", axis.text = element_text(size = 16), axis.title = element_text(size = 18)) +
+  ylim(0,100)
+
+(plot1a + plot2a + plot3a) / (plot1b + plot2b + plot3b)
+
+ggsave("./final_plot.png", width = 10, height = 6, dpi = 600)
+
+
+
 err = data.frame()
 err = rbind(err,err3)
 err = rbind(err,err8)

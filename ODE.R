@@ -254,14 +254,14 @@ z0 <- as.array(c(1000,100))
 t <- seq(0,10, length=101)
 input <- lapply(t, function(time) {
   dplyr::tibble(
-    zmin = zmin_ode(time, z0 = z0, lambda_minus = 1.2, lambda_plus = 1.2, omega_minus = 0.005, omega_plus = 0.005),
-    zplus = zplus_ode(time, z0, lambda_minus = 1.2, lambda_plus = 1.2, omega_minus = 0.005, omega_plus = 0.005)
+    zmin = zmin_ode(time, z0 = z0, lambda_minus = 1.2, lambda_plus = 1.2, omega_minus = 0.01, omega_plus = 0.001),
+    zplus = zplus_ode(time, z0, lambda_minus = 1.2, lambda_plus = 1.2, omega_minus = 0.01, omega_plus = 0.001)
     )
 }) %>% do.call('bind_rows', .)
 output <- lapply(t, function(time) {
   dplyr::tibble(
-    zmin = zmin_ode(time, z0 = z0, lambda_minus = 1.193330, lambda_plus = 1.13419, omega_minus = 0.00595, omega_plus = 0.01404),
-    zplus = zplus_ode(time, z0, lambda_minus = 1.193330, lambda_plus = 1.13419, omega_minus = 0.00595, omega_plus = 0.01404)
+    zmin = zmin_ode(time, z0 = z0, lambda_minus = 1.19406 , lambda_plus = 1.16899 , omega_minus = 0.00706 , omega_plus = 0.00612 ),
+    zplus = zplus_ode(time, z0, lambda_minus = 1.19406 , lambda_plus = 1.16899 , omega_minus = 0.00706 , omega_plus = 0.00612 )
   )
 }) %>% do.call('bind_rows', .)
 
@@ -272,7 +272,7 @@ output2 <- lapply(t, function(time) {
   )
 }) %>% do.call('bind_rows', .)
 
-sim <- read.csv("./PEPI/sim_1.2_0.001_0.01/simulation_3 copy.csv")
+sim <- read.csv("./sim_1.2_0.01_0.001/simulation_50.csv")
 
 #sim <- sim[1:(nrow(sim)-1),]
 input$t <- t
@@ -283,13 +283,22 @@ input %>%
   ggplot(mapping = aes(x=t, y=value, col=name)) +
   geom_point()
 
+ggplot() +
+  geom_line(data = input, aes(x = t, y = zmin, color = "zmin"), linewidth = 1.5) +
+  geom_line(data = input, aes(x = t, y = zplus, color = "zplus"), linewidth = 1.5) +
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18), legend.title = element_blank()) +
+  labs(x = "t", y = "Z") +
+  scale_color_manual(values = c("#3bc2ce","#FFCA0A")) +
+  theme(legend.position = "none")
+ggsave("./ode_sol_1_0.png", dpi = 600, width = 5, height = 4)
+
 compmin = ggplot() +
   geom_line(data = input, aes(x = t, y = zmin, color = "ODE"), linewidth = 0.8) +
-  geom_line(data = output, aes(x = t, y = zmin, color = "Inference"), size = 0.8) + xlim(6,10) +
+  geom_line(data = output, aes(x = t, y = zmin, color = "Inference"), size = 0.8) +
   # geom_line(data = output2, aes(x = t, y = zmin, color = "inf5_min"), size = 0.8) +
   # geom_point(data = simulation5, aes(x = time, y = z_minus, color = "sim4"), size = 1) + 
-  geom_point(data = simulation_py, aes(x = time, y = z_minus, color = "Input"), size = 1.5) +
-  labs(y="z-") +
+  geom_point(data = sim, aes(x = time, y = z_minus, color = "Input"), size = 1.5) +
+  labs(y="z-") + scale_y_continuous(trans = "log10") +
   theme(legend.text = element_text(size = 16), axis.text = element_text(size = 16), axis.title = element_text(size = 18)) +
   scale_color_manual(values = c("red","black","blue"), name = element_blank()) +
   theme(legend.position = "none")
@@ -304,12 +313,13 @@ compmin = ggplot() +
   ggsave("./legend_odevsinf.png",dpi=600,width=5,height=4)
 compplus = ggplot() +
   geom_line(data = input, aes(x = t, y = zplus, color = "ODE"), linewidth = 0.8) +
-  geom_line(data = output, aes(x = t, y = zplus, color = "Inference"), size = 0.8) + xlim(6,10) +
+  geom_line(data = output, aes(x = t, y = zplus, color = "Inference"), linewidth = 0.8) + 
   # geom_line(data = output2, aes(x = t, y = zplus, color = "inf5_plus"), size = 0.8) +
   # geom_point(data = simulation4, aes(x = time, y = z_plus, color = "sim4"), size = 1) + 
-  geom_point(data = simulation_py, aes(x = time, y = z_plus, color = "Input"), size = 1.5) +
+  geom_point(data = sim, aes(x = time, y = z_plus, color = "Input"), size = 1.5) +
   labs(y="z+") + theme(axis.text = element_text(size = 16), axis.title = element_text(size = 18)) +
-  scale_color_manual(values = c("red","black","blue"), name = element_blank()) +
+  scale_color_manual(values = c("red","black","blue"), name = element_blank()) + 
+  scale_y_continuous(trans = "log10") + 
   theme(legend.position = "none")
   # geom_point(data = sim1, aes(x = time, y = z_plus, color = "sim_1"), size = 0.8) +
   # geom_point(data = sim2, aes(x = time, y = z_plus, color = "sim_2"), size = 0.8) +
@@ -319,7 +329,7 @@ compplus = ggplot() +
   # geom_point(data = sim7, aes(x = time, y = zp, color = "sim_7"), size = 0.5) +
   # geom_point(data = sim8, aes(x = time, y = zp, color = "sim_8"), size = 0.5) +
   # geom_point(data = sim9, aes(x = time, y = zp, color = "sim_9"), size = 0.5)
-
+ggsave("./legend_odevsing.png",dpi=600, width = 5, height = 4)
 compmin + compplus
 ggsave("./ode_vs_inf.png", dpi = 600, width=10,height = 4)
 

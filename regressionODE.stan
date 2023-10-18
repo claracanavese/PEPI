@@ -4,12 +4,12 @@ functions {
                           real[] theta //lambda_minus,lambda_plus, omega_minus, omega_plus
                           ) {
     vector[5] dzdt;
-    real lambda_minus = theta[1];
-    real lambda_plus = theta[2];
-    // real lambda_minus = 1.2;
-    // real lambda_plus = 1.2;
-    real omega_minus = theta[3];
-    real omega_plus = theta[4];
+    // real lambda_minus = theta[1];
+    // real lambda_plus = theta[2];
+    real lambda_minus = 1.2;
+    real lambda_plus = 1.2;
+    real omega_minus = theta[1];
+    real omega_plus = theta[2];
 
     dzdt[1] = lambda_minus*z[1] + omega_minus*z[2]; // mean -
     dzdt[2] = lambda_plus*z[2] + omega_plus*z[1]; // mean +
@@ -40,27 +40,27 @@ data {
 // }
 
 parameters {
-  real<lower=0> lambda_minus;
-  real<lower=0> lambda_plus;
+  // real<lower=0> lambda_minus;
+  // real<lower=0> lambda_plus;
   real<lower=0, upper=0.02> rate_minus; // omega_minus / lambda_plus
   real<lower=0, upper=0.02> rate_plus; // omega_plus / lambda_minus
 }
 
 transformed parameters {
-  real theta[4];
-  theta[1] = lambda_minus;
-  theta[2] = lambda_plus;
-  theta[3] = rate_minus*lambda_plus;
-  theta[4] = rate_plus*lambda_minus;
+  real theta[2];
+  // theta[1] = lambda_minus;
+  // theta[2] = lambda_plus;
+  theta[1] = rate_minus*1.2;
+  theta[2] = rate_plus*1.2;
 }
 
 model {
   // real z_hat[n_times,5];
   array[n_times] vector[5] z_hat = ode_rk45(switching_process, z0, t0, t, theta);
   
-  target += gamma_lpdf(lambda_minus | 2., 1.5);
-  target += gamma_lpdf(lambda_plus | 2., 1.5);
-  target += gamma_lpdf(rate_minus | 1, 1000);
+  // target += gamma_lpdf(lambda_minus | 2., 1.5);
+  // target += gamma_lpdf(lambda_plus | 2., 1.5);
+  target += gamma_lpdf(rate_minus | 3, 500);
   target += gamma_lpdf(rate_plus | 3, 500);
 
   // z_hat = integrate_ode_rk45(switching_process, z0, t0, t, theta, x_r, x_i);
