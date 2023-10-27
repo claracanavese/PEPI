@@ -250,12 +250,12 @@ zplus_ode <- function(t, z0, lambda_minus, lambda_plus, omega_minus, omega_plus)
   return(zplus)
 }
 
-z0 <- as.array(c(1000,100))
-t <- seq(0,10, length=101)
+z0 <- as.array(c(1,0))
+t <- seq(0,20, length=501)
 input <- lapply(t, function(time) {
   dplyr::tibble(
-    zmin = zmin_ode(time, z0 = z0, lambda_minus = 1.2, lambda_plus = 1.2, omega_minus = 0.01, omega_plus = 0.001),
-    zplus = zplus_ode(time, z0, lambda_minus = 1.2, lambda_plus = 1.2, omega_minus = 0.01, omega_plus = 0.001)
+    zmin = zmin_ode(time, z0 = z0, lambda_minus = 1.2, lambda_plus = 1.2, omega_minus = 0.005, omega_plus = 0.005),
+    zplus = zplus_ode(time, z0, lambda_minus = 1.2, lambda_plus = 1.2, omega_minus = 0.005, omega_plus = 0.005)
     )
 }) %>% do.call('bind_rows', .)
 output <- lapply(t, function(time) {
@@ -288,9 +288,9 @@ ggplot() +
   geom_line(data = input, aes(x = t, y = zplus, color = "zplus"), linewidth = 1.5) +
   theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18), legend.title = element_blank()) +
   labs(x = "t", y = "Z") +
-  scale_color_manual(values = c("#3bc2ce","#FFCA0A")) +
-  theme(legend.position = "none")
-ggsave("./ode_sol_1_0.png", dpi = 600, width = 5, height = 4)
+  scale_color_manual(values = c("#3bc2ce","#FFCA0A")) #+
+  #theme(legend.position = "none")
+ggsave("./ode_sol_1_0.png", dpi = 600, width = 5, height = 3)
 
 compmin = ggplot() +
   geom_line(data = input, aes(x = t, y = zmin, color = "ODE"), linewidth = 0.8) +
