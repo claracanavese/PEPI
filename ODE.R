@@ -267,8 +267,8 @@ output <- lapply(t, function(time) {
 
 output2 <- lapply(t, function(time) {
   dplyr::tibble(
-    zmin = zmin_ode(time, z0 = z0, lambda_minus = 1.50099, lambda_plus = 0.9756, omega_minus = 0.0058, omega_plus = 0.00534),
-    zplus = zplus_ode(time, z0, lambda_minus = 1.50099, lambda_plus = 0.9756, omega_minus = 0.0058, omega_plus = 0.00534)
+    zmin = zmin_ode(time, z0 = z0, lambda_minus = 1.19372, lambda_plus = 1.21430, omega_minus = 0.01, omega_plus = 0.001),
+    zplus = zplus_ode(time, z0, lambda_minus = 1.19372, lambda_plus = 1.21430, omega_minus = 0.01, omega_plus = 0.001)
   )
 }) %>% do.call('bind_rows', .)
 
@@ -294,14 +294,14 @@ ggsave("./ode_sol_1_0.png", dpi = 600, width = 5, height = 4)
 
 compmin = ggplot() +
   geom_line(data = input, aes(x = t, y = zmin, color = "ODE"), linewidth = 0.8) +
-  geom_line(data = output, aes(x = t, y = zmin, color = "Inference"), size = 0.8) +
-  # geom_line(data = output2, aes(x = t, y = zmin, color = "inf5_min"), size = 0.8) +
+  # geom_line(data = output, aes(x = t, y = zmin, color = "Inference"), linewidth = 0.8) +
+  geom_line(data = output2, aes(x = t, y = zmin, color = "Inference"), size = 0.8) +
   # geom_point(data = simulation5, aes(x = time, y = z_minus, color = "sim4"), size = 1) + 
-  geom_point(data = sim, aes(x = time, y = z_minus, color = "Input"), size = 1.5) +
-  labs(y="z-") + scale_y_continuous(trans = "log10") +
+  geom_point(data = simulation_py, aes(x = time, y = z_minus, color = "Input"), size = 1.5) +
+  labs(y="z-") + #scale_y_continuous(trans = "log10") +
   theme(legend.text = element_text(size = 16), axis.text = element_text(size = 16), axis.title = element_text(size = 18)) +
   scale_color_manual(values = c("red","black","blue"), name = element_blank()) +
-  theme(legend.position = "none")
+  theme(legend.position = "none") #+ xlim(7.5,10)
   # geom_point(data = sim1, aes(x = time, y = z_minus, color = "sim_1"), size = 0.8) +
   # geom_point(data = sim2, aes(x = time, y = z_minus, color = "sim_2"), size = 0.8) +
   # geom_point(data = sim3, aes(x = time, y = z_minus, color = "sim_3"), size = 0.8) +
@@ -313,14 +313,14 @@ compmin = ggplot() +
   ggsave("./legend_odevsinf.png",dpi=600,width=5,height=4)
 compplus = ggplot() +
   geom_line(data = input, aes(x = t, y = zplus, color = "ODE"), linewidth = 0.8) +
-  geom_line(data = output, aes(x = t, y = zplus, color = "Inference"), linewidth = 0.8) + 
-  # geom_line(data = output2, aes(x = t, y = zplus, color = "inf5_plus"), size = 0.8) +
+  # geom_line(data = output, aes(x = t, y = zplus, color = "Inference"), linewidth = 0.8) +
+  geom_line(data = output2, aes(x = t, y = zplus, color = "Inference"), size = 0.8) +
   # geom_point(data = simulation4, aes(x = time, y = z_plus, color = "sim4"), size = 1) + 
-  geom_point(data = sim, aes(x = time, y = z_plus, color = "Input"), size = 1.5) +
+  geom_point(data = simulation_py, aes(x = time, y = z_plus, color = "Input"), size = 1.5) +
   labs(y="z+") + theme(axis.text = element_text(size = 16), axis.title = element_text(size = 18)) +
   scale_color_manual(values = c("red","black","blue"), name = element_blank()) + 
-  scale_y_continuous(trans = "log10") + 
-  theme(legend.position = "none")
+  #scale_y_continuous(trans = "log10") +
+  theme(legend.position = "none") #+ xlim(7.5,10)
   # geom_point(data = sim1, aes(x = time, y = z_plus, color = "sim_1"), size = 0.8) +
   # geom_point(data = sim2, aes(x = time, y = z_plus, color = "sim_2"), size = 0.8) +
   # geom_point(data = sim3, aes(x = time, y = z_plus, color = "sim_3"), size = 0.8) +
@@ -329,9 +329,9 @@ compplus = ggplot() +
   # geom_point(data = sim7, aes(x = time, y = zp, color = "sim_7"), size = 0.5) +
   # geom_point(data = sim8, aes(x = time, y = zp, color = "sim_8"), size = 0.5) +
   # geom_point(data = sim9, aes(x = time, y = zp, color = "sim_9"), size = 0.5)
-ggsave("./legend_odevsing.png",dpi=600, width = 5, height = 4)
+#ggsave("./legend_odevsing.png",dpi=600, width = 5, height = 4)
 compmin + compplus
-ggsave("./ode_vs_inf.png", dpi = 600, width=10,height = 4)
+ggsave("./ode_vs_inf_fixedomega_nolog.png", dpi = 600, width=10,height = 4)
 
 zmin_ode(0, z0, 1.5, 1.0, .01, .01)
 
