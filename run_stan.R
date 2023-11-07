@@ -10,7 +10,7 @@ simulation_py <- read.csv("./simulation_1.2_0.01_0.001_101p.csv") %>% tibble::as
 # colnames(simulation_py) <- c('time','z_minus','z_plus','var_minus','var_plus','cov')
 samples <- simulation_py[2:101,]
 samples <- simulation_py[c(2,5,8,11,14,16,19,21),]
-# simulation_py <- simulation_py[,-1]
+samples <- simulation_py[2:101,]
 # t_samples = seq(1.00, 8.00, by = 0.70) %>% round(., 3)
 # samples = simulation_py %>% filter(simulation_py$time %in% t_samples)
 
@@ -27,6 +27,9 @@ prior_lambda = ggplot() +
   # geom_vline(xintercept = 1.0, color = "#379237", linewidth = 0.8) +
   # geom_vline(xintercept = 1.2, color = "#54B435", linewidth = 0.8) +
   # geom_vline(xintercept = 1.5, color = "#82CD47", linewidth = 0.8)
+
+gamma_wide = data.frame( "gamma" = rgamma(10^6,shape=3,rate=500))
+gamma_narrow = data.frame("gamma" = rgamma(10^6,shape=1,rate=1000))
 
 prior_omega_p = ggplot() + 
   # stat_function(fun = dgamma, args = list(shape = 1, rate = 1000), linewidth = 1) +
@@ -77,17 +80,21 @@ data_list <- list(
 # )
 
 #model <- rstan::stan_model("./PEPI/old/regression.stan")
-model <- rstan::stan_model("/Users/claracanavese/Documents/PEPI/PEPI/regressionODE.stan")
+model <- rstan::stan_model("./regressionODE.stan")
 fit <- rstan::sampling(model, data_list, chains=4, warmup=4000, iter=8000, cores=4)
 # fit1 <- readRDS("./fit_new_ode/ssa - 10/1.2_0.01_0.001_sim4.rds")
 
 fit_g = readRDS("./fit_8/fit_1.5_1.0_0.001_0.01/fit_50.rds")
 fit3 = readRDS("./fit_3/fit_1.2_0.01_0.001/fit_50.rds")
 fit18 = readRDS("./fit_18/fit_1.2_0.01_0.001/fit_50.rds")
+fit100 = readRDS("./fit_100.rds")
+fit100_ric = readRDS("./fit_100_RIC.rds")
+fit100_new = readRDS("./fit_100_new.rds")
+fit100_new_ric = readRDS("./fit_100_new_RIC.rds")
 # fit27 = readRDS("./fit_18/fit_1.2_0.01_0.001/fit_27.rds")
 print(fit, pars = c("lambda_minus", "lambda_plus","rate_minus", "rate_plus", "theta[3]", "theta[4]"), digits_summary = 5)
 print(fit18, digits_summary = 5)
-saveRDS(fit,"./fit_3/fit_1.0_1.5_0.005/fit_2.rds")
+saveRDS(fit,"./fit_100_new.rds")
 
 bayesplot::mcmc_trace(fit, pars = c("lambda_minus", "lambda_plus", "rate_minus", "rate_plus"))
 ggsave("./traceplot_example.png", width = 6, height = 4, dpi = 600)
@@ -120,21 +127,61 @@ pluspred
 minuspred + pluspred
 ggsave("./prediction_example.png", dpi = 600, width = 11, height = 4)
 
-posterior = as.data.frame(fit)
-posterior9 = as.data.frame(fit9)
-posterior18 = as.data.frame(fit_18)
-posterior27 = as.data.frame(fit27)
+posterior_g = as.data.frame(fit_g)
+posterior3 = as.data.frame(fit3)
+posterior18 = as.data.frame(fit18)
+posterior100 = as.data.frame(fit100)
+posterior100_ric = as.data.frame(fit100_ric)
+posterior100_new = as.data.frame(fit100_new)
+posterior100_new_ric = as.data.frame(fit100_new_ric)
 
-posterior_lambda_min = posterior %>% ggplot() + geom_density(aes(x = lambda_minus, y = after_stat(density)), linewidth = 1) + ggtitle("Posterior") + xlim(0,3) + xlab("lambda_minus") + theme(plot.title = element_text(hjust = 0.5)) + 
-  geom_vline(xintercept = 1.2, color = "forestgreen", linewidth = 1) + theme(axis.text = element_text(size = 14), axis.title = element_text(size = 16))
-posterior_lambda_plus = posterior %>% ggplot() + geom_density(aes(x = lambda_plus, y = after_stat(density)), linewidth = 1) + ggtitle("Posterior") + xlim(0,3) + xlab("lambda_plus") + theme(plot.title = element_text(hjust = 0.5)) + 
-  geom_vline(xintercept = 1.2, color = "forestgreen", linewidth = 1) +  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 16))
-# posterior_omega_min = posterior %>% ggplot() + geom_density(aes(x = omega_minus, y = after_stat(density))) + ggtitle("Posterior") + xlim(0,0.03) + xlab("omega_minus") + theme(plot.title = element_text(hjust = 0.5)) + geom_vline(xintercept = 0.01, color = "forestgreen")
-# posterior_omega_plus = posterior %>% ggplot() + geom_density(aes(x = omega_plus, y = after_stat(density))) + ggtitle("Posterior") + xlim(0,0.03) + xlab("omega_plus") + theme(plot.title = element_text(hjust = 0.5)) + geom_vline(xintercept = 0.001, color = "forestgreen")
-posterior_omega_min = posterior %>% ggplot() + geom_density(aes(x = rate_minus, y = after_stat(density)), linewidth = 1) + ggtitle("Posterior") + xlim(0,0.02) + xlab("ratio_minus") + theme(plot.title = element_text(hjust = 0.5)) + 
-  geom_vline(xintercept = 0.01/1.2, color = "forestgreen", linewidth = 1) + theme(axis.text = element_text(size = 14), axis.title = element_text(size = 16))
-posterior_omega_plus = posterior %>% ggplot() + geom_density(aes(x = rate_plus, y = after_stat(density)), linewidth = 1) + ggtitle("Posterior") + xlim(0,0.02) + xlab("ratio_plus") + theme(plot.title = element_text(hjust = 0.5)) + 
-  geom_vline(xintercept = 0.001/1.2, color = "forestgreen", linewidth = 1)+ theme(axis.text = element_text(size = 14), axis.title = element_text(size = 16))
+
+posterior_lambda_min = posterior100_new_ric %>% 
+  ggplot() + 
+  geom_density(aes(x = lambda_minus, y = after_stat(ndensity), color = "Posterior"), linewidth = 1) + 
+  #ggtitle("Posterior") + 
+  xlim(0,3) + xlab("lambda_minus") + 
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  geom_vline(xintercept = 1.2, color = "black", linewidth = 1) + 
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 16), legend.position = "none") +
+  geom_density(data = prior_lambda, aes(x = gamma, y = after_stat(ndensity), color = "Prior"), linewidth = 1) +
+  #stat_function(fun=dgamma, aes(color = "Prior"), args = list(shape = 1200., rate = 1000), linewidth = 1) +
+  scale_color_manual(values = c("#00A5AB","#E64823")) 
+
+posterior_lambda_plus = posterior100_new_ric %>% 
+  ggplot() + 
+  geom_density(aes(x = lambda_plus, y = after_stat(ndensity), color = "Posterior"), linewidth = 1) + 
+  #ggtitle("Posterior VS Prior") + 
+  xlim(0,3) + xlab("lambda_plus") + theme(plot.title = element_text(hjust = 0.5)) + 
+  geom_vline(xintercept = 1.2, color = "black", linewidth = 1) + 
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 16), legend.position = "none") +
+  geom_density(data = prior_lambda, aes(x = gamma, y = after_stat(ndensity), color = "Prior"), linewidth = 1) +
+  #stat_function(fun=dgamma, aes(color = "Prior"), args = list(shape = 2., rate = 1.5), linewidth = 1) +
+  scale_color_manual(values = c("#00A5AB","#E64823")) 
+
+prior_omega_min = data.frame("gamma" = rgamma(10^6,shape=42,rate=5000))
+
+posterior_omega_min = posterior100_new_ric %>% ggplot() + 
+  geom_density(aes(x = rate_minus, y = after_stat(ndensity), color = "Posterior"), linewidth = 1) + 
+  #ggtitle("Posterior") + 
+  xlim(0,0.02) + xlab("ratio_minus") + 
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  geom_vline(xintercept = 0.01/1.2, color = "black", linewidth = 1) + 
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 16), legend.position = "none") +
+  geom_density(data = prior_omega_min, aes(x = gamma, y = after_stat(ndensity), color = "Prior"), linewidth = 1) +
+  scale_color_manual(values = c("#00A5AB","#E64823")) 
+
+prior_omega_plus = data.frame("gamma" = rgamma(10^6,shape=4,rate=5000))
+
+posterior_omega_plus = posterior100_new_ric %>% ggplot() + 
+  geom_density(aes(x = rate_plus, y = after_stat(ndensity), color = "Posterior"), linewidth = 1) + 
+  #ggtitle("Posterior") + 
+  xlim(0,0.02) + xlab("ratio_plus") + 
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  geom_vline(xintercept = 0.001/1.2, color = "black", linewidth = 1) + 
+  theme(axis.text = element_text(size = 14), axis.title = element_text(size = 16), legend.position = "none") +
+  geom_density(data = prior_omega_plus, aes(x = gamma, y = after_stat(ndensity), color = "Prior"), linewidth = 1) +
+  scale_color_manual(values = c("#00A5AB","#E64823")) 
 
 posterior_lambda_plus_3 + posterior_lambda_plus_18
 (posterior_lambda_min_3 + posterior_lambda_plus_3 +posterior_lambda_min_18 + posterior_lambda_plus_18 )/ ( posterior_omega_min_3 + posterior_omega_plus_3+ posterior_omega_min_18 + posterior_omega_plus_18)
@@ -148,9 +195,8 @@ posterior_omega_min / prior_omega
 #ggsave("./GitHub/switching_process/Gillespy2/1.5_1.0_005_001/beta_2_80/omega_minus_posterior.png", width = 12, height = 7, dpi = 600)
 posterior_omega_plus / prior_omega_p
 
-(posterior_lambda_min + posterior_lambda_plus) / (prior_lambda+prior_lambda)
-(posterior_omega_min + posterior_omega_plus) / (prior_omega + prior_omega_p)
-ggsave("./prior_posterior_fixed_lambda.png", width = 8, height = 5, dpi = 600)
+posterior_lambda_min + posterior_lambda_plus + posterior_omega_min + posterior_omega_plus
+ggsave("C:/Users/utente/Desktop/UNI/Tesi/Presentation/prior_posterior_fit100_new_ric.png", width = 8, height = 6, dpi = 600)
 
 (posterior_lambda_min + posterior_lambda_plus) / (posterior_omega_plus + posterior_omega_min) 
 ggsave("./posterior_example.png", dpi = 600, width = 6, height = 5)
